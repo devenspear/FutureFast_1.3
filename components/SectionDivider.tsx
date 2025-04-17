@@ -1,7 +1,12 @@
 import React from "react";
 
 // Props allow flipping the curve and customizing color
-export default function SectionDivider({ flip = false, color = "#111827", gradientId = "gradient1" }) {
+type SectionDividerProps = {
+  flip?: boolean;
+  gradientId?: string;
+};
+
+export default function SectionDivider({ flip = false, gradientId = "gradient1" }: SectionDividerProps) {
   return (
     <div aria-hidden="true" style={{ lineHeight: 0 }}>
       <svg

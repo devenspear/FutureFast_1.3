@@ -10,7 +10,7 @@ export default function HeroSection() {
         <div className="w-full h-full bg-gradient-to-br from-purple-900/40 via-transparent to-indigo-900/30" />
       </div>
       <h1
-        className="relative z-10 text-4xl md:text-6xl font-bold text-white tracking-tight animate-slide-up font-futureTech"
+        className="relative z-10 text-4xl md:text-6xl font-bold text-white tracking-tight animate-slide-up font-orbitron"
       >
         {headline}
       </h1>

@@ -51,6 +51,19 @@ body {
     letter-spacing: 0.03em;
     text-transform: none;
   }
+  /* Animated orb keyframes */
+  .animate-orb1 {
+    animation: orb1move 18s linear infinite alternate;
+  }
+  .animate-orb2 {
+    animation: orb2move 22s linear infinite alternate;
+  }
+  .animate-orb3 {
+    animation: orb3move 25s linear infinite alternate;
+  }
+  .animate-orb4 {
+    animation: orb4move 20s linear infinite alternate;
+  }
 }
 
 @keyframes fadeIn {
@@ -68,4 +81,20 @@ body {
 @keyframes gradientX {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+@keyframes orb1move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(60vw, 10vh) scale(1.1); }
+}
+@keyframes orb2move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-30vw, -10vh) scale(1.2); }
+}
+@keyframes orb3move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-10vw, 20vh) scale(0.9); }
+}
+@keyframes orb4move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(20vw, -20vh) scale(1.05); }
 }

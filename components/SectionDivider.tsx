@@ -1,0 +1,28 @@
+import React from "react";
+
+// Props allow flipping the curve and customizing color
+export default function SectionDivider({ flip = false, color = "#111827", gradientId = "gradient1" }) {
+  return (
+    <div aria-hidden="true" style={{ lineHeight: 0 }}>
+      <svg
+        viewBox="0 0 1440 120"
+        width="100%"
+        height="60"
+        preserveAspectRatio="none"
+        style={{ display: "block", transform: flip ? "rotate(180deg)" : undefined }}
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#a78bfa" />
+            <stop offset="100%" stopColor="#312e81" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M0,0 C480,120 960,0 1440,120 L1440,120 L0,120 Z"
+          fill={`url(#${gradientId})`}
+          opacity="0.9"
+        />
+      </svg>
+    </div>
+  );
+}

@@ -64,6 +64,15 @@ body {
   .animate-orb4 {
     animation: orb4move 20s linear infinite alternate;
   }
+  /* Fix for Tailwind gradient text */
+  .bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .text-transparent {
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
 }
 
 @keyframes fadeIn {

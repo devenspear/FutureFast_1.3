@@ -1,9 +1,21 @@
-// Minimal test page for Vercel troubleshooting
+import HeroSection from "../../components/HeroSection";
+import LibraryGrid from "../../components/LibraryGrid";
+import FeaturedInsight from "../../components/FeaturedInsight";
+import ExponentialTimeline from "../../components/ExponentialTimeline";
+import SubscribeSection from "../../components/SubscribeSection";
+import AboutMe from "../../components/AboutMe";
+import Footer from "../../components/Footer";
 
 export default function Home() {
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'black', color: 'white' }}>
-      <h1>Hello from Vercel minimal test!</h1>
+    <main className="bg-black min-h-screen w-full">
+      <HeroSection />
+      <LibraryGrid />
+      <FeaturedInsight />
+      <ExponentialTimeline />
+      <SubscribeSection />
+      <AboutMe />
+      <Footer />
     </main>
   );
 }

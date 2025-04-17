@@ -10,9 +10,8 @@ export default function AboutMe() {
           <img
             src="/DKS_Future_head.JPG"
             alt="Deven Spear"
-            className="object-cover w-full h-full hidden md:block"
+            className="object-cover w-full h-full"
           />
-          <span className="text-6xl md:text-7xl lg:text-8xl text-white md:hidden">🧑‍💻</span>
         </div>
         {/* Copy block */}
         <div className="flex-1 text-left">

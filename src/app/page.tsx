@@ -6,6 +6,8 @@ import SubscribeSection from "../../components/SubscribeSection";
 import AboutMe from "../../components/AboutMe";
 import Footer from "../../components/Footer";
 
+// Trivial change for Vercel redeploy
+
 export default function Home() {
   return (
     <main className="bg-black min-h-screen w-full">

@@ -59,6 +59,7 @@ const MeshSpeedLines: React.FC = () => {
     canvas.height = height;
 
     function draw() {
+      if (!ctx) return; // Fix: ensure ctx is not null before using
       ctx.clearRect(0, 0, width, height);
       const scrollY = window.scrollY;
       linesRef.current.forEach((line, i) => {

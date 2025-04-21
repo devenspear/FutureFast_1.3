@@ -1,6 +1,16 @@
 import { getPublishedCards } from "../lib/notion";
 
-const PLACEHOLDER_CARDS = [
+// Define a type for the mapped card structure
+interface NotionCard {
+  category: string;
+  title: string;
+  year: string;
+  type: string;
+  summary: string;
+  tag: string;
+}
+
+const PLACEHOLDER_CARDS: NotionCard[] = [
   {
     category: "Category",
     title: "Sample Resource Title",
@@ -52,7 +62,7 @@ const PLACEHOLDER_CARDS = [
 ];
 
 export default async function NotionLibraryGrid() {
-  let cards: any[] = [];
+  let cards: NotionCard[] = [];
   let error = null;
   try {
     cards = await getPublishedCards();
@@ -62,8 +72,8 @@ export default async function NotionLibraryGrid() {
   }
 
   // Map Notion cards to the visual card structure
-  const mappedCards = !error && cards.length
-    ? cards.map((card: any) => ({
+  const mappedCards: NotionCard[] = !error && cards.length
+    ? cards.map((card: any): NotionCard => ({
         category: card.properties.Type?.select?.name || "Category",
         title: card.properties.Name?.title?.[0]?.plain_text || "Untitled",
         year: "2025", // Optionally map from Notion if you add a year property

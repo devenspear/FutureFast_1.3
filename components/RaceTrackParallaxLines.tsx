@@ -9,6 +9,12 @@ const GLOW_COLOR = "rgba(80,200,255,0.28)";
 const NUM_STREAKS = 18;
 const STREAK_COLOR = "rgba(255,255,255,0.22)";
 const STREAK_GLOW = "rgba(80,200,255,0.22)";
+const NUM_BLOBS = 7;
+const BLOB_COLORS = [
+  "rgba(80,200,255,0.15)",
+  "rgba(255,255,255,0.09)",
+  "rgba(80,255,200,0.12)"
+];
 
 const HERO_HEIGHT_FRAC = 0.75; // Hero is 75% of viewport height
 const VANISH_Y_FRAC = 0.33; // Vanishing point at 33% of hero height
@@ -21,6 +27,12 @@ function randomBetween(a: number, b: number) {
   return a + Math.random() * (b - a);
 }
 
+// --- Curve function for exponential lines ---
+function expCurve(t: number, base: number = 3): number {
+  // Exponential curve that starts slow and accelerates
+  return (Math.exp(base * t) - 1) / (Math.exp(base) - 1);
+}
+
 // Define the Streak type for proper typing
 type Streak = {
   delay: number;
@@ -31,10 +43,21 @@ type Streak = {
   alpha: number;
 };
 
+// --- Blob type ---
+type Blob = {
+  frac: number; // horizontal position (0-1)
+  size: number;
+  alpha: number;
+  color: string;
+  speed: number;
+  delay: number;
+};
+
 const RaceTrackParallaxLines: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>(0); // FIX: Provide initial value 0 to useRef<number>()
+  const animationRef = useRef<number>(0); 
   const streaksRef = useRef<Streak[]>([]);
+  const blobsRef = useRef<Blob[]>([]);
 
   // Generate zoom streaks
   useEffect(() => {
@@ -43,13 +66,26 @@ const RaceTrackParallaxLines: React.FC = () => {
       streaks.push({
         frac: randomBetween(0, 1),
         speed: randomBetween(0.008, 0.017),
-        width: randomBetween(2, 4),
+        width: randomBetween(4, 8), 
         length: randomBetween(60, 170),
         alpha: randomBetween(0.25, 0.7),
         delay: randomBetween(0, 900),
       });
     }
     streaksRef.current = streaks;
+    // Generate blobs
+    const blobs: Blob[] = [];
+    for (let i = 0; i < NUM_BLOBS; i++) {
+      blobs.push({
+        frac: randomBetween(0, 1),
+        size: randomBetween(40, 110),
+        alpha: randomBetween(0.13, 0.33),
+        color: BLOB_COLORS[Math.floor(Math.random() * BLOB_COLORS.length)],
+        speed: randomBetween(0.004, 0.009),
+        delay: randomBetween(0, 900),
+      });
+    }
+    blobsRef.current = blobs;
   }, []);
 
   useEffect(() => {
@@ -63,51 +99,56 @@ const RaceTrackParallaxLines: React.FC = () => {
     canvas.height = height;
 
     function draw() {
-      if (!ctx) return; // Fix: ensure ctx is not null before using
+      if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
-      // Vanishing point fixed
       const vanishingX = width / 2;
       const vanishingY = height * VANISH_Y_FRAC + 38;
       const bottomY = height;
       const t = Date.now() / 1800;
-      // Draw converging road lines from left and right edges
+
+      // --- Exponential curved lines (roller coaster style) ---
       for (let i = 0; i < NUM_LINES; i++) {
         const frac = i / (NUM_LINES - 1);
-        // Fan lines from left to right edge
         const baseX = lerp(0, width, frac);
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(baseX, bottomY);
-        // Slight curve for a "road" feel
-        const ctrlY = lerp(bottomY, vanishingY, 0.55);
-        const ctrlX = lerp(baseX, vanishingX, 0.5) + Math.sin(t + i) * 8 * (frac - 0.5);
-        ctx.quadraticCurveTo(ctrlX, ctrlY, vanishingX, vanishingY);
+        // Exponential curve upward to vanishing point
+        for (let j = 0; j <= 40; j++) {
+          const tt = j / 40;
+          // Exponential curve for y, lerp for x
+          const expT = expCurve(tt, 2.7); 
+          const x = lerp(baseX, vanishingX, tt);
+          const y = lerp(bottomY, vanishingY, expT);
+          ctx.lineTo(x, y);
+        }
         ctx.strokeStyle = LINE_COLOR;
-        ctx.lineWidth = LINE_WIDTH;
-        ctx.shadowBlur = 12;
+        ctx.lineWidth = LINE_WIDTH + 1.4 * Math.abs(frac - 0.5); 
+        ctx.shadowBlur = 18;
         ctx.shadowColor = GLOW_COLOR;
-        ctx.globalAlpha = 0.95;
+        ctx.globalAlpha = 0.97;
         ctx.stroke();
         ctx.restore();
       }
-      // Animate zoom streaks
+
+      // --- Animated streaks (lines) ---
       const now = Date.now();
       for (let i = 0; i < streaksRef.current.length; i++) {
         const s = streaksRef.current[i];
-        let prog = ((now + s.delay) * s.speed) % 1.2;
+        // Exponential acceleration toward the center
+        let prog = expCurve(((now + s.delay) * s.speed) % 1.0, 2.7);
         if (prog < 0.01) prog += 0.02 * Math.random();
         const frac = s.frac;
         const baseX = lerp(0, width, frac);
-        const ctrlY = lerp(bottomY, vanishingY, 0.55);
-        const ctrlX = lerp(baseX, vanishingX, 0.5) + Math.sin(t + i) * 8 * (frac - 0.5);
-        // Interpolate along quadratic Bezier
-        function bezier(t: number) {
-          const x = (1-t)*(1-t)*baseX + 2*(1-t)*t*ctrlX + t*t*vanishingX;
-          const y = (1-t)*(1-t)*bottomY + 2*(1-t)*t*ctrlY + t*t*vanishingY;
+        // Exponential curve for y, lerp for x
+        function bezier(tt: number) {
+          const expT = expCurve(tt, 2.7);
+          const x = lerp(baseX, vanishingX, tt);
+          const y = lerp(bottomY, vanishingY, expT);
           return [x, y];
         }
         const [x1, y1] = bezier(prog);
-        const [x2, y2] = bezier(Math.max(0, prog - s.length/height));
+        const [x2, y2] = bezier(Math.max(0, prog - s.length / height));
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(x1, y1);
@@ -115,12 +156,34 @@ const RaceTrackParallaxLines: React.FC = () => {
         ctx.strokeStyle = STREAK_COLOR;
         ctx.lineWidth = s.width;
         ctx.globalAlpha = s.alpha * (1 - prog);
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 18;
         ctx.shadowColor = STREAK_GLOW;
         ctx.stroke();
         ctx.restore();
       }
+
+      // --- Animated blobs ---
+      for (let i = 0; i < blobsRef.current.length; i++) {
+        const b = blobsRef.current[i];
+        let prog = expCurve(((now + b.delay) * b.speed) % 1.0, 2.7);
+        if (prog < 0.01) prog += 0.02 * Math.random();
+        const frac = b.frac;
+        const baseX = lerp(0, width, frac);
+        const expT = expCurve(prog, 2.7);
+        const x = lerp(baseX, vanishingX, prog);
+        const y = lerp(bottomY, vanishingY, expT);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, b.size, 0, 2 * Math.PI);
+        ctx.globalAlpha = b.alpha * (1 - prog);
+        ctx.fillStyle = b.color;
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = b.color;
+        ctx.fill();
+        ctx.restore();
+      }
     }
+
     function animate() {
       draw();
       animationRef.current = requestAnimationFrame(animate);

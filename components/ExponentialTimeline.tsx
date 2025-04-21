@@ -5,7 +5,11 @@ const decades = [2025, 2030, 2040];
 export default function ExponentialTimeline() {
   return (
     <section className="py-16 bg-gray-950 animate-fade-in" id="timeline">
-      <h2 className="text-3xl font-bold text-white mb-8 text-center">Exponential Timeline</h2>
+      <h2
+        className="font-orbitron text-3xl md:text-5xl font-bold text-center mx-auto mb-8 mt-6 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words"
+      >
+        Exponential Timeline
+      </h2>
       <div className="overflow-x-auto">
         <div className="flex space-x-12 min-w-[700px] px-8">
           {decades.map((decade, idx) => (

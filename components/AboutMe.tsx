@@ -3,7 +3,7 @@ import React from 'react';
 export default function AboutMe() {
   return (
     <section className="py-16 bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white" id="about">
-      <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10 px-4 md:px-8">
+      <div className="flex flex-col md:flex-row items-center gap-10 px-4 md:px-8">
         {/* Photo block */}
         <div className="flex-shrink-0 w-40 h-40 rounded-2xl shadow-lg bg-gradient-to-br from-purple-700 to-indigo-900 overflow-hidden flex items-center justify-center">
           {/* Use DKS_Future_head as the headshot */}
@@ -15,7 +15,7 @@ export default function AboutMe() {
         </div>
         {/* Copy block */}
         <div className="flex-1 text-left">
-          <h2 className="text-3xl font-bold mb-2">About Us</h2>
+          <h2 className="font-orbitron text-3xl md:text-5xl font-bold text-center mx-auto mb-8 mt-6 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words">About Us</h2>
           <p className="mb-4 text-purple-200 text-lg">
             Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, he builds ventures that bridge physical and digital worlds.
           </p>

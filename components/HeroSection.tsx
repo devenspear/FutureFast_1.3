@@ -1,8 +1,8 @@
 import React from 'react';
-import MeshSpeedLines from './MeshSpeedLines';
+import RaceTrackParallaxLines from './RaceTrackParallaxLines';
 
 const headline = "Win the Race of Exponential Disruption";
-const subHeadline = "Executive‑level insights on AI, Web3, Robotics & beyond—delivered in minutes, not month";
+const subHeadline = "Executive‑level insights on AI, Web3, Robotics & beyond—delivered in minutes, not months";
 
 // Animated blurred dots for hero section
 function AnimatedOrbs() {
@@ -38,8 +38,8 @@ export default function HeroSection() {
       className="relative flex flex-col items-center justify-center min-h-[60vh] md:min-h-[80vh] w-full overflow-hidden bg-black"
       style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
-      {/* Mesh speed lines background */}
-      <MeshSpeedLines />
+      {/* Race track parallax lines background */}
+      <RaceTrackParallaxLines />
       {/* Overlay for contrast */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent z-10" />
       {/* Animated orbs and content here */}
@@ -47,8 +47,7 @@ export default function HeroSection() {
         {/* Animated blurred dots */}
         <AnimatedOrbs />
         <h1
-          className="relative z-10 text-3xl md:text-6xl font-bold text-white tracking-tight animate-slide-up text-center bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words max-w-xl md:max-w-3xl lg:max-w-4xl"
-          style={{ fontFamily: "var(--font-orbitron), Arial, Helvetica, sans-serif" }}
+          className="font-orbitron relative z-10 text-5xl md:text-7xl font-bold text-white tracking-tight animate-slide-up text-center bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words max-w-2xl md:max-w-4xl lg:max-w-5xl mb-4"
         >
           {headline}
         </h1>

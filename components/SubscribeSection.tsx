@@ -4,7 +4,11 @@ export default function SubscribeSection() {
   return (
     <section className="py-16 bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white text-center px-4" id="about">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-purple-300">Why We Exist</h2>
+        <h2
+          className="font-orbitron text-3xl md:text-5xl font-bold text-center mx-auto mb-8 mt-6 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words"
+        >
+          Why We Exist
+        </h2>
         <p className="mb-10 text-lg md:text-xl text-purple-100 font-medium">
           We’re living in super‑exponential times, yet our brains—and calendars—aren’t wired for that velocity. <span className="text-purple-400 font-bold">FutureFaster.ai</span> exists to bridge that gap for real‑estate owners, entrepreneurs, and small‑business executives who need to make smart bets on AI, Web3, AR/VR, robotics, and other disruptive forces without a PhD in computer science or 20 spare hours a week.
         </p>

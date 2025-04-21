@@ -64,22 +64,26 @@ const MeshSpeedLines: React.FC = () => {
       const scrollY = window.scrollY;
       linesRef.current.forEach((line, i) => {
         // Parallax: lines at greater depth move slower on scroll
-        const parallax = scrollY * (0.12 + 0.13 * line.depth);
+        if (typeof line !== 'object' || line === null || !('depth' in line) || !('yStart' in line) || !('baseOffset' in line)) {
+          return;
+        }
+        const typedLine = line as { depth: number; yStart: number; baseOffset: number };
+        const parallax = scrollY * (0.12 + 0.13 * typedLine.depth);
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(-60, line.yStart + line.baseOffset + Math.sin(Date.now()/1100 + i) * 8 + parallax);
+        ctx.moveTo(-60, typedLine.yStart + typedLine.baseOffset + Math.sin(Date.now()/1100 + i) * 8 + parallax);
         ctx.bezierCurveTo(
-          line.ctrl1[0],
-          line.ctrl1[1] + Math.cos(Date.now()/1200 + i*2) * 18 + parallax * 0.8,
-          line.ctrl2[0],
-          line.ctrl2[1] + Math.sin(Date.now()/1300 + i*3) * 18 + parallax * 0.5,
+          (line as any).ctrl1[0],
+          (line as any).ctrl1[1] + Math.cos(Date.now()/1200 + i*2) * 18 + parallax * 0.8,
+          (line as any).ctrl2[0],
+          (line as any).ctrl2[1] + Math.sin(Date.now()/1300 + i*3) * 18 + parallax * 0.5,
           width + 60,
-          line.yEnd + line.baseOffset + Math.cos(Date.now()/1000 + i) * 8 + parallax
+          (line as any).yEnd + typedLine.baseOffset + Math.cos(Date.now()/1000 + i) * 8 + parallax
         );
-        ctx.strokeStyle = line.color;
-        ctx.lineWidth = line.width + Math.sin(Date.now()/900 + i) * 0.3;
+        ctx.strokeStyle = (line as any).color;
+        ctx.lineWidth = (line as any).width + Math.sin(Date.now()/900 + i) * 0.3;
         ctx.shadowBlur = 4;
-        ctx.shadowColor = line.color;
+        ctx.shadowColor = (line as any).color;
         ctx.globalAlpha = 0.92;
         ctx.stroke();
         ctx.restore();

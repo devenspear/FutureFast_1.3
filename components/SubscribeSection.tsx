@@ -2,24 +2,35 @@ import React from 'react';
 
 export default function SubscribeSection() {
   return (
-    <section className="py-16 bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white text-center" id="subscribe">
-      <h2 className="text-3xl font-bold mb-4">Subscribe to Exponize</h2>
-      <p className="mb-6 text-lg text-purple-200">One email a week. All signal. No noise.</p>
-      {/* Transparent subscribe box with submit button */}
-      <form className="max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-xl p-6 shadow-lg flex flex-col gap-4 border border-purple-400/20">
-        <input
-          type="email"
-          required
-          placeholder="Your email address"
-          className="px-4 py-3 rounded-lg bg-white/40 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
-        />
-        <button
-          type="submit"
-          className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-700 to-indigo-700 text-white font-bold shadow-md hover:from-purple-800 hover:to-indigo-800 transition-all"
-        >
-          Subscribe
-        </button>
-      </form>
+    <section className="py-16 bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white text-center px-4" id="about">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-purple-300">Why We Exist</h2>
+        <p className="mb-10 text-lg md:text-xl text-purple-100 font-medium">
+          We’re living in super‑exponential times, yet our brains—and calendars—aren’t wired for that velocity. <span className="text-purple-400 font-bold">FutureFaster.ai</span> exists to bridge that gap for real‑estate owners, entrepreneurs, and small‑business executives who need to make smart bets on AI, Web3, AR/VR, robotics, and other disruptive forces without a PhD in computer science or 20 spare hours a week.
+        </p>
+        <div className="grid md:grid-cols-2 gap-8 text-left">
+          {/* What We Deliver */}
+          <div className="bg-gray-900/70 rounded-xl p-6 shadow border border-purple-700/20">
+            <h3 className="text-2xl font-bold mb-3 text-cyan-300">What We Deliver</h3>
+            <ul className="list-disc ml-5 space-y-2 text-purple-100">
+              <li><span className="font-semibold text-white">Layered Learning</span> – 60‑second headlines, 3‑minute briefs, and 5‑minute deep dives so you choose the depth you need.</li>
+              <li><span className="font-semibold text-white">Actionable Takeaways</span> – Every piece ends with “What this means for your business” in plain English.</li>
+              <li><span className="font-semibold text-white">Interactive Tools</span> – Self‑scoring “Readiness” dashboards turn curiosity into next‑step checklists.</li>
+              <li><span className="font-semibold text-white">Community & Consulting</span> – When you’re ready for tactical help, our partner network stands by.</li>
+            </ul>
+          </div>
+          {/* How We’re Different */}
+          <div className="bg-gray-900/70 rounded-xl p-6 shadow border border-pink-700/20">
+            <h3 className="text-2xl font-bold mb-3 text-pink-300">How We’re Different</h3>
+            <ul className="list-disc ml-5 space-y-2 text-purple-100">
+              <li><span className="font-semibold text-white">Executive First</span> – Written for decision‑makers, not developers.</li>
+              <li><span className="font-semibold text-white">Neutral Librarian</span> – We curate all credible voices—McKinsey, CB Insights, podcasts, whitepapers—so you don’t have to.</li>
+              <li><span className="font-semibold text-white">Radically Clear</span> – If a ninth‑grader can’t understand it, we rewrite it.</li>
+              <li><span className="font-semibold text-white">Built for Speed</span> – Mobile‑first pages load in under 1 s; summaries read in under 3 min.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

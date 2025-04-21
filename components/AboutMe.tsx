@@ -15,7 +15,7 @@ export default function AboutMe() {
         </div>
         {/* Copy block */}
         <div className="flex-1 text-left">
-          <h2 className="text-3xl font-bold mb-2">Deven Spear</h2>
+          <h2 className="text-3xl font-bold mb-2">About Us</h2>
           <p className="mb-4 text-purple-200 text-lg">
             Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, he builds ventures that bridge physical and digital worlds.
           </p>

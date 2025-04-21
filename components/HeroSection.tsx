@@ -1,6 +1,7 @@
 import React from 'react';
 
-const headline = "Mapping the Curve of Exponential Disruption";
+const headline = "Win the Race of Exponential Disruption";
+const subHeadline = "Executive‑level insights on AI, Web3, Robotics & beyond—delivered in minutes, not month";
 
 // Animated blurred dots for hero section
 function AnimatedOrbs() {
@@ -41,19 +42,19 @@ export default function HeroSection() {
       {/* Overlay for contrast */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent z-10" />
       {/* Animated orbs and content here */}
-      <div className="relative z-20 flex flex-col items-center justify-center h-full w-full">
+      <div className="relative z-20 flex flex-col items-center justify-center h-full w-full px-4">
         {/* Animated blurred dots */}
         <AnimatedOrbs />
         <h1
-          className="relative z-10 text-4xl md:text-6xl font-bold text-white tracking-tight animate-slide-up text-center bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent"
+          className="relative z-10 text-3xl md:text-6xl font-bold text-white tracking-tight animate-slide-up text-center bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words max-w-xl md:max-w-3xl lg:max-w-4xl"
           style={{ fontFamily: "var(--font-orbitron), Arial, Helvetica, sans-serif" }}
         >
           {headline}
         </h1>
         <p
-          className="relative z-10 mt-4 text-lg md:text-2xl text-purple-200 font-futureTech animate-typewriter border-r-2 border-purple-200 pr-2 text-center"
+          className="relative z-10 mt-4 text-base md:text-2xl text-purple-200 font-futureTech animate-typewriter border-r-2 border-purple-200 pr-2 text-center break-words max-w-md md:max-w-2xl lg:max-w-3xl"
         >
-          Charting the future, one breakthrough at a time.
+          {subHeadline}
         </p>
       </div>
     </section>

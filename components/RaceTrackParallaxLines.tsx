@@ -142,7 +142,7 @@ const RaceTrackParallaxLines: React.FC = () => {
         }
         // Main line on top
         ctx.beginPath();
-        let [x0, y0] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, 0);
+        const [x0, y0] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, 0);
         ctx.moveTo(x0, y0);
         for (let j = 1; j <= 50; j++) {
           const t = j / 50;
@@ -194,7 +194,7 @@ const RaceTrackParallaxLines: React.FC = () => {
         let progLin = ((now + car.delay) * car.speed) % 1.0;
         if (progLin < 0.01) progLin += 0.02 * Math.random();
         // Steep ease: slow at start, fast at top
-        let prog = Math.pow(progLin, 2.5);
+        const prog = Math.pow(progLin, 2.5);
         const frac = car.trackFrac;
         const baseX = lerp(0, width, frac);
         // Follow the convex arc

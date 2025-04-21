@@ -53,6 +53,7 @@ const RaceTrackParallaxLines: React.FC = () => {
     canvas.height = height;
 
     function draw() {
+      if (!ctx) return; // Fix: ensure ctx is not null before using
       ctx.clearRect(0, 0, width, height);
       // Vanishing point fixed
       const vanishingX = width / 2;

@@ -17,7 +17,7 @@ const BLOB_COLORS = [
 ];
 
 const HERO_HEIGHT_FRAC = 0.75; // Hero is 75% of viewport height
-const VANISH_Y_FRAC = 0.33; // Vanishing point at 33% of hero height
+const VANISH_Y_FRAC = 0; // Vanishing point at the very top
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -43,21 +43,22 @@ type Streak = {
   alpha: number;
 };
 
-// --- Blob type ---
-type Blob = {
-  frac: number; // horizontal position (0-1)
+// --- MonorailCar type ---
+type MonorailCar = {
+  trackFrac: number; // which main line/track this car rides (0-1)
   size: number;
   alpha: number;
   color: string;
   speed: number;
   delay: number;
+  windowColor: string;
 };
 
 const RaceTrackParallaxLines: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0); 
   const streaksRef = useRef<Streak[]>([]);
-  const blobsRef = useRef<Blob[]>([]);
+  const carsRef = useRef<MonorailCar[]>([]);
 
   // Generate zoom streaks
   useEffect(() => {
@@ -65,7 +66,7 @@ const RaceTrackParallaxLines: React.FC = () => {
     for (let i = 0; i < NUM_STREAKS; i++) {
       streaks.push({
         frac: randomBetween(0, 1),
-        speed: randomBetween(0.008, 0.017),
+        speed: randomBetween(0.003, 0.007), // SLOWER animation for streaks
         width: randomBetween(4, 8), 
         length: randomBetween(60, 170),
         alpha: randomBetween(0.25, 0.7),
@@ -73,19 +74,21 @@ const RaceTrackParallaxLines: React.FC = () => {
       });
     }
     streaksRef.current = streaks;
-    // Generate blobs
-    const blobs: Blob[] = [];
+    // Generate monorail cars
+    const cars: MonorailCar[] = [];
     for (let i = 0; i < NUM_BLOBS; i++) {
-      blobs.push({
-        frac: randomBetween(0, 1),
-        size: randomBetween(40, 110),
-        alpha: randomBetween(0.13, 0.33),
+      const frac = randomBetween(0, 1);
+      cars.push({
+        trackFrac: frac,
+        size: randomBetween(42, 90),
+        alpha: randomBetween(0.18, 0.33),
         color: BLOB_COLORS[Math.floor(Math.random() * BLOB_COLORS.length)],
-        speed: randomBetween(0.004, 0.009),
+        speed: randomBetween(0.0015, 0.004),
         delay: randomBetween(0, 900),
+        windowColor: 'rgba(255,255,255,0.42)',
       });
     }
-    blobsRef.current = blobs;
+    carsRef.current = cars;
   }, []);
 
   useEffect(() => {
@@ -102,7 +105,7 @@ const RaceTrackParallaxLines: React.FC = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
       const vanishingX = width / 2;
-      const vanishingY = height * VANISH_Y_FRAC + 38;
+      const vanishingY = height * VANISH_Y_FRAC;
       const bottomY = height;
       const t = Date.now() / 1800;
 
@@ -162,23 +165,48 @@ const RaceTrackParallaxLines: React.FC = () => {
         ctx.restore();
       }
 
-      // --- Animated blobs ---
-      for (let i = 0; i < blobsRef.current.length; i++) {
-        const b = blobsRef.current[i];
-        let prog = expCurve(((now + b.delay) * b.speed) % 1.0, 2.7);
+      // --- Animated monorail cars ---
+      for (let i = 0; i < carsRef.current.length; i++) {
+        const car = carsRef.current[i];
+        let prog = expCurve(((now + car.delay) * car.speed) % 1.0, 2.7);
         if (prog < 0.01) prog += 0.02 * Math.random();
-        const frac = b.frac;
+        const frac = car.trackFrac;
         const baseX = lerp(0, width, frac);
-        const expT = expCurve(prog, 2.7);
-        const x = lerp(baseX, vanishingX, prog);
-        const y = lerp(bottomY, vanishingY, expT);
+        // --- Calculate position and tangent for the car ---
+        function curvePos(tt: number) {
+          const expT = expCurve(tt, 2.7);
+          const x = lerp(baseX, vanishingX, tt);
+          const y = lerp(bottomY, vanishingY, expT);
+          return [x, y];
+        }
+        // Position
+        const [x, y] = curvePos(prog);
+        // Tangent (direction)
+        const [x2, y2] = curvePos(Math.min(1, prog + 0.01));
+        const angle = Math.atan2(y2 - y, x2 - x);
+        // --- Draw monorail car ---
+        const carLen = car.size * 2.8;
+        const carWid = car.size * 0.72;
         ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
         ctx.beginPath();
-        ctx.arc(x, y, b.size, 0, 2 * Math.PI);
-        ctx.globalAlpha = b.alpha * (1 - prog);
-        ctx.fillStyle = b.color;
+        // Capsule body
+        ctx.moveTo(-carLen / 2 + carWid / 2, -carWid / 2);
+        ctx.arc(-carLen / 2 + carWid / 2, 0, carWid / 2, -Math.PI / 2, Math.PI / 2, true);
+        ctx.lineTo(carLen / 2 - carWid / 2, carWid / 2);
+        ctx.arc(carLen / 2 - carWid / 2, 0, carWid / 2, Math.PI / 2, -Math.PI / 2, true);
+        ctx.closePath();
+        ctx.globalAlpha = car.alpha * (1 - prog);
+        ctx.fillStyle = car.color;
         ctx.shadowBlur = 18;
-        ctx.shadowColor = b.color;
+        ctx.shadowColor = car.color;
+        ctx.fill();
+        // Window
+        ctx.globalAlpha = car.alpha * 0.7 * (1 - prog);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, carLen * 0.36, carWid * 0.32, 0, 0, 2 * Math.PI);
+        ctx.fillStyle = car.windowColor;
         ctx.fill();
         ctx.restore();
       }

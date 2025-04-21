@@ -130,6 +130,7 @@ const RaceTrackParallaxLines: React.FC = () => {
     function handleResize() {
       width = window.innerWidth;
       height = window.innerHeight * HERO_HEIGHT_FRAC;
+      if (!canvas) return;
       canvas.width = width;
       canvas.height = height;
     }

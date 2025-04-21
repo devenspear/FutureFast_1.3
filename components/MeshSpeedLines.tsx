@@ -55,6 +55,7 @@ const MeshSpeedLines: React.FC = () => {
     if (!ctx) return;
     let width = window.innerWidth;
     let height = window.innerHeight * 0.9;
+    if (!canvas) return; // Fix: ensure canvas is not null before setting width/height
     canvas.width = width;
     canvas.height = height;
 
@@ -108,6 +109,7 @@ const MeshSpeedLines: React.FC = () => {
     function handleResize() {
       width = window.innerWidth;
       height = window.innerHeight * 0.9;
+      if (!canvas) return; // Fix: ensure canvas is not null before setting width/height
       canvas.width = width;
       canvas.height = height;
     }

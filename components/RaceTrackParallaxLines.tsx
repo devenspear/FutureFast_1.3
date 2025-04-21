@@ -107,7 +107,6 @@ const RaceTrackParallaxLines: React.FC = () => {
       const vanishingX = width / 2;
       const vanishingY = height * VANISH_Y_FRAC;
       const bottomY = height;
-      const t = Date.now() / 1800;
 
       // --- Exponential curved lines (roller coaster style) ---
       for (let i = 0; i < NUM_LINES; i++) {

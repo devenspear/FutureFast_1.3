@@ -1,4 +1,5 @@
 import { getPublishedCards } from "../lib/notion";
+import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 // Define a type for the mapped card structure
 interface NotionCard {
@@ -62,24 +63,24 @@ const PLACEHOLDER_CARDS: NotionCard[] = [
 ];
 
 export default async function NotionLibraryGrid() {
-  let cards: NotionCard[] = [];
+  let cards: PageObjectResponse[] = [];
   let error = null;
   try {
-    cards = await getPublishedCards();
-  } catch (err: any) {
-    error = err?.message || String(err);
+    cards = (await getPublishedCards()) as PageObjectResponse[];
+  } catch (err: unknown) {
+    error = (err as Error)?.message || String(err);
     console.error("Notion fetch error:", err);
   }
 
   // Map Notion cards to the visual card structure
   const mappedCards: NotionCard[] = !error && cards.length
-    ? cards.map((card: any): NotionCard => ({
-        category: card.properties.Type?.select?.name || "Category",
-        title: card.properties.Name?.title?.[0]?.plain_text || "Untitled",
+    ? cards.map((card: PageObjectResponse): NotionCard => ({
+        category: (card.properties as any).Type?.select?.name || "Category",
+        title: (card.properties as any).Name?.title?.[0]?.plain_text || "Untitled",
         year: "2025", // Optionally map from Notion if you add a year property
-        type: card.properties.Type?.select?.name || "Type",
-        summary: card.properties.Summary?.rich_text?.[0]?.plain_text || "",
-        tag: card.properties.Tags?.multi_select?.[0]?.name || "Tag"
+        type: (card.properties as any).Type?.select?.name || "Type",
+        summary: (card.properties as any).Summary?.rich_text?.[0]?.plain_text || "",
+        tag: (card.properties as any).Tags?.multi_select?.[0]?.name || "Tag"
       }))
     : PLACEHOLDER_CARDS;
 

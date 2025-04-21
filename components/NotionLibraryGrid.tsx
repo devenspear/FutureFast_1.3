@@ -11,6 +11,14 @@ interface NotionCard {
   tag: string;
 }
 
+// Custom type for Notion properties
+interface NotionCardProperties {
+  Type?: { select?: { name?: string } };
+  Name?: { title?: { plain_text?: string }[] };
+  Summary?: { rich_text?: { plain_text?: string }[] };
+  Tags?: { multi_select?: { name?: string }[] };
+}
+
 const PLACEHOLDER_CARDS: NotionCard[] = [
   {
     category: "Category",
@@ -74,14 +82,17 @@ export default async function NotionLibraryGrid() {
 
   // Map Notion cards to the visual card structure
   const mappedCards: NotionCard[] = !error && cards.length
-    ? cards.map((card: PageObjectResponse): NotionCard => ({
-        category: (card.properties as any).Type?.select?.name || "Category",
-        title: (card.properties as any).Name?.title?.[0]?.plain_text || "Untitled",
-        year: "2025", // Optionally map from Notion if you add a year property
-        type: (card.properties as any).Type?.select?.name || "Type",
-        summary: (card.properties as any).Summary?.rich_text?.[0]?.plain_text || "",
-        tag: (card.properties as any).Tags?.multi_select?.[0]?.name || "Tag"
-      }))
+    ? cards.map((card: PageObjectResponse): NotionCard => {
+        const properties = card.properties as unknown as NotionCardProperties;
+        return {
+          category: properties.Type?.select?.name || "Category",
+          title: properties.Name?.title?.[0]?.plain_text || "Untitled",
+          year: "2025",
+          type: properties.Type?.select?.name || "Type",
+          summary: properties.Summary?.rich_text?.[0]?.plain_text || "",
+          tag: properties.Tags?.multi_select?.[0]?.name || "Tag"
+        };
+      })
     : PLACEHOLDER_CARDS;
 
   return (

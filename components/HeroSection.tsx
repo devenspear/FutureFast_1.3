@@ -1,4 +1,5 @@
 import React from 'react';
+import MeshSpeedLines from './MeshSpeedLines';
 
 const headline = "Win the Race of Exponential Disruption";
 const subHeadline = "Executive‑level insights on AI, Web3, Robotics & beyond—delivered in minutes, not month";
@@ -31,14 +32,14 @@ function AnimatedOrbs() {
   );
 }
 
-const backgroundImage = '/expoCurve_back2.jpg';
-
 export default function HeroSection() {
   return (
     <section
       className="relative flex flex-col items-center justify-center min-h-[60vh] md:min-h-[80vh] w-full overflow-hidden bg-black"
-      style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
+      {/* Mesh speed lines background */}
+      <MeshSpeedLines />
       {/* Overlay for contrast */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent z-10" />
       {/* Animated orbs and content here */}

@@ -23,7 +23,7 @@ function randomBetween(a: number, b: number) {
 
 const RaceTrackParallaxLines: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(0); // FIX: Provide initial value 0 to useRef<number>()
   const streaksRef = useRef<unknown[]>([]);
 
   // Generate zoom streaks

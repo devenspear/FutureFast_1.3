@@ -20,7 +20,7 @@ function randomBetween(a: number, b: number) {
 const MeshSpeedLines: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const linesRef = useRef<unknown[]>([]);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(0);
 
   // Generate mesh lines
   useEffect(() => {

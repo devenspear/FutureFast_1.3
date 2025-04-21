@@ -97,7 +97,7 @@ export default async function NotionLibraryGrid() {
 
   return (
     <section className="w-full py-8">
-      <h2 className="font-orbitron text-3xl md:text-5xl font-bold text-center mx-auto mb-8 mt-6 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words">Curated Library</h2>
+      <h2 className="font-orbitron text-3xl md:text-5xl font-bold text-center mx-auto mb-8 mt-6 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words">Resource Library</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {mappedCards.map((card, idx) => (
           <div key={idx} className="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">

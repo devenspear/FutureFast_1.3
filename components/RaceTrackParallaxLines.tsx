@@ -3,9 +3,9 @@ import React, { useRef, useEffect } from "react";
 
 // Settings
 const NUM_LINES = 16;
-const LINE_COLOR = "rgba(80,200,255,0.18)";
+const LINE_COLOR = "rgba(80,220,255,0.65)";
 const LINE_WIDTH = 2.2;
-const GLOW_COLOR = "rgba(80,200,255,0.28)";
+const GLOW_COLOR = "rgba(80,220,255,0.45)";
 const NUM_STREAKS = 18;
 const STREAK_COLOR = "rgba(255,255,255,0.22)";
 const STREAK_GLOW = "rgba(80,200,255,0.22)";
@@ -108,26 +108,50 @@ const RaceTrackParallaxLines: React.FC = () => {
       const vanishingY = height * VANISH_Y_FRAC;
       const bottomY = height;
 
-      // --- Exponential curved lines (roller coaster style) ---
+      // --- Outward-bowing (convex) rollercoaster curve ---
+      function convexRollercoasterCurve(baseX: number, vanishingX: number, bottomY: number, vanishingY: number, frac: number, t: number) {
+        // X: smoothly interpolate from baseX to vanishingX
+        const x = lerp(baseX, vanishingX, Math.pow(t, 1.18));
+        // Y: convex arc (ease-out, stays low then shoots up)
+        const y = lerp(bottomY, vanishingY, Math.pow(t, 2.2));
+        return [x, y];
+      }
+
+      // Draw convex rollercoaster lines with glow
       for (let i = 0; i < NUM_LINES; i++) {
         const frac = i / (NUM_LINES - 1);
         const baseX = lerp(0, width, frac);
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(baseX, bottomY);
-        // Exponential curve upward to vanishing point
-        for (let j = 0; j <= 40; j++) {
-          const tt = j / 40;
-          // Exponential curve for y, lerp for x
-          const expT = expCurve(tt, 2.7); 
-          const x = lerp(baseX, vanishingX, tt);
-          const y = lerp(bottomY, vanishingY, expT);
+        let prev = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, 0);
+        for (let j = 1; j <= 50; j++) {
+          const t = j / 50;
+          const curr = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, t);
+          ctx.moveTo(prev[0], prev[1]);
+          ctx.lineTo(curr[0], curr[1]);
+          // Glow for each segment
+          ctx.save();
+          ctx.strokeStyle = GLOW_COLOR;
+          ctx.lineWidth = (LINE_WIDTH + 2.7 * Math.abs(frac - 0.5));
+          ctx.shadowBlur = 16;
+          ctx.shadowColor = GLOW_COLOR;
+          ctx.globalAlpha = 0.4;
+          ctx.stroke();
+          ctx.restore();
+          prev = curr;
+        }
+        // Main line on top
+        ctx.beginPath();
+        let [x0, y0] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, 0);
+        ctx.moveTo(x0, y0);
+        for (let j = 1; j <= 50; j++) {
+          const t = j / 50;
+          const [x, y] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, t);
           ctx.lineTo(x, y);
         }
         ctx.strokeStyle = LINE_COLOR;
-        ctx.lineWidth = LINE_WIDTH + 1.4 * Math.abs(frac - 0.5); 
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = GLOW_COLOR;
+        ctx.lineWidth = LINE_WIDTH + 1.4 * Math.abs(frac - 0.5);
+        ctx.shadowBlur = 0;
         ctx.globalAlpha = 0.97;
         ctx.stroke();
         ctx.restore();
@@ -164,47 +188,40 @@ const RaceTrackParallaxLines: React.FC = () => {
         ctx.restore();
       }
 
-      // --- Animated monorail cars ---
+      // --- Animated blobs follow the convex arc, are smaller, and visible to the end ---
       for (let i = 0; i < carsRef.current.length; i++) {
         const car = carsRef.current[i];
-        let prog = expCurve(((now + car.delay) * car.speed) % 1.0, 2.7);
-        if (prog < 0.01) prog += 0.02 * Math.random();
+        let progLin = ((now + car.delay) * car.speed) % 1.0;
+        if (progLin < 0.01) progLin += 0.02 * Math.random();
+        // Steep ease: slow at start, fast at top
+        let prog = Math.pow(progLin, 2.5);
         const frac = car.trackFrac;
         const baseX = lerp(0, width, frac);
-        // --- Calculate position and tangent for the car ---
-        function curvePos(tt: number) {
-          const expT = expCurve(tt, 2.7);
-          const x = lerp(baseX, vanishingX, tt);
-          const y = lerp(bottomY, vanishingY, expT);
-          return [x, y];
-        }
-        // Position
-        const [x, y] = curvePos(prog);
-        // Tangent (direction)
-        const [x2, y2] = curvePos(Math.min(1, prog + 0.01));
+        // Follow the convex arc
+        const [x, y] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, prog);
+        const [x2, y2] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, Math.min(1, prog + 0.01));
         const angle = Math.atan2(y2 - y, x2 - x);
-        // --- Draw monorail car ---
-        const carLen = car.size * 2.8;
-        const carWid = car.size * 0.72;
+        // 60% smaller overall, visible to the end
+        const scale = lerp(0.4, 0.11, prog); // base is 0.4 (60% smaller), shrinks to 0.11
+        const alpha = car.alpha * (1 - 0.7 * prog); // fades a bit, but visible at top
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(angle);
+        ctx.scale(scale, scale);
         ctx.beginPath();
-        // Capsule body
-        ctx.moveTo(-carLen / 2 + carWid / 2, -carWid / 2);
-        ctx.arc(-carLen / 2 + carWid / 2, 0, carWid / 2, -Math.PI / 2, Math.PI / 2, true);
-        ctx.lineTo(carLen / 2 - carWid / 2, carWid / 2);
-        ctx.arc(carLen / 2 - carWid / 2, 0, carWid / 2, Math.PI / 2, -Math.PI / 2, true);
+        ctx.moveTo(-car.size * 1.4 + car.size * 0.36, -car.size * 0.36);
+        ctx.arc(-car.size * 1.4 + car.size * 0.36, 0, car.size * 0.36, -Math.PI / 2, Math.PI / 2, true);
+        ctx.lineTo(car.size * 1.4 - car.size * 0.36, car.size * 0.36);
+        ctx.arc(car.size * 1.4 - car.size * 0.36, 0, car.size * 0.36, Math.PI / 2, -Math.PI / 2, true);
         ctx.closePath();
-        ctx.globalAlpha = car.alpha * (1 - prog);
+        ctx.globalAlpha = alpha;
         ctx.fillStyle = car.color;
-        ctx.shadowBlur = 18;
+        ctx.shadowBlur = 15;
         ctx.shadowColor = car.color;
         ctx.fill();
-        // Window
-        ctx.globalAlpha = car.alpha * 0.7 * (1 - prog);
+        ctx.globalAlpha = alpha * 0.7;
         ctx.beginPath();
-        ctx.ellipse(0, 0, carLen * 0.36, carWid * 0.32, 0, 0, 2 * Math.PI);
+        ctx.ellipse(0, 0, car.size * 0.7, car.size * 0.45, 0, 0, 2 * Math.PI);
         ctx.fillStyle = car.windowColor;
         ctx.fill();
         ctx.restore();

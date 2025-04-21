@@ -21,14 +21,24 @@ function randomBetween(a: number, b: number) {
   return a + Math.random() * (b - a);
 }
 
+// Define the Streak type for proper typing
+type Streak = {
+  delay: number;
+  speed: number;
+  frac: number;
+  length: number;
+  width: number;
+  alpha: number;
+};
+
 const RaceTrackParallaxLines: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0); // FIX: Provide initial value 0 to useRef<number>()
-  const streaksRef = useRef<unknown[]>([]);
+  const streaksRef = useRef<Streak[]>([]);
 
   // Generate zoom streaks
   useEffect(() => {
-    const streaks = [];
+    const streaks: Streak[] = [];
     for (let i = 0; i < NUM_STREAKS; i++) {
       streaks.push({
         frac: randomBetween(0, 1),

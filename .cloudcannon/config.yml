@@ -1,0 +1,34 @@
+collections:
+  catalog:
+    path: "content/catalog"
+    output: true
+    fields:
+      title: { type: text }
+      description: { type: textarea }
+      year: { type: text }
+      type: { type: text }
+      tag: { type: text }
+      image: { type: text }
+      body: { type: markdown }
+  posts:
+    path: "content/posts"
+    output: true
+    fields:
+      title: { type: text }
+      date: { type: datetime }
+      tag: { type: text }
+      body: { type: markdown }
+  sections:
+    path: "content/sections"
+    output: true
+    fields:
+      headline: { type: text }
+      subheadline: { type: text }
+      body: { type: markdown }
+  site:
+    path: "content/site"
+    output: true
+    fields:
+      site_title: { type: text }
+      footer_text: { type: text }
+      navigation: { type: list, items: { label: text, url: text } }

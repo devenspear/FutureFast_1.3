@@ -1,0 +1,20 @@
+collections_config:
+  catalog:
+    path: content/catalog
+    name: Catalog
+    icon: ballot
+  sections:
+    path: content/sections
+    name: Sections
+    icon: directions
+  site:
+    path: content/site
+    name: Site
+    icon: gite
+paths:
+  static: ''
+  uploads: uploads
+timezone: America/New_York
+markdown:
+  engine: commonmark
+  options: {}

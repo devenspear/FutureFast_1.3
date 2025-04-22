@@ -52,7 +52,7 @@ export default function HeroSection() {
           {headline}
         </h1>
         <p
-          className="relative z-10 mt-4 text-base md:text-2xl text-purple-200 font-futureTech animate-typewriter border-r-2 border-purple-200 pr-2 text-center break-words max-w-md md:max-w-2xl lg:max-w-3xl"
+          className="relative z-10 mt-4 text-base md:text-2xl text-purple-200 font-futureTech animate-typewriter border-r-2 border-purple-200 pr-2 text-center break-words max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-3xl whitespace-pre-line"
         >
           {subHeadline}
         </p>

@@ -1,5 +1,5 @@
 import { getPublishedCards } from "../lib/notion";
-import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type { PageObjectResponse } from "@notionhq/client";
 
 // Define a type for the mapped card structure
 interface NotionCard {

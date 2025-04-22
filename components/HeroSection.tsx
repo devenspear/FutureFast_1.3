@@ -1,8 +1,8 @@
 import React from 'react';
 import RaceTrackParallaxLines from './RaceTrackParallaxLines';
+import { getHeroContent } from './HeroSectionContent';
 
-const headline = "Win the Race of Exponential Disruption";
-const subHeadline = "Executive‑level insights on AI, Web3, Robotics & beyond—delivered in minutes, not months";
+const { headline, subheadline } = getHeroContent();
 
 // Animated blurred dots for hero section
 function AnimatedOrbs() {
@@ -52,9 +52,9 @@ export default function HeroSection() {
           {headline}
         </h1>
         <p
-          className="relative z-10 mt-4 text-base md:text-2xl text-purple-200 font-futureTech animate-typewriter border-r-2 border-purple-200 pr-2 text-center break-words max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-3xl whitespace-pre-line"
+          className="relative z-10 mt-4 text-base md:text-2xl text-purple-200 font-futureTech animate-typewriter border-r-2 border-purple-200 pr-2 text-center break-words max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl whitespace-pre-line"
         >
-          {subHeadline}
+          {subheadline}
         </p>
       </div>
     </section>

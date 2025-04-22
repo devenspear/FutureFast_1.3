@@ -39,10 +39,10 @@ export default function LibraryGrid() {
         {cards.map((card, idx) => (
           <div key={idx} className="bg-gray-900 rounded-xl p-6 shadow-lg flex flex-col justify-between min-h-[220px]">
             <div>
-              <div className="text-xs font-bold uppercase mb-1 text-purple-300">
-                {card.tag}
-              </div>
               <h3 className="text-xl font-bold mb-2 text-white">{card.title}</h3>
+              <span className="inline-block bg-purple-800 text-purple-100 px-3 py-1 rounded text-xs font-semibold mb-2">
+                {card.tag}
+              </span>
               <div className="text-gray-400 text-sm mb-1">
                 {card.year} • {card.type}
               </div>

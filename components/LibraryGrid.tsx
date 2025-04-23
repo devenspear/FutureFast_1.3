@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import React from 'react';
+import ResourceCard from './ResourceCard';
+import ResourceDetailModal from './ResourceDetailModal';
 
 interface Card {
   title: string;
@@ -11,6 +13,7 @@ interface Card {
   tag: string;
   image?: string;
   body?: string;
+  url?: string;
 }
 
 function getCards(): Card[] {
@@ -30,6 +33,8 @@ function getCards(): Card[] {
 
 export default function LibraryGrid() {
   const cards = getCards();
+  const [selected, setSelected] = useState<Card | null>(null);
+
   return (
     <section className="py-16 px-4 max-w-7xl mx-auto" id="resource-library">
       <h2 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-10 bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent">
@@ -37,24 +42,10 @@ export default function LibraryGrid() {
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((card, idx) => (
-          <div key={idx} className="bg-gray-900 rounded-xl p-6 shadow-lg flex flex-col justify-between min-h-[220px]">
-            <div>
-              <h3 className="text-xl font-bold mb-2 text-white">{card.title}</h3>
-              <span className="inline-block bg-purple-800 text-purple-100 px-3 py-1 rounded text-xs font-semibold mb-2">
-                {card.tag}
-              </span>
-              <div className="text-gray-400 text-sm mb-1">
-                {card.year} • {card.type}
-              </div>
-              <p className="text-gray-300 mb-4">{card.description}</p>
-              {card.image && (
-                <img src={card.image} alt={card.title} className="w-full rounded-lg mb-2" />
-              )}
-            </div>
-            {card.body && <div className="text-gray-400 text-xs mt-2">{card.body.substring(0, 120)}...</div>}
-          </div>
+          <ResourceCard key={idx} card={card} onClick={() => setSelected(card)} />
         ))}
       </div>
+      <ResourceDetailModal card={selected} onClose={() => setSelected(null)} />
     </section>
   );
 }

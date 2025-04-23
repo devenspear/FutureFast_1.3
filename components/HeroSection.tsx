@@ -1,8 +1,5 @@
 import React from 'react';
 import RaceTrackParallaxLines from './RaceTrackParallaxLines';
-import { getHeroContent } from './HeroSectionContent';
-
-const { headline, subheadline } = getHeroContent();
 
 export default function HeroSection() {
   return (

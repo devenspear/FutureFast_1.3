@@ -16,16 +16,16 @@ export default function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent z-10" />
       {/* Animated content here */}
       <div className="relative z-20 flex flex-col items-center justify-center h-full w-full px-4">
-        <h1
-          className="font-orbitron relative z-10 text-5xl md:text-7xl font-bold text-white tracking-tight animate-slide-up text-center bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent break-words max-w-2xl md:max-w-4xl lg:max-w-5xl mb-4"
-        >
-          {headline}
-        </h1>
-        <p
-          className="relative z-10 mt-4 text-base md:text-2xl text-purple-200 font-futureTech animate-typewriter border-r-2 border-purple-200 pr-2 text-center break-words max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl whitespace-pre-line"
-        >
-          {subheadline}
-        </p>
+        <div className="text-center mb-2">
+          <h1 className="font-orbitron text-6xl md:text-8xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg animate-slide-up">
+            Win the Race of <br className="hidden md:inline" />Exponential Disruption
+          </h1>
+        </div>
+        <div className="mt-6 flex justify-center">
+          <span className="font-orbitron text-lg md:text-2xl px-6 py-3 rounded-xl bg-black/60 border border-cyan-400 shadow-lg text-cyan-200 tracking-wide animate-fade-in backdrop-blur-sm">
+            Executive-level insights on AI, Web3, Robotics & more
+          </span>
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 import React from "react";
+import type { Card } from './LibraryGrid.server';
 
-export default function ResourceDetailModal({ card, onClose }: { card: any, onClose: () => void }) {
+export default function ResourceDetailModal({ card, onClose }: { card: Card|null, onClose: () => void }) {
   if (!card) return null;
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
@@ -13,6 +14,7 @@ export default function ResourceDetailModal({ card, onClose }: { card: any, onCl
           ×
         </button>
         {card.image && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={card.image} alt={card.title} className="w-full rounded-xl mb-4 shadow" />
         )}
         <h2 className="text-3xl font-bold text-cyan-300 mb-2">{card.title}</h2>

@@ -1,6 +1,7 @@
 import React from "react";
+import type { Card } from './LibraryGrid.server';
 
-export default function ResourceCard({ card, onClick }: { card: any, onClick: () => void }) {
+export default function ResourceCard({ card, onClick }: { card: Card, onClick: () => void }) {
   return (
     <div
       className="bg-gray-900 rounded-xl p-6 shadow-lg cursor-pointer hover:shadow-2xl hover:ring-2 hover:ring-cyan-400 transition"
@@ -19,6 +20,7 @@ export default function ResourceCard({ card, onClick }: { card: any, onClick: ()
       </div>
       <p className="text-gray-300 mb-4">{card.description}</p>
       {card.image && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={card.image} alt={card.title} className="w-full rounded-lg mb-2" />
       )}
     </div>

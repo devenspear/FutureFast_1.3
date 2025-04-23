@@ -22,22 +22,6 @@ function randomBetween(a: number, b: number) {
   return a + Math.random() * (b - a);
 }
 
-// --- Curve function for exponential lines ---
-function expCurve(t: number, base: number = 3): number {
-  // Exponential curve that starts slow and accelerates
-  return (Math.exp(base * t) - 1) / (Math.exp(base) - 1);
-}
-
-// Define the Streak type for proper typing
-type Streak = {
-  delay: number;
-  speed: number;
-  frac: number;
-  length: number;
-  width: number;
-  alpha: number;
-};
-
 interface RainbowDot {
   t: number;        // Progress along the line (0-1)
   speed: number;    // How fast the dot moves
@@ -140,7 +124,7 @@ const RaceTrackParallaxLines: React.FC = () => {
         const baseX = lerp(0, width, frac);
         for (let j = 0; j < DOTS_PER_LINE; j++) {
           const dot = dotsRef.current[i][j];
-          let t = dot.t;
+          const t = dot.t;
           if (dot.delay > 0) {
             dot.delay -= 16;
             continue;

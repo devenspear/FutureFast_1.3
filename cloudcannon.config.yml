@@ -13,7 +13,7 @@ collections_config:
     icon: gite
 paths:
   static: ''
-  uploads: uploads
+  uploads: public/uploads
 timezone: America/New_York
 markdown:
   engine: commonmark

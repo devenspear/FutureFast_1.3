@@ -140,7 +140,7 @@ const RaceTrackParallaxLines: React.FC = () => {
           ctx.save();
           ctx.beginPath();
           ctx.arc(x, y, DOT_RADIUS, 0, 2 * Math.PI);
-          ctx.globalAlpha = 0.44; // semi-transparent
+          ctx.globalAlpha = 0.4; // 40% transparent for hero section lines
           ctx.fillStyle = dot.color;
           ctx.shadowBlur = 6;
           ctx.shadowColor = dot.color;

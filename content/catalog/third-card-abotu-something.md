@@ -1,5 +1,5 @@
 ---
-title: Third Card abotu something
+title: Third Card about something
 description: I like robots They are fun. and Funny Do you like robots
 year: '2025'
 type: Study

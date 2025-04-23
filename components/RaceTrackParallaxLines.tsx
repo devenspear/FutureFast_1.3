@@ -6,16 +6,11 @@ const NUM_LINES = 16;
 const LINE_COLOR = "rgba(80,220,255,0.65)";
 const LINE_WIDTH = 2.2;
 const GLOW_COLOR = "rgba(80,220,255,0.45)";
-const NUM_STREAKS = 18;
-const STREAK_COLOR = "rgba(255,255,255,0.22)";
-const STREAK_GLOW = "rgba(80,200,255,0.22)";
-const NUM_BLOBS = 7;
-const BLOB_COLORS = [
-  "rgba(80,200,255,0.15)",
-  "rgba(255,255,255,0.09)",
-  "rgba(80,255,200,0.12)"
-];
-
+const DOTS_PER_LINE = 2;
+const DOT_RADIUS = 6;
+const DOT_ACCEL = 2.1; // exponential acceleration
+const DOT_MIN_SPEED = 0.004; // Increase speed by 200%
+const DOT_MAX_SPEED = 0.016; // Increase speed by 200%
 const HERO_HEIGHT_FRAC = 0.75; // Hero is 75% of viewport height
 const VANISH_Y_FRAC = 0; // Vanishing point at the very top
 
@@ -43,52 +38,34 @@ type Streak = {
   alpha: number;
 };
 
-// --- MonorailCar type ---
-type MonorailCar = {
-  trackFrac: number; // which main line/track this car rides (0-1)
-  size: number;
-  alpha: number;
-  color: string;
-  speed: number;
-  delay: number;
-  windowColor: string;
-};
+interface RainbowDot {
+  t: number;        // Progress along the line (0-1)
+  speed: number;    // How fast the dot moves
+  color: string;    // Dot color
+  delay: number;    // Delay before starting
+}
 
 const RaceTrackParallaxLines: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0); 
-  const streaksRef = useRef<Streak[]>([]);
-  const carsRef = useRef<MonorailCar[]>([]);
+  const dotsRef = useRef<RainbowDot[][]>([]);
 
-  // Generate zoom streaks
+  // Generate dots
   useEffect(() => {
-    const streaks: Streak[] = [];
-    for (let i = 0; i < NUM_STREAKS; i++) {
-      streaks.push({
-        frac: randomBetween(0, 1),
-        speed: randomBetween(0.003, 0.007), // SLOWER animation for streaks
-        width: randomBetween(4, 8), 
-        length: randomBetween(60, 170),
-        alpha: randomBetween(0.25, 0.7),
-        delay: randomBetween(0, 900),
-      });
+    const dots: RainbowDot[][] = [];
+    for (let i = 0; i < NUM_LINES; i++) {
+      const lineDots: RainbowDot[] = [];
+      for (let j = 0; j < DOTS_PER_LINE; j++) {
+        lineDots.push({
+          t: Math.random(),
+          speed: randomBetween(DOT_MIN_SPEED, DOT_MAX_SPEED),
+          color: getRandomRainbowColor(),
+          delay: randomBetween(0, 1200),
+        });
+      }
+      dots.push(lineDots);
     }
-    streaksRef.current = streaks;
-    // Generate monorail cars
-    const cars: MonorailCar[] = [];
-    for (let i = 0; i < NUM_BLOBS; i++) {
-      const frac = randomBetween(0, 1);
-      cars.push({
-        trackFrac: frac,
-        size: randomBetween(42, 90),
-        alpha: randomBetween(0.18, 0.33),
-        color: BLOB_COLORS[Math.floor(Math.random() * BLOB_COLORS.length)],
-        speed: randomBetween(0.0015, 0.004),
-        delay: randomBetween(0, 900),
-        windowColor: 'rgba(255,255,255,0.42)',
-      });
-    }
-    carsRef.current = cars;
+    dotsRef.current = dots;
   }, []);
 
   useEffect(() => {
@@ -157,74 +134,35 @@ const RaceTrackParallaxLines: React.FC = () => {
         ctx.restore();
       }
 
-      // --- Animated streaks (lines) ---
-      const now = Date.now();
-      for (let i = 0; i < streaksRef.current.length; i++) {
-        const s = streaksRef.current[i];
-        // Exponential acceleration toward the center
-        let prog = expCurve(((now + s.delay) * s.speed) % 1.0, 2.7);
-        if (prog < 0.01) prog += 0.02 * Math.random();
-        const frac = s.frac;
+      // --- Animated rainbow dots (semi-transparent, faster) ---
+      for (let i = 0; i < NUM_LINES; i++) {
+        const frac = i / (NUM_LINES - 1);
         const baseX = lerp(0, width, frac);
-        // Exponential curve for y, lerp for x
-        function bezier(tt: number) {
-          const expT = expCurve(tt, 2.7);
-          const x = lerp(baseX, vanishingX, tt);
-          const y = lerp(bottomY, vanishingY, expT);
-          return [x, y];
+        for (let j = 0; j < DOTS_PER_LINE; j++) {
+          const dot = dotsRef.current[i][j];
+          let t = dot.t;
+          if (dot.delay > 0) {
+            dot.delay -= 16;
+            continue;
+          }
+          dot.t += dot.speed * Math.pow(1 + t, DOT_ACCEL);
+          if (dot.t >= 1) {
+            dot.t = 0;
+            dot.speed = randomBetween(DOT_MIN_SPEED, DOT_MAX_SPEED);
+            dot.color = getRandomRainbowColor();
+            dot.delay = randomBetween(0, 1200);
+          }
+          const [x, y] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, t);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(x, y, DOT_RADIUS, 0, 2 * Math.PI);
+          ctx.globalAlpha = 0.44; // semi-transparent
+          ctx.fillStyle = dot.color;
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = dot.color;
+          ctx.fill();
+          ctx.restore();
         }
-        const [x1, y1] = bezier(prog);
-        const [x2, y2] = bezier(Math.max(0, prog - s.length / height));
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.strokeStyle = STREAK_COLOR;
-        ctx.lineWidth = s.width;
-        ctx.globalAlpha = s.alpha * (1 - prog);
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = STREAK_GLOW;
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // --- Animated blobs follow the convex arc, are smaller, and visible to the end ---
-      for (let i = 0; i < carsRef.current.length; i++) {
-        const car = carsRef.current[i];
-        let progLin = ((now + car.delay) * car.speed) % 1.0;
-        if (progLin < 0.01) progLin += 0.02 * Math.random();
-        // Steep ease: slow at start, fast at top
-        const prog = Math.pow(progLin, 2.5);
-        const frac = car.trackFrac;
-        const baseX = lerp(0, width, frac);
-        // Follow the convex arc
-        const [x, y] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, prog);
-        const [x2, y2] = convexRollercoasterCurve(baseX, vanishingX, bottomY, vanishingY, frac, Math.min(1, prog + 0.01));
-        const angle = Math.atan2(y2 - y, x2 - x);
-        // 60% smaller overall, visible to the end
-        const scale = lerp(0.4, 0.11, prog); // base is 0.4 (60% smaller), shrinks to 0.11
-        const alpha = car.alpha * (1 - 0.7 * prog); // fades a bit, but visible at top
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(angle);
-        ctx.scale(scale, scale);
-        ctx.beginPath();
-        ctx.moveTo(-car.size * 1.4 + car.size * 0.36, -car.size * 0.36);
-        ctx.arc(-car.size * 1.4 + car.size * 0.36, 0, car.size * 0.36, -Math.PI / 2, Math.PI / 2, true);
-        ctx.lineTo(car.size * 1.4 - car.size * 0.36, car.size * 0.36);
-        ctx.arc(car.size * 1.4 - car.size * 0.36, 0, car.size * 0.36, Math.PI / 2, -Math.PI / 2, true);
-        ctx.closePath();
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = car.color;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = car.color;
-        ctx.fill();
-        ctx.globalAlpha = alpha * 0.7;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, car.size * 0.7, car.size * 0.45, 0, 0, 2 * Math.PI);
-        ctx.fillStyle = car.windowColor;
-        ctx.fill();
-        ctx.restore();
       }
     }
 
@@ -257,5 +195,10 @@ const RaceTrackParallaxLines: React.FC = () => {
     />
   );
 };
+
+function getRandomRainbowColor() {
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue}, 95%, 55%)`;
+}
 
 export default RaceTrackParallaxLines;

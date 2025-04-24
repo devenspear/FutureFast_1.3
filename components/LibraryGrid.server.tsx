@@ -7,11 +7,13 @@ export interface Card {
   title: string;
   description: string;
   year: string;
+  month?: string;
   type: string;
   tag: string;
   image?: string;
   body?: string;
   url?: string;
+  summary?: string;
 }
 
 export default function LibraryGrid() {

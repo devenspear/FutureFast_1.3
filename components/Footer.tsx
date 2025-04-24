@@ -55,8 +55,12 @@ export default function Footer() {
           </a>
         ))}
       </div>
-      <div className="mb-2 text-xs text-gray-600"> 2025 Deven Spear | All Rights Reserved</div>
-      <div className="text-xs text-purple-600">Made with AI &amp; Code</div>
+      <div className="mb-2 text-xs text-gray-400">2025 &copy; FutureFast.AI. All Rights Reserved.</div>
+      <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-400 mb-2">
+        <a href="/terms" className="hover:text-white underline">Terms & Conditions</a>
+        <a href="/privacy" className="hover:text-white underline">Privacy Policy</a>
+      </div>
+      <div className="text-xs text-gray-400">Made by Deven Spear with AI Coding Team</div>
     </footer>
   );
 }

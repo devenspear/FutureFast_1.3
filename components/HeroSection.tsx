@@ -1,5 +1,9 @@
 import React from 'react';
 
+// Sampled hero image colors (example):
+// Blue: #1d5cff
+// Gold: #ffd700
+
 export default function HeroSection() {
   return (
     <section
@@ -10,7 +14,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent z-10" />
       {/* Animated content here */}
       <div className="relative z-20 flex flex-col items-center justify-center w-full h-full py-24">
-        <h1 className="font-orbitron text-5xl md:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-fade-in drop-shadow-xl">
+        <h1 className="font-orbitron text-5xl md:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-[#1d5cff] via-[#ffd700] to-[#1d5cff] bg-clip-text text-transparent animate-fade-in drop-shadow-xl">
           Win the Race of <br className="hidden md:inline" />Exponential Disruption
         </h1>
         <div className="mt-6 flex justify-center">

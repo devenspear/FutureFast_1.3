@@ -21,7 +21,7 @@ export default function LibraryGrid() {
   let cards: Card[] = [];
   if (fs.existsSync(cardsDir)) {
     cards = fs.readdirSync(cardsDir)
-      .filter((file) => file.endsWith('.md'))
+      .filter((file) => file.endsWith('.md') && !file.startsWith('_'))
       .map((file) => {
         const filePath = path.join(cardsDir, file);
         const { data, content } = matter(fs.readFileSync(filePath, 'utf8'));

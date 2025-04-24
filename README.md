@@ -1,6 +1,6 @@
-# Exponize Homepage
+# FutureFast Homepage
 
-This project is a professional, animated, mobile-first homepage for Exponize.com, built with Next.js, Tailwind CSS, and (future) Contentful CMS.
+This project is a professional, animated, mobile-first homepage for FutureFast.com, built with Next.js, Tailwind CSS, and (future) Contentful CMS.
 
 ## Features
 - **Hero Section:** Animated headline, subheadline, and background
@@ -19,7 +19,7 @@ This project is a professional, animated, mobile-first homepage for Exponize.com
 
 ## Project Structure
 ```
-exponize2/
+FutureFast.1.1/
   components/
   lib/
   public/
@@ -36,8 +36,8 @@ exponize2/
 ## Local Development
 1. Clone the repo:
    ```bash
-   git clone https://github.com/devenspear/exponize2.git
-   cd exponize2
+   git clone https://github.com/devenspear/FutureFast.1.1.git
+   cd FutureFast.1.1
    ```
 2. Install dependencies:
    ```bash
@@ -69,3 +69,5 @@ exponize2/
 ---
 
 2025 Deven Spear | All Rights Reserved
+
+This is a fork of Exponize2.3, now rebranded as FutureFast 1.1. All previous Exponize references have been updated.

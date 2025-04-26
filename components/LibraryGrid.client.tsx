@@ -14,7 +14,6 @@ function mapCMSToResourceCard(card: CMSCard): ResourceCardProps {
     description: card.description,
     image: card.image || '/images/default.jpg',
     overlayText: card.tag,
-    duration: '',
     platform: card.type,
     url: card.url || '',
   };

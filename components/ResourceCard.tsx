@@ -30,10 +30,10 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
 
   return (
     <div
-      className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 hover:shadow-lg hover:ring-2 hover:ring-blue-300 transition-transform duration-200 ease-in-out group cursor-pointer relative animate-card-glow flex flex-col justify-between h-[420px] md:h-[450px] lg:h-[480px] xl:h-[500px]"
+      className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 hover:shadow-lg hover:ring-2 hover:ring-blue-300 transition-transform duration-200 ease-in-out group cursor-pointer relative animate-card-glow flex flex-col h-full"
       style={{ minHeight: 320, maxHeight: 520 }}
     >
-      <div>
+      <div className="flex flex-col h-full">
         <div className="relative h-36 w-full rounded-t-xl overflow-hidden">
           <Image
             src={imgSrc}
@@ -43,7 +43,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         </div>
-        <div className="p-3 flex flex-col h-full">
+        <div className="p-3 flex flex-col flex-1 min-h-0">
           {/* Tag and Type side by side */}
           {(overlayText || platform) && (
             <div className="flex flex-row items-center gap-2 text-xs font-semibold text-blue-700 mb-1">
@@ -61,11 +61,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
           {description && (
             <p className="text-sm text-gray-700 mt-1 line-clamp-3">{description}</p>
           )}
-          {/* Bottom info: Month Year, Tag|Type, See Source always pinned */}
+          {/* Bottom info: See Source always pinned */}
           <div className="mt-auto pt-2 flex flex-col gap-1">
-            {/* Month and Year side by side, if available */}
-            {/* (Assume date is formatted as 'Month Year' already, else parse if needed) */}
-            {/* Tag and Type already shown above */}
             {url && (
               <a
                 href={url}

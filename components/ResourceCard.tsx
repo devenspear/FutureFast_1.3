@@ -71,7 +71,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-blue-700 underline text-center font-semibold hover:text-blue-900 transition"
+                className="see-source-btn block w-full text-center font-semibold transition focus:outline-none"
               >
                 See Source
               </a>

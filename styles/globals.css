@@ -19,3 +19,40 @@
 .animate-card-glow:hover {
   animation: card-glow 0.35s forwards;
 }
+
+/* See Source Button (Gradient Outline) */
+.see-source-btn {
+  padding: 0.5rem 0;
+  border-radius: 9999px;
+  border: 2px solid;
+  border-image: linear-gradient(90deg, #06b6d4 0%, #2563eb 100%);
+  border-image-slice: 1;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px 0 rgba(59,130,246,0.06);
+  margin-top: 0.5rem;
+}
+.see-source-btn:hover, .see-source-btn:focus {
+  color: #0ea5e9;
+  border-image: linear-gradient(90deg, #2563eb 0%, #06b6d4 100%);
+  border-image-slice: 1;
+  box-shadow: 0 4px 16px 0 rgba(59,130,246,0.16);
+  text-decoration: none;
+}
+.see-source-btn:active {
+  color: #0ea5e9;
+  box-shadow: 0 2px 8px 0 rgba(59,130,246,0.12);
+}
+
+/* Prevent button from shrinking or moving */
+.see-source-btn {
+  min-height: 2.5rem;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}

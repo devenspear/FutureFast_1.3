@@ -43,9 +43,7 @@ export default function NewsAndDisruptionSection() {
             {newsItems.map((item, idx) => (
               <li 
                 key={idx} 
-                className={`py-4 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg ${
-                  item.featured ? 'border-l-4 border-cyan-500' : ''
-                }`}
+                className="py-4 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg"
               >
                 <a 
                   href={item.url} 
@@ -85,6 +83,7 @@ export default function NewsAndDisruptionSection() {
         {/* Disruption Weekly - Right Side */}
         <div className="lg:w-1/2 flex flex-col items-center">
           <h2 className="text-2xl font-bold text-white mb-4 text-center">Disruption Weekly</h2>
+          <p className="text-center text-gray-300 mb-4">Click below to subscribe on LinkedIn</p>
           <a
             href="https://www.linkedin.com/newsletters/disruption-weekly-7120892654304776192/"
             target="_blank"
@@ -100,11 +99,6 @@ export default function NewsAndDisruptionSection() {
                 className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 priority
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                <span className="inline-flex items-center text-cyan-400 text-sm font-semibold">
-                  Subscribe on LinkedIn <FaExternalLinkAlt className="ml-1 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </div>
             </div>
           </a>
         </div>

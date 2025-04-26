@@ -9,12 +9,9 @@ export interface ResourceCardProps {
   description?: string;
   image: string;
   overlayText?: string;
-  duration?: string;
   platform?: string;
   url?: string;
 }
-
-const CARD_HEIGHT = 420; // 30% less than previous
 
 const GRADIENT_PLACEHOLDER = '/images/gradient-placeholder.svg';
 
@@ -25,7 +22,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   description,
   image,
   overlayText,
-  duration,
   platform,
   url,
 }) => {

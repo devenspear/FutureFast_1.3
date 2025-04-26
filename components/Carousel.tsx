@@ -7,7 +7,6 @@ interface CarouselProps {
 }
 
 const scrollAmount = 300;
-const CARD_HEIGHT = 420;
 
 const Carousel: React.FC<CarouselProps> = ({ cards }) => {
   const scrollRef = useRef<HTMLDivElement>(null);

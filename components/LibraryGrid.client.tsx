@@ -6,11 +6,16 @@ import type { ResourceCardProps } from './ResourceCard';
 
 // Map CMSCard to ResourceCardProps
 function mapCMSToResourceCard(card: CMSCard): ResourceCardProps {
+  // Combine month and year if both exist
+  let date = card.year;
+  if (card.month && card.year) {
+    date = `${card.month.charAt(0).toUpperCase() + card.month.slice(1)} ${card.year}`;
+  }
   return {
     id: card.title,
     title: card.title,
     author: '',
-    date: card.year,
+    date,
     description: card.description,
     image: card.image || '/images/default.jpg',
     overlayText: card.tag,

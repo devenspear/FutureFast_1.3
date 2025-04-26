@@ -57,9 +57,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
           {author && <p className="text-xs text-gray-500 mb-1">By: {author}</p>}
           {/* Month and Year side by side */}
           {date && <p className="text-xs text-gray-400 mb-1">{date}</p>}
-          {/* Expanded description with ellipsis if too long */}
+          {/* Expanded description with ellipsis if too long, clamp at 4 lines for 60-70 chars */}
           {description && (
-            <p className="text-sm text-gray-700 mt-1 line-clamp-3">{description}</p>
+            <p className="text-sm text-gray-700 mt-1 line-clamp-4">{description}</p>
           )}
           {/* Bottom info: See Source always pinned */}
           <div className="mt-auto pt-2 flex flex-col gap-1">
@@ -70,7 +70,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                 rel="noopener noreferrer"
                 className="see-source-btn block w-full text-center font-semibold transition focus:outline-none"
               >
-                See Source
+                See Source...
               </a>
             )}
           </div>

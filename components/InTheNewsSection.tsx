@@ -1,5 +1,16 @@
 import React from 'react';
+import { FaExternalLinkAlt, FaCalendarAlt, FaNewspaper } from 'react-icons/fa';
+import { format } from 'date-fns';
 
+export interface NewsItem {
+  title: string;
+  source: string;
+  url: string;
+  publishedDate: string; // ISO format date
+  featured?: boolean;
+}
+
+// Sample news items
 const newsItems = [
   {
     title: 'AI Breakthroughs in 2025',
@@ -9,7 +20,7 @@ const newsItems = [
   },
   {
     title: 'Web3 and Real Estate',
-    summary: 'Blockchain disruption and FutureFast’s impact on property markets.',
+    summary: 'Blockchain disruption and FutureFast\'s impact on property markets.',
     link: '#',
     image: '/news2.jpg',
   },

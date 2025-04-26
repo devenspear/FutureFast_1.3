@@ -37,45 +37,13 @@ export default function NewsAndDisruptionSection() {
       <h1 className="font-orbitron text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">In The News</h1>
       
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
-        {/* Disruption Weekly - Left Side */}
-        <div className="lg:w-1/2 flex flex-col items-center">
-          <a
-            href="https://www.linkedin.com/newsletters/disruption-weekly-7120892654304776192/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full max-w-md mx-auto group"
-          >
-            <div className="relative overflow-hidden rounded-xl border-2 border-cyan-400 shadow-lg transition-all duration-300 group-hover:shadow-cyan-500/30 group-hover:shadow-xl">
-              <Image
-                src="/images/DisWeekly_Banner.jpg"
-                alt="Disruption Weekly Banner"
-                width={500}
-                height={300}
-                className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-                <div className="p-4 w-full">
-                  <h2 className="text-2xl font-bold text-white mb-2">Disruption Weekly</h2>
-                  <p className="text-sm text-gray-200 mb-3">
-                    Explore the latest insights and trends on our LinkedIn newsletter.
-                  </p>
-                  <span className="inline-flex items-center text-cyan-400 text-sm font-semibold">
-                    Visit on LinkedIn <FaExternalLinkAlt className="ml-1 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-        
-        {/* News Articles - Right Side */}
+        {/* News Articles - Left Side */}
         <div className="lg:w-1/2">
-          <ul className="divide-y divide-gray-800">
+          <ul>
             {newsItems.map((item, idx) => (
               <li 
                 key={idx} 
-                className={`py-4 transition-all duration-200 hover:bg-gray-900 px-3 rounded-lg ${
+                className={`py-4 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg ${
                   item.featured ? 'border-l-4 border-cyan-500' : ''
                 }`}
               >
@@ -112,6 +80,33 @@ export default function NewsAndDisruptionSection() {
               </li>
             ))}
           </ul>
+        </div>
+        
+        {/* Disruption Weekly - Right Side */}
+        <div className="lg:w-1/2 flex flex-col items-center">
+          <h2 className="text-2xl font-bold text-white mb-4 text-center">Disruption Weekly</h2>
+          <a
+            href="https://www.linkedin.com/newsletters/disruption-weekly-7120892654304776192/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full max-w-md mx-auto group"
+          >
+            <div className="relative overflow-hidden rounded-xl border-2 border-cyan-400 transition-all duration-300 group-hover:shadow-cyan-500/30 group-hover:shadow-xl">
+              <Image
+                src="/images/DisWeekly_Banner.jpg"
+                alt="Disruption Weekly Banner"
+                width={500}
+                height={300}
+                className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                priority
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                <span className="inline-flex items-center text-cyan-400 text-sm font-semibold">
+                  Subscribe on LinkedIn <FaExternalLinkAlt className="ml-1 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     </section>

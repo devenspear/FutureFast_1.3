@@ -14,7 +14,7 @@ export default function AboutMe() {
           />
         </div>
         <div className="flex-1 flex flex-col items-center md:items-start">
-          <h1 className="font-orbitron text-5xl md:text-6xl font-bold text-center mb-8 mt-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent break-words w-full">About Deven</h1>
+          <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-8 mt-6 bg-gradient-to-r from-[#1d5cff] via-[#ffd700] to-[#1d5cff] bg-clip-text text-transparent break-words w-full">About Deven</h1>
           <p className="mb-4 text-purple-200 text-lg text-center md:text-left w-full">
             Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, he builds ventures that bridge physical and digital worlds.
           </p>

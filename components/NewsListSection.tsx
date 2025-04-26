@@ -52,7 +52,7 @@ interface NewsListProps {
 const NewsListSection: React.FC<NewsListProps> = ({ newsItems = sampleNewsItems }) => {
   return (
     <section className="py-16 bg-black text-white" id="in-the-news">
-      <h1 className="font-orbitron text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">In The News</h1>
+      <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-[#1d5cff] via-[#ffd700] to-[#1d5cff] bg-clip-text text-transparent">In The News</h1>
       
       <div className="max-w-4xl mx-auto px-4">
         <ul className="divide-y divide-gray-800">

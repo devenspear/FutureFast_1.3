@@ -1,0 +1,24 @@
+_inputs:
+  title:
+    type: text
+    label: Article Title
+    comment: The full title of the news article
+  source:
+    type: text
+    label: Publication Source
+    comment: The name of the publication (e.g., TechCrunch, Forbes)
+  url:
+    type: url
+    label: Article URL
+    comment: The full URL to the original article
+  publishedDate:
+    type: datetime
+    label: Publication Date
+    comment: When the article was published
+  featured:
+    type: checkbox
+    label: Featured Article
+    comment: Highlight this article in the list
+    
+_structures: {}
+_editables: {}

@@ -2,32 +2,36 @@ import React from 'react';
 import Image from 'next/image';
 import { FaExternalLinkAlt, FaCalendarAlt, FaNewspaper } from 'react-icons/fa';
 
-// Sample news items
+// News items are now loaded from markdown files in /content/news/
+// This hardcoded data is just for development/preview
 const newsItems = [
   {
-    title: 'AI Breakthroughs in 2025: What Business Leaders Need to Know',
+    title: 'xAI\'s Grok chatbot can now \'see\' the world around it',
     source: 'TechCrunch',
-    date: 'Jan 15, 2025',
-    url: 'https://techcrunch.com/ai-breakthroughs-2025',
-    featured: true,
+    date: 'April 22, 2025',
+    url: 'https://techcrunch.com/2025/04/22/xais-grok-chatbot-can-now-see-the-world-around-it/',
+    icon: '📸'
   },
   {
-    title: 'Web3 Technologies Reshape Global Real Estate Markets',
+    title: 'OpenAI launches GPT-4.1 with major improvements in reasoning, memory, and tool use',
+    source: 'The Decoder',
+    date: 'April 20, 2025',
+    url: 'https://the-decoder.com/openai-launches-gpt-4-1-new-model-family-to-improve-agents-long-contexts-and-coding/',
+    icon: '✨'
+  },
+  {
+    title: 'AI 50 2025: AI Agents Move Beyond Chat',
     source: 'Forbes',
-    date: 'Nov 28, 2024',
-    url: 'https://forbes.com/web3-real-estate-markets',
+    date: 'April 10, 2025',
+    url: 'https://www.forbes.com/sites/konstantinebuhler/2025/04/10/ai-50-2025-ai-agents-move-beyond-chat/',
+    icon: '✨'
   },
   {
-    title: 'Robotics Revolution: How Automation is Changing Daily Life',
-    source: 'MIT Technology Review',
-    date: 'Sep 5, 2024',
-    url: 'https://technologyreview.mit.edu/robotics-everyday-impact',
-  },
-  {
-    title: 'The Future of Work: AI and Human Collaboration',
-    source: 'Harvard Business Review',
-    date: 'Dec 10, 2024',
-    url: 'https://hbr.org/future-of-work-ai-collaboration',
+    title: 'Runway\'s Gen-3 Alpha Turbo is here and can make AI videos faster than you can type',
+    source: 'VentureBeat',
+    date: 'April 8, 2025',
+    url: 'https://venturebeat.com/ai/runways-gen-3-alpha-turbo-is-here-and-can-make-ai-videos-faster-than-you-can-type/',
+    icon: '🎥'
   }
 ];
 
@@ -53,6 +57,7 @@ export default function NewsAndDisruptionSection() {
                 >
                   <div className="flex-1">
                     <h2 className="text-lg font-bold group-hover:text-cyan-400 transition-colors">
+                      {item.icon && <span className="mr-2" style={{fontSize: '1.25rem'}}>{item.icon}</span>}
                       {item.title}
                     </h2>
                     

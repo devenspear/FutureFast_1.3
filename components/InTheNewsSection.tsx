@@ -1,51 +1,89 @@
 import React from 'react';
 import { FaExternalLinkAlt, FaCalendarAlt, FaNewspaper } from 'react-icons/fa';
-import { format } from 'date-fns';
-
-export interface NewsItem {
-  title: string;
-  source: string;
-  url: string;
-  publishedDate: string; // ISO format date
-  featured?: boolean;
-}
 
 // Sample news items
 const newsItems = [
   {
-    title: 'AI Breakthroughs in 2025',
-    summary: 'How FutureFast is shaping the future of artificial intelligence.',
-    link: '#',
-    image: '/news1.jpg',
+    title: 'AI Breakthroughs in 2025: What Business Leaders Need to Know',
+    source: 'TechCrunch',
+    date: 'Jan 15, 2025',
+    url: 'https://techcrunch.com/ai-breakthroughs-2025',
+    featured: true,
   },
   {
-    title: 'Web3 and Real Estate',
-    summary: 'Blockchain disruption and FutureFast\'s impact on property markets.',
-    link: '#',
-    image: '/news2.jpg',
+    title: 'Web3 Technologies Reshape Global Real Estate Markets',
+    source: 'Forbes',
+    date: 'Nov 28, 2024',
+    url: 'https://forbes.com/web3-real-estate-markets',
   },
   {
-    title: 'Robotics in Everyday Life',
-    summary: 'The rise of automation and what it means for business leaders.',
-    link: '#',
-    image: '/news3.jpg',
+    title: 'Robotics Revolution: How Automation is Changing Daily Life',
+    source: 'MIT Technology Review',
+    date: 'Sep 5, 2024',
+    url: 'https://technologyreview.mit.edu/robotics-everyday-impact',
   },
-  // Add more items as needed
+  {
+    title: 'The Future of Work: AI and Human Collaboration',
+    source: 'Harvard Business Review',
+    date: 'Dec 10, 2024',
+    url: 'https://hbr.org/future-of-work-ai-collaboration',
+  },
+  {
+    title: 'Quantum Computing Breakthrough Could Accelerate AI Development',
+    source: 'Nature',
+    date: 'Feb 20, 2025',
+    url: 'https://nature.com/quantum-computing-ai',
+    featured: true,
+  }
 ];
 
 export default function InTheNewsSection() {
   return (
     <section className="py-16 bg-black text-white" id="in-the-news">
       <h1 className="font-orbitron text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">In The News</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {newsItems.map((item, idx) => (
-          <a key={idx} href={item.link} className="bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl transition p-6 flex flex-col items-start group">
-            <img src={item.image} alt={item.title} className="w-full h-40 object-cover rounded mb-4" />
-            <h2 className="text-2xl font-bold mb-2 group-hover:text-cyan-400 transition">{item.title}</h2>
-            <p className="text-gray-300 mb-4">{item.summary}</p>
-            <span className="mt-auto text-cyan-400 font-semibold">Read More →</span>
-          </a>
-        ))}
+      
+      <div className="max-w-4xl mx-auto px-4">
+        <ul className="divide-y divide-gray-800">
+          {newsItems.map((item, idx) => (
+            <li 
+              key={idx} 
+              className={`py-5 transition-all duration-200 hover:bg-gray-900 px-4 rounded-lg ${
+                item.featured ? 'border-l-4 border-cyan-500' : ''
+              }`}
+            >
+              <a 
+                href={item.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex flex-col md:flex-row md:items-center gap-3 w-full group"
+              >
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold group-hover:text-cyan-400 transition-colors">
+                    {item.title}
+                  </h2>
+                  
+                  <div className="flex flex-wrap items-center mt-2 text-sm text-gray-400 gap-4">
+                    <div className="flex items-center gap-1">
+                      <FaNewspaper className="text-cyan-500" />
+                      <span>{item.source}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
+                      <FaCalendarAlt className="text-cyan-500" />
+                      <span>{item.date}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-end">
+                  <span className="text-cyan-500 group-hover:translate-x-1 transition-transform duration-200">
+                    <FaExternalLinkAlt />
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

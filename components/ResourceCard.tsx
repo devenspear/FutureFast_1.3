@@ -59,8 +59,22 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
           {date && <p className="text-xs text-gray-400 mb-1">{date}</p>}
           {/* Description with fixed height to ensure consistent truncation */}
           {description && (
-            <div className="mt-1 mb-3" style={{ minHeight: '4.5rem', maxHeight: '4.5rem', overflow: 'hidden' }}>
+            <div className="mt-1" style={{ 
+              minHeight: '5rem', 
+              maxHeight: '9rem', 
+              overflow: 'hidden',
+              position: 'relative',
+              marginBottom: '60px' // 50px padding + 10px extra space
+            }}>
               <p className="text-sm text-gray-700">{description}</p>
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '20px',
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1))'
+              }}></div>
             </div>
           )}
           {/* Bottom info: See Source always pinned with direct styling */}

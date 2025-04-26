@@ -24,10 +24,11 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
     <div className="relative w-full min-h-[440px] md:min-h-[470px] lg:min-h-[500px] xl:min-h-[520px]">
       <button
         aria-label="Scroll left"
-        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900 text-blue-200 shadow-md rounded-full p-2 hover:bg-blue-700 hover:text-white transition border border-blue-700"
+        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900 text-blue-200 shadow-md rounded-full p-3 hover:bg-blue-700 hover:text-white transition border border-blue-700"
+        style={{ opacity: 0.7, transform: 'translateY(-50%) scale(1.3)' }}
         onClick={() => scroll('left')}
       >
-        <FaChevronLeft />
+        <FaChevronLeft size={20} />
       </button>
       <div
         ref={scrollRef}
@@ -45,10 +46,11 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
       </div>
       <button
         aria-label="Scroll right"
-        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900 text-blue-200 shadow-md rounded-full p-2 hover:bg-blue-700 hover:text-white transition border border-blue-700"
+        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900 text-blue-200 shadow-md rounded-full p-3 hover:bg-blue-700 hover:text-white transition border border-blue-700"
+        style={{ opacity: 0.7, transform: 'translateY(-50%) scale(1.3)' }}
         onClick={() => scroll('right')}
       >
-        <FaChevronRight />
+        <FaChevronRight size={20} />
       </button>
     </div>
   );

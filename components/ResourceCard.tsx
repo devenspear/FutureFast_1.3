@@ -52,8 +52,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
               {platform && <span>{platform}</span>}
             </div>
           )}
-          {/* Bold, dark title */}
-          <h3 className="font-bold text-lg text-gray-900 mb-1 line-clamp-2">{title}</h3>
+          {/* Bold, dark title - Reduced font size from text-lg to text-base with custom styling */}
+          <h3 className="font-bold text-base text-gray-900 mb-1 line-clamp-2" style={{ fontSize: '14px' }}>{title}</h3>
           {author && <p className="text-xs text-gray-500 mb-1">By: {author}</p>}
           {/* Month and Year side by side */}
           {date && <p className="text-xs text-gray-400 mb-1">{date}</p>}

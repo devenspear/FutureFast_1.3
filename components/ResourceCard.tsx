@@ -64,7 +64,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
               maxHeight: '9rem', 
               overflow: 'hidden',
               position: 'relative',
-              marginBottom: '60px' // 50px padding + 10px extra space
+              marginBottom: '25px' 
             }}>
               <p className="text-sm text-gray-700">{description}</p>
               <div style={{
@@ -78,7 +78,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             </div>
           )}
           {/* Bottom info: See Source always pinned with direct styling */}
-          <div className="mt-auto pt-2">
+          <div className="mt-auto">
             {url && (
               <a
                 href={url}
@@ -97,7 +97,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                   boxShadow: '0 2px 8px 0 rgba(59,130,246,0.10)',
                   minHeight: '2.5rem',
                   cursor: 'pointer',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  marginBottom: '15px' 
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.background = 'linear-gradient(90deg, #2563eb 0%, #06b6d4 100%)';

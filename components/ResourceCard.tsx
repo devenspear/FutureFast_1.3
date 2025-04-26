@@ -57,22 +57,22 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
           {author && <p className="text-xs text-gray-500 mb-1">By: {author}</p>}
           {/* Month and Year side by side */}
           {date && <p className="text-xs text-gray-400 mb-1">{date}</p>}
-          {/* Description with fixed height to ensure consistent truncation */}
+          {/* Description with expanded height to show more text */}
           {description && (
             <div className="mt-1" style={{ 
               minHeight: '5rem', 
-              maxHeight: '9rem', 
+              maxHeight: '14rem', 
               overflow: 'hidden',
               position: 'relative',
-              marginBottom: '25px' 
+              marginBottom: '25px'
             }}>
-              <p className="text-sm text-gray-700">{description}</p>
+              <p className="text-sm text-gray-700" style={{ lineHeight: '1.5' }}>{description}</p>
               <div style={{
                 position: 'absolute',
                 bottom: 0,
                 left: 0,
                 right: 0,
-                height: '20px',
+                height: '30px',
                 background: 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1))'
               }}></div>
             </div>

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "1",
+    "title": "Storytelling for Leaders",
+    "author": "Todd Dewett",
+    "date": "Oct 2, 2023",
+    "description": "Learn how to use storytelling to become more approachable and relatable and build rapport with subordinates at work.",
+    "image": "/images/storytelling-leaders.jpg",
+    "overlayText": "is building rapport with anyone with less status at work.",
+    "duration": "1h 10m",
+    "platform": "LinkedIn"
+  },
+  {
+    "id": "2",
+    "title": "How to Fearlessly Negotiate",
+    "author": "Pete Mockaitis",
+    "date": "",
+    "description": "Get more of what you want.",
+    "image": "/images/negotiate.jpg",
+    "overlayText": "NEGOTIATE",
+    "duration": "28m",
+    "platform": "LinkedIn"
+  },
+  {
+    "id": "3",
+    "title": "Effective Communication: Speaking Your Customers'...",
+    "author": "Sam Dey",
+    "date": "",
+    "description": "",
+    "image": "/images/communication.jpg",
+    "overlayText": "",
+    "duration": "33m",
+    "platform": "LinkedIn"
+  },
+  {
+    "id": "4",
+    "title": "Building Better Relationships through Listening and Validation",
+    "author": "Pete Mockaitis",
+    "date": "",
+    "description": "",
+    "image": "/images/listening.jpg",
+    "overlayText": "LISTENING VALIDATION",
+    "duration": "22m",
+    "platform": "LinkedIn"
+  }
+]

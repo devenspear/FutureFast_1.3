@@ -1,22 +1,36 @@
 'use client';
-import React, { useState } from 'react';
-import ResourceCard from './ResourceCard';
-import ResourceDetailModal from './ResourceDetailModal';
-import type { Card } from './LibraryGrid.server';
+import React from 'react';
+import Carousel from './Carousel';
+import type { Card as CMSCard } from './LibraryGrid.server';
+import type { ResourceCardProps } from './ResourceCard';
 
-export default function LibraryGridClient({ cards }: { cards: Card[] }) {
-  const [selected, setSelected] = useState<Card | null>(null);
+// Map CMSCard to ResourceCardProps
+function mapCMSToResourceCard(card: CMSCard): ResourceCardProps {
+  return {
+    id: card.title,
+    title: card.title,
+    author: '',
+    date: card.year,
+    description: card.description,
+    image: card.image || '/images/default.jpg',
+    overlayText: card.tag,
+    duration: '',
+    platform: card.type,
+    url: card.url || '',
+  };
+}
+
+export default function LibraryGridClient({ cards }: { cards: CMSCard[] }) {
+  const resourceCards: ResourceCardProps[] = cards.map(mapCMSToResourceCard);
   return (
     <section className="py-16 px-4 max-w-7xl mx-auto" id="resource-library">
       <h1 className="font-orbitron text-5xl md:text-6xl font-bold text-center mb-10 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
         Resource Library
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {cards.map((card, idx) => (
-          <ResourceCard key={idx} card={card} onClick={() => setSelected(card)} orientation="landscape" />
-        ))}
+      {/* Only show the new carousel, no black ribbon or 2x2 grid */}
+      <div className="mb-12">
+        <Carousel cards={resourceCards} />
       </div>
-      <ResourceDetailModal card={selected} onClose={() => setSelected(null)} />
     </section>
   );
 }

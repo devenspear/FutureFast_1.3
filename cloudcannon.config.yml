@@ -3,6 +3,12 @@ collections_config:
     path: content/catalog
     name: Catalog
     icon: ballot
+  news:
+    path: content/news
+    name: News Articles
+    icon: article
+    _enabled_editors:
+      - data
   sections:
     path: content/sections
     name: Sections

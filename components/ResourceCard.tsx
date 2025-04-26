@@ -57,18 +57,42 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
           {author && <p className="text-xs text-gray-500 mb-1">By: {author}</p>}
           {/* Month and Year side by side */}
           {date && <p className="text-xs text-gray-400 mb-1">{date}</p>}
-          {/* Expanded description with ellipsis if too long, clamp at 4 lines for 60-70 chars */}
+          {/* Description with fixed height to ensure consistent truncation */}
           {description && (
-            <p className="text-sm text-gray-700 mt-1 line-clamp-4">{description}</p>
+            <div className="mt-1 mb-3" style={{ minHeight: '4.5rem', maxHeight: '4.5rem', overflow: 'hidden' }}>
+              <p className="text-sm text-gray-700">{description}</p>
+            </div>
           )}
-          {/* Bottom info: See Source always pinned */}
-          <div className="mt-auto pt-2 flex flex-col gap-1">
+          {/* Bottom info: See Source always pinned with direct styling */}
+          <div className="mt-auto pt-2">
             {url && (
               <a
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="see-source-btn block w-full text-center font-semibold transition focus:outline-none"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.5rem 0',
+                  borderRadius: '9999px',
+                  background: 'linear-gradient(90deg, #06b6d4 0%, #2563eb 100%)',
+                  color: '#fff',
+                  fontWeight: '600',
+                  fontSize: '1rem',
+                  textAlign: 'center',
+                  boxShadow: '0 2px 8px 0 rgba(59,130,246,0.10)',
+                  minHeight: '2.5rem',
+                  cursor: 'pointer',
+                  textDecoration: 'none'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, #2563eb 0%, #06b6d4 100%)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px 0 rgba(59,130,246,0.18)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, #06b6d4 0%, #2563eb 100%)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px 0 rgba(59,130,246,0.10)';
+                }}
               >
                 See Source...
               </a>

@@ -3,13 +3,15 @@
 import React from 'react';
 import Image from 'next/image';
 import { defaultAboutFutureFastContent, AboutFutureFastContent } from '../lib/content';
-import GoogleFormEmbed from './GoogleFormEmbed';
 
 // Use the default content directly in the client component
 // This will be replaced with server-side data fetching in a future update
 const content: AboutFutureFastContent = defaultAboutFutureFastContent;
 
 export default function AboutWithSubscription() {
+  // Google Form ID
+  const formId = '1FAIpQLSfvKmVdVXcZ1H7_e29KGaBYCQwsa313Ene5vmlzgGNTmV333g';
+  
   return (
     <section className="py-16 bg-black text-white" id="about">
       <div className="container mx-auto px-4">
@@ -53,7 +55,21 @@ export default function AboutWithSubscription() {
               <p className="text-lg text-purple-100 mb-6">
                 Sign up below to be added to our mailing list. You will receive updates and be invited to more content like this.
               </p>
-              <GoogleFormEmbed />
+              
+              {/* Direct iframe embed with styling */}
+              <div className="w-full rounded-xl overflow-hidden">
+                <iframe 
+                  src={`https://docs.google.com/forms/d/e/${formId}/viewform?embedded=true&usp=pp_url`}
+                  width="100%" 
+                  height="480" 
+                  frameBorder="0" 
+                  marginHeight={0} 
+                  marginWidth={0}
+                  className="bg-transparent"
+                >
+                  Loading…
+                </iframe>
+              </div>
             </div>
           </div>
         </div>

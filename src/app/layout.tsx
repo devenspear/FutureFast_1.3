@@ -18,7 +18,14 @@ export const metadata: Metadata = {
   description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.",
   metadataBase: new URL("https://futurefast.com"),
   robots: { index: true, follow: true },
-  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg", apple: "/favicon.svg" },
+  icons: { 
+    icon: [
+      { url: "/poker-chip-favicon.svg", type: "image/svg+xml" },
+      { url: "/poker-chip-favicon.png", type: "image/png" }
+    ],
+    shortcut: "/poker-chip-favicon.png", 
+    apple: "/poker-chip-favicon.png" 
+  },
   openGraph: {
     title: "FutureFast: Empowering Speed",
     description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.",
@@ -39,7 +46,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
-        <link rel="icon" href="/favicon.svg" />
+        <link rel="icon" href="/poker-chip-favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/poker-chip-favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/poker-chip-favicon.png" />
         <link rel="canonical" href="https://futurefast.com" />
         <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION} />
         <Script src={`https://www.googletagmanager.com/gtag/js?id=G-F4CGW7GF6P`} strategy="afterInteractive" />

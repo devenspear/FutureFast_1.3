@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { defaultAboutFutureFastContent, AboutFutureFastContent } from '../lib/content';
 
@@ -9,9 +9,70 @@ import { defaultAboutFutureFastContent, AboutFutureFastContent } from '../lib/co
 const content: AboutFutureFastContent = defaultAboutFutureFastContent;
 
 export default function AboutWithSubscription() {
-  // Google Form ID
-  const formId = '1FAIpQLSfvKmVdVXcZ1H7_e29KGaBYCQwsa313Ene5vmlzgGNTmV333g';
-  const formUrl = `https://docs.google.com/forms/d/e/${formId}/viewform`;
+  // Form state
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    company: ''
+  });
+  
+  // Form submission state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
+  
+  // Handle form input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Reset submission state
+    setIsSubmitting(true);
+    setSubmitResult(null);
+    
+    try {
+      // Submit to our API endpoint
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      // Parse the response
+      const result = await response.json();
+      
+      // Update submission state
+      setSubmitResult(result);
+      
+      // Clear form if successful
+      if (result.success) {
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          company: ''
+        });
+      }
+    } catch (error) {
+      // Handle errors
+      setSubmitResult({
+        success: false,
+        message: 'An error occurred. Please try again later.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   
   return (
     <section className="py-16 bg-black text-white" id="about">
@@ -57,20 +118,100 @@ export default function AboutWithSubscription() {
                 Sign up below to be added to our mailing list. You will receive updates and be invited to more content like this.
               </p>
               
-              {/* Styled button that links to Google Form */}
-              <div className="w-full rounded-xl overflow-hidden bg-gray-800 p-8 text-center">
-                <h3 className="text-xl font-bold text-white mb-4">Join Our Mailing List</h3>
-                <p className="text-gray-300 mb-6">
+              {/* Newsletter subscription form */}
+              <div className="w-full rounded-xl overflow-hidden bg-gray-800 p-8">
+                <h3 className="text-xl font-bold text-white mb-4 text-center">Join Our Mailing List</h3>
+                <p className="text-gray-300 mb-6 text-center">
                   Get exclusive updates, early access to resources, and invitations to special events.
                 </p>
-                <a 
-                  href={formUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg"
-                >
-                  Subscribe Now
-                </a>
+                
+                {submitResult ? (
+                  <div className={`p-4 mb-6 rounded-lg ${submitResult.success ? 'bg-green-900/50 text-green-100' : 'bg-red-900/50 text-red-100'}`}>
+                    <p>{submitResult.message}</p>
+                    {submitResult.success && (
+                      <button 
+                        onClick={() => setSubmitResult(null)}
+                        className="mt-4 text-sm underline hover:text-white"
+                      >
+                        Subscribe another email
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-1">
+                          First Name*
+                        </label>
+                        <input
+                          type="text"
+                          id="firstName"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
+                          placeholder="John"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-1">
+                          Last Name*
+                        </label>
+                        <input
+                          type="text"
+                          id="lastName"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
+                          placeholder="Doe"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                        Email Address*
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
+                        placeholder="john.doe@example.com"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-1">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        id="company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
+                        placeholder="Acme Inc."
+                      />
+                    </div>
+                    
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? 'Subscribing...' : 'Subscribe Now'}
+                    </button>
+                  </form>
+                )}
               </div>
             </div>
           </div>

@@ -53,6 +53,8 @@ body {
   }
   .font-orbitron {
     font-family: 'Orbitron', Arial, Helvetica, sans-serif !important;
+    line-height: 1.3;
+    padding-bottom: 0.1em;
   }
   /* Animated orb keyframes */
   .animate-orb1 {

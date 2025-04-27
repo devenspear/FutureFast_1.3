@@ -5,10 +5,14 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   // Only protect admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
+    console.log('Middleware triggered for admin route');
+    
     // Check if the user is authenticated
     const authHeader = request.headers.get('authorization');
     
     if (!authHeader || !isValidAuthHeader(authHeader)) {
+      console.log('Authentication failed or not provided');
+      
       // Return a response that will trigger the browser to show a login prompt
       return new NextResponse('Authentication required', {
         status: 401,
@@ -17,6 +21,8 @@ export function middleware(request: NextRequest) {
         },
       });
     }
+    
+    console.log('Authentication successful');
   }
   
   return NextResponse.next();
@@ -24,7 +30,7 @@ export function middleware(request: NextRequest) {
 
 // Configure which paths should be protected by this middleware
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/admin/:path*'],
 };
 
 // Validate the authorization header
@@ -44,6 +50,8 @@ function isValidAuthHeader(authHeader: string): boolean {
   // In production, use environment variables
   const expectedUsername = process.env.ADMIN_USERNAME || 'admin';
   const expectedPassword = process.env.ADMIN_PASSWORD || 'futurefast2025';
+  
+  console.log('Checking credentials against:', { expectedUsername });
   
   return username === expectedUsername && password === expectedPassword;
 }

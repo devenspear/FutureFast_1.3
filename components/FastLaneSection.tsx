@@ -67,7 +67,7 @@ const Speedometer = () => {
             cx="100" 
             cy="100" 
             r="60" 
-            fill="#0d0d0d" 
+            fill="#000000" 
             stroke="rgba(80,220,255,0.3)" 
             strokeWidth="1" 
           />
@@ -127,13 +127,7 @@ export default function FastLaneSection() {
   };
 
   return (
-    <section id="intro" className="py-16 md:py-24 bg-black text-white relative overflow-hidden">
-      {/* Background speed blur effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d] to-[#1a1a1a] opacity-90"></div>
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 animate-gradient-x bg-gradient-to-r from-transparent via-[#00c8ff] to-transparent"></div>
-      </div>
-      
+    <section id="intro" className="py-16 md:py-24 bg-black text-white relative">
       <div className="container mx-auto px-4 relative z-10">
         <motion.div 
           className="flex flex-col lg:flex-row gap-12 items-center"
@@ -145,10 +139,10 @@ export default function FastLaneSection() {
           {/* Left column: Content */}
           <div className="lg:w-1/2">
             <motion.h2 
-              className="font-orbitron text-4xl md:text-5xl font-bold tracking-tight mb-6 bg-gradient-to-r from-[#1d5cff] via-[#00c8ff] to-[#1d5cff] bg-clip-text text-transparent"
+              className="font-orbitron text-4xl md:text-5xl font-bold tracking-tight mb-6 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent pb-1"
               variants={itemVariants}
             >
-              Welcome to the Fast Lane 🚀
+              Welcome to the Fast Lane
             </motion.h2>
             
             <motion.p 
@@ -197,7 +191,7 @@ export default function FastLaneSection() {
             className="lg:w-2/5 flex justify-center"
             variants={itemVariants}
           >
-            <div className="w-full max-w-md aspect-square bg-gray-900/30 rounded-2xl border border-[#00c8ff]/20 shadow-lg backdrop-blur-sm p-6 flex items-center justify-center">
+            <div className="w-full max-w-md aspect-square bg-black border border-[#00c8ff]/20 shadow-lg p-6 flex items-center justify-center rounded-2xl">
               <Speedometer />
             </div>
           </motion.div>

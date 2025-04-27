@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { FaExternalLinkAlt, FaCalendarAlt, FaNewspaper } from 'react-icons/fa';
+import { trackNewsClick, trackDisruptionWeeklyClick } from '../lib/analytics';
 
 // News items are now loaded from markdown files in /content/news/
 // This hardcoded data is just for development/preview
@@ -53,6 +54,7 @@ export default function NewsAndDisruptionSection() {
                   href={item.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
+                  onClick={() => trackNewsClick(item.title, item.source, item.url)}
                   className="flex flex-col md:flex-row md:items-center gap-2 w-full group"
                 >
                   <div className="flex-1">
@@ -89,20 +91,20 @@ export default function NewsAndDisruptionSection() {
         <div className="lg:w-1/2 flex flex-col items-center">
           <h2 className="text-2xl font-bold text-white mb-4 text-center">Disruption Weekly</h2>
           <p className="text-center text-gray-300 mb-4">Click below to subscribe on LinkedIn</p>
-          <a
-            href="https://www.linkedin.com/newsletters/disruption-weekly-7120892654304776192/"
-            target="_blank"
+          <a 
+            href="https://www.linkedin.com/newsletters/disruption-weekly-7120892654304776192/" 
+            target="_blank" 
             rel="noopener noreferrer"
+            onClick={trackDisruptionWeeklyClick}
             className="block w-full max-w-md mx-auto group"
           >
             <div className="relative overflow-hidden rounded-xl border-2 border-cyan-400 transition-all duration-300 group-hover:shadow-cyan-500/30 group-hover:shadow-xl">
               <Image
-                src="/images/DisWeekly_Banner.jpg"
-                alt="Disruption Weekly Banner"
-                width={500}
-                height={300}
-                className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                priority
+                src="/disruption-weekly.png"
+                alt="Disruption Weekly Newsletter"
+                width={600}
+                height={338}
+                className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
               />
             </div>
           </a>

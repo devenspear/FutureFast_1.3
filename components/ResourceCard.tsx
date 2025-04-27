@@ -1,5 +1,6 @@
 import React from "react";
 import Image from 'next/image';
+import { trackResourceClick } from '../lib/analytics';
 
 export interface ResourceCardProps {
   id: string;
@@ -70,6 +71,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => url && trackResourceClick(title, url)}
                 style={{
                   display: 'block',
                   width: '100%',

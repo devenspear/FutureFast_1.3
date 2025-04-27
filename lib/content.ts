@@ -1,7 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-
 // Define types for the content
 export interface WhyWeExistContent {
   title: string;
@@ -79,37 +75,3 @@ export const defaultAboutMeContent: AboutMeContent = {
     "From smart homes to sacred geometry, from SaaS to spiritual systems, Deven sees the big picture and engineers what's next. He's the rare leader who fuses engineering precision with creative intuition—and delivers."
   ]
 };
-
-// Function to get the Why We Exist content
-export function getWhyWeExistContent(): WhyWeExistContent {
-  try {
-    // Read the markdown file
-    const filePath = path.join(process.cwd(), 'content', 'sections', 'why_we_exist.md');
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    
-    // Parse the markdown file
-    const { data } = matter(fileContents);
-    
-    return data as WhyWeExistContent;
-  } catch (error) {
-    console.error('Error loading Why We Exist content:', error);
-    return defaultWhyWeExistContent;
-  }
-}
-
-// Function to get the About Me content
-export function getAboutMeContent(): AboutMeContent {
-  try {
-    // Read the markdown file
-    const filePath = path.join(process.cwd(), 'content', 'sections', 'about_me.md');
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    
-    // Parse the markdown file
-    const { data } = matter(fileContents);
-    
-    return data as AboutMeContent;
-  } catch (error) {
-    console.error('Error loading About Me content:', error);
-    return defaultAboutMeContent;
-  }
-}

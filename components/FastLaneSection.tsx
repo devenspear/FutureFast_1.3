@@ -162,7 +162,7 @@ export default function FastLaneSection() {
             <motion.ul className="space-y-3 mb-8" variants={itemVariants}>
               <li className="flex items-start">
                 <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>
-                <span className="text-gray-300">Skills now expire in ~2 years – the technical "half‑life" has shrunk from a decade to &lt; 30 months.</span>
+                <span className="text-gray-300">Skills now expire in ~2 years – the technical &ldquo;half‑life&rdquo; has shrunk from a decade to &lt; 30 months.</span>
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>

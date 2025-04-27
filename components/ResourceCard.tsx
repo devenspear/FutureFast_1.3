@@ -33,7 +33,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
 
   return (
     <div
-      className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 hover:shadow-lg hover:ring-2 hover:ring-blue-300 transition-transform duration-200 ease-in-out group cursor-pointer relative animate-card-glow flex flex-col h-full"
+      className="rounded-xl shadow-md overflow-hidden hover:scale-105 hover:shadow-lg hover:ring-2 hover:ring-blue-300 transition-transform duration-200 ease-in-out group cursor-pointer relative animate-card-glow flex flex-col h-full bg-gradient-to-br from-white via-white to-purple-50"
       style={{ minHeight: 320, maxHeight: 520 }}
     >
       <div className="flex flex-col h-full">

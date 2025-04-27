@@ -11,6 +11,7 @@ const content: AboutFutureFastContent = defaultAboutFutureFastContent;
 export default function AboutWithSubscription() {
   // Google Form ID
   const formId = '1FAIpQLSfvKmVdVXcZ1H7_e29KGaBYCQwsa313Ene5vmlzgGNTmV333g';
+  const formUrl = `https://docs.google.com/forms/d/e/${formId}/viewform`;
   
   return (
     <section className="py-16 bg-black text-white" id="about">
@@ -56,19 +57,20 @@ export default function AboutWithSubscription() {
                 Sign up below to be added to our mailing list. You will receive updates and be invited to more content like this.
               </p>
               
-              {/* Direct iframe embed with styling */}
-              <div className="w-full rounded-xl overflow-hidden">
-                <iframe 
-                  src={`https://docs.google.com/forms/d/e/${formId}/viewform?embedded=true&usp=pp_url`}
-                  width="100%" 
-                  height="480" 
-                  frameBorder="0" 
-                  marginHeight={0} 
-                  marginWidth={0}
-                  className="bg-transparent"
+              {/* Styled button that links to Google Form */}
+              <div className="w-full rounded-xl overflow-hidden bg-gray-800 p-8 text-center">
+                <h3 className="text-xl font-bold text-white mb-4">Join Our Mailing List</h3>
+                <p className="text-gray-300 mb-6">
+                  Get exclusive updates, early access to resources, and invitations to special events.
+                </p>
+                <a 
+                  href={formUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg"
                 >
-                  Loading…
-                </iframe>
+                  Subscribe Now
+                </a>
               </div>
             </div>
           </div>

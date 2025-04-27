@@ -102,11 +102,12 @@ export default function NewsAndDisruptionSection() {
           >
             <div className="relative overflow-hidden rounded-xl border-2 border-cyan-400 transition-all duration-300 group-hover:shadow-cyan-500/30 group-hover:shadow-xl">
               <Image
-                src="https://placehold.co/600x338/0a192f/64ffda?text=Disruption+Weekly"
+                src="/images/DisWeekly_Banner.jpg"
                 alt="Disruption Weekly Newsletter"
-                width={600}
-                height={338}
-                className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
+                width={500}
+                height={300}
+                className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                priority
               />
             </div>
           </a>

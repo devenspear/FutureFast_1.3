@@ -8,32 +8,43 @@ export interface GAEvent {
   category?: string;
   label?: string;
   value?: number;
-  [key: string]: any; // Allow for custom properties
+  [key: string]: unknown; // Allow for custom properties with safer type
+}
+
+// Define window with gtag
+interface WindowWithGtag {
+  gtag?: (command: string, ...args: unknown[]) => void;
 }
 
 // Function to track page views
-export const pageview = (url: string) => {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('config', 'G-F4CGW7GF6P', {
-      page_path: url,
-    });
+export const pageview = (url: string): void => {
+  if (typeof window !== 'undefined') {
+    const win = window as unknown as WindowWithGtag;
+    if (win.gtag) {
+      win.gtag('config', 'G-F4CGW7GF6P', {
+        page_path: url,
+      });
+    }
   }
 };
 
 // Function to track events
-export const event = ({ action, category, label, value, ...rest }: GAEvent) => {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value,
-      ...rest,
-    });
+export const event = ({ action, category, label, value, ...rest }: GAEvent): void => {
+  if (typeof window !== 'undefined') {
+    const win = window as unknown as WindowWithGtag;
+    if (win.gtag) {
+      win.gtag('event', action, {
+        event_category: category,
+        event_label: label,
+        value: value,
+        ...rest,
+      });
+    }
   }
 };
 
 // Common events for easier tracking
-export const trackResourceClick = (resourceTitle: string, resourceUrl: string) => {
+export const trackResourceClick = (resourceTitle: string, resourceUrl: string): void => {
   event({
     action: 'resource_click',
     category: 'resource_library',
@@ -42,7 +53,7 @@ export const trackResourceClick = (resourceTitle: string, resourceUrl: string) =
   });
 };
 
-export const trackNewsClick = (newsTitle: string, newsSource: string, newsUrl: string) => {
+export const trackNewsClick = (newsTitle: string, newsSource: string, newsUrl: string): void => {
   event({
     action: 'news_click',
     category: 'news',
@@ -52,7 +63,7 @@ export const trackNewsClick = (newsTitle: string, newsSource: string, newsUrl: s
   });
 };
 
-export const trackDisruptionWeeklyClick = () => {
+export const trackDisruptionWeeklyClick = (): void => {
   event({
     action: 'disruption_weekly_click',
     category: 'newsletter',

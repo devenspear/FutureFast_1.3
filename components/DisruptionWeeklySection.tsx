@@ -5,7 +5,7 @@ export default function DisruptionWeeklySection() {
   return (
     <section className="py-16 bg-black text-white text-center flex flex-col md:flex-row items-center justify-center gap-10" id="disruption-weekly">
       <div className="flex-1 flex flex-col items-center md:items-start md:pl-12">
-        <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center md:text-left mb-8 bg-gradient-to-r from-[#1d5cff] via-[#ffd700] to-[#1d5cff] bg-clip-text text-transparent">Disruption Weekly</h1>
+        <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center md:text-left mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">Disruption Weekly</h1>
         <p className="mb-8 text-lg md:text-xl text-purple-100 font-medium max-w-2xl mx-auto md:mx-0">
           Explore the latest insights and trends on our LinkedIn newsletter. Stay ahead of disruption every week!
         </p>

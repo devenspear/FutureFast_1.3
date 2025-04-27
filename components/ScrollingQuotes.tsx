@@ -87,9 +87,9 @@ export default function ScrollingQuotes({
           {formattedQuotes.map((quote, index) => (
             <div key={index} className="flex-shrink-0 flex items-center">
               <div className="text-white text-xl md:text-2xl font-medium">
-                <span className="text-cyan-400 mr-2">"</span>
+                <span className="text-cyan-400 mr-2">&ldquo;</span>
                 {quote.text}
-                <span className="text-cyan-400 ml-2">"</span>
+                <span className="text-cyan-400 ml-2">&rdquo;</span>
                 {quote.author && (
                   <span className="text-gray-400 text-base ml-2">— {quote.author}</span>
                 )}

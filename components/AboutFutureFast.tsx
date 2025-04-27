@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { defaultAboutFutureFastContent, AboutFutureFastContent } from '../lib/content';
 
 // Use the default content directly in the client component
@@ -13,11 +14,13 @@ export default function AboutFutureFast() {
       <div className="flex flex-col md:flex-row items-center gap-10 px-4 md:px-8 md:flex-row-reverse">
         {/* Photo block */}
         <div className="flex-shrink-0 w-40 h-40 rounded-2xl shadow-lg bg-gradient-to-br from-purple-700 to-indigo-900 overflow-hidden flex items-center justify-center md:ml-8">
-          {/* Use image from markdown */}
-          <img
+          {/* Use next/image instead of img */}
+          <Image
             src={content.image}
             alt="FutureFast"
-            className="object-cover w-full h-full"
+            width={160}
+            height={160}
+            className="object-cover"
           />
         </div>
         <div className="flex-1 flex flex-col items-center md:items-start">

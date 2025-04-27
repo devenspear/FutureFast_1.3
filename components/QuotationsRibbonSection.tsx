@@ -19,9 +19,9 @@ export default function QuotationsRibbonSection() {
       <div className="whitespace-nowrap animate-marquee flex items-center absolute left-0 right-0">
         {quotes.map((quote, idx) => (
           <div key={idx} className="mx-12 inline-block text-xl md:text-2xl font-medium">
-            <span style={{ color: '#3A0B2F' }} className="mr-2">"</span>
+            <span style={{ color: '#3A0B2F' }} className="mr-2">&ldquo;</span>
             <span style={{ color: '#3A0B2F' }}>{quote.text}</span>
-            <span style={{ color: '#3A0B2F' }} className="ml-2">"</span>
+            <span style={{ color: '#3A0B2F' }} className="ml-2">&rdquo;</span>
             {quote.author && (
               <span style={{ color: '#3A0B2F', opacity: 0.8 }} className="text-base ml-2">— {quote.author}</span>
             )}
@@ -30,9 +30,9 @@ export default function QuotationsRibbonSection() {
         {/* Repeat for infinite effect */}
         {quotes.map((quote, idx) => (
           <div key={idx + quotes.length} className="mx-12 inline-block text-xl md:text-2xl font-medium">
-            <span style={{ color: '#3A0B2F' }} className="mr-2">"</span>
+            <span style={{ color: '#3A0B2F' }} className="mr-2">&ldquo;</span>
             <span style={{ color: '#3A0B2F' }}>{quote.text}</span>
-            <span style={{ color: '#3A0B2F' }} className="ml-2">"</span>
+            <span style={{ color: '#3A0B2F' }} className="ml-2">&rdquo;</span>
             {quote.author && (
               <span style={{ color: '#3A0B2F', opacity: 0.8 }} className="text-base ml-2">— {quote.author}</span>
             )}

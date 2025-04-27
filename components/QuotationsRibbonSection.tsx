@@ -15,32 +15,26 @@ export default function QuotationsRibbonSection() {
   const quotes = defaultQuotes;
   
   return (
-    <section className="w-full bg-gray-900 py-8 overflow-hidden">
-      <div 
-        className="whitespace-nowrap animate-marquee flex items-center"
-        style={{
-          maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
-        }}
-      >
+    <section className="w-full bg-black py-8 overflow-hidden relative">
+      <div className="whitespace-nowrap animate-marquee flex items-center absolute left-0 right-0">
         {quotes.map((quote, idx) => (
-          <div key={idx} className="mx-12 inline-block text-xl md:text-2xl font-medium text-white">
-            <span className="text-cyan-400 mr-2">"</span>
-            {quote.text}
-            <span className="text-cyan-400 ml-2">"</span>
+          <div key={idx} className="mx-12 inline-block text-xl md:text-2xl font-medium">
+            <span style={{ color: '#3A0B2F' }} className="mr-2">"</span>
+            <span style={{ color: '#3A0B2F' }}>{quote.text}</span>
+            <span style={{ color: '#3A0B2F' }} className="ml-2">"</span>
             {quote.author && (
-              <span className="text-gray-400 text-base ml-2">— {quote.author}</span>
+              <span style={{ color: '#3A0B2F', opacity: 0.8 }} className="text-base ml-2">— {quote.author}</span>
             )}
           </div>
         ))}
         {/* Repeat for infinite effect */}
         {quotes.map((quote, idx) => (
-          <div key={idx + quotes.length} className="mx-12 inline-block text-xl md:text-2xl font-medium text-white">
-            <span className="text-cyan-400 mr-2">"</span>
-            {quote.text}
-            <span className="text-cyan-400 ml-2">"</span>
+          <div key={idx + quotes.length} className="mx-12 inline-block text-xl md:text-2xl font-medium">
+            <span style={{ color: '#3A0B2F' }} className="mr-2">"</span>
+            <span style={{ color: '#3A0B2F' }}>{quote.text}</span>
+            <span style={{ color: '#3A0B2F' }} className="ml-2">"</span>
             {quote.author && (
-              <span className="text-gray-400 text-base ml-2">— {quote.author}</span>
+              <span style={{ color: '#3A0B2F', opacity: 0.8 }} className="text-base ml-2">— {quote.author}</span>
             )}
           </div>
         ))}
@@ -53,6 +47,10 @@ export default function QuotationsRibbonSection() {
         .animate-marquee {
           display: flex;
           animation: marquee 30s linear infinite;
+          width: 100vw;
+          position: absolute;
+          left: 0;
+          right: 0;
         }
         .animate-marquee:hover {
           animation-play-state: paused;

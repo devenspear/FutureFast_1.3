@@ -7,7 +7,7 @@ import { defaultAboutFutureFastContent, AboutFutureFastContent } from '../lib/co
 // This will be replaced with server-side data fetching in a future update
 const content: AboutFutureFastContent = defaultAboutFutureFastContent;
 
-export default function AboutMe() {
+export default function AboutFutureFast() {
   return (
     <section className="py-16 bg-black text-white" id="about">
       <div className="flex flex-col md:flex-row items-center gap-10 px-4 md:px-8 md:flex-row-reverse">

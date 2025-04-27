@@ -7,9 +7,9 @@ import { defaultThoughtLeadersContent } from '../lib/content';
 // This will be replaced with server-side data fetching in a future update
 const content = defaultThoughtLeadersContent;
 
-export default function SubscribeSection() {
+export default function ThoughtLeadersSection() {
   return (
-    <section className="py-16 bg-black text-white text-center px-4" id="about">
+    <section className="py-16 bg-black text-white text-center px-4" id="thought-leaders">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mx-auto mb-8 mt-6 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent break-words">
           {content.headline}

@@ -1,5 +1,5 @@
 // Define types for the content
-export interface WhyWeExistContent {
+export interface ThoughtLeadersContent {
   title: string;
   headline: string;
   description: string;
@@ -14,17 +14,17 @@ export interface WhyWeExistContent {
   }>;
 }
 
-export interface AboutMeContent {
+export interface AboutFutureFastContent {
   title: string;
   headline: string;
   image: string;
   bio_paragraphs: string[];
 }
 
-// Default content for Why We Exist
-export const defaultWhyWeExistContent: WhyWeExistContent = {
-  title: 'Why We Exist',
-  headline: 'Why We Exist',
+// Default content for Thought Leaders to Follow
+export const defaultThoughtLeadersContent: ThoughtLeadersContent = {
+  title: 'Thought Leaders to Follow',
+  headline: 'Thought Leaders to Follow',
   description: '',
   main_text: "We're living in super‑exponential times, yet our brains—and calendars—aren't wired for that velocity. FutureFaster.ai exists to bridge that gap for real‑estate owners, entrepreneurs, and small‑business executives who need to make smart bets on AI, Web3, AR/VR, robotics, and other disruptive forces without a PhD in computer science or 20 spare hours a week.",
   what_we_deliver: [
@@ -65,10 +65,10 @@ export const defaultWhyWeExistContent: WhyWeExistContent = {
   ]
 };
 
-// Default content for About Me
-export const defaultAboutMeContent: AboutMeContent = {
-  title: 'About Deven',
-  headline: 'About Deven',
+// Default content for About FutureFast
+export const defaultAboutFutureFastContent: AboutFutureFastContent = {
+  title: 'About FutureFast',
+  headline: 'About FutureFast',
   image: '/DKS_Future_head.JPG',
   bio_paragraphs: [
     "Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, he builds ventures that bridge physical and digital worlds.",

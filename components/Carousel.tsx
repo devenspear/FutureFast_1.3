@@ -45,11 +45,12 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
       
       <button
         aria-label="Scroll left"
-        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
+        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
         style={{ 
           opacity: 0.85, 
           animation: 'pulse-animation 2s infinite',
-          transform: 'translateY(-50%) scale(1.3)'
+          transform: 'translateY(-50%) scale(1.3)',
+          left: '-30px' // Position mostly outside with ~20% overlap
         }}
         onClick={() => scroll('left')}
       >
@@ -58,7 +59,7 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
       
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto gap-4 py-4 px-12 scrollbar-hide scroll-smooth"
+        className="flex overflow-x-auto gap-4 py-4 px-8 scrollbar-hide scroll-smooth"
         style={{ scrollBehavior: 'smooth' }}
       >
         {cards.map((card, idx) => (
@@ -73,11 +74,12 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
       
       <button
         aria-label="Scroll right"
-        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
+        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
         style={{ 
           opacity: 0.85, 
           animation: 'pulse-animation 2s infinite',
-          transform: 'translateY(-50%) scale(1.3)'
+          transform: 'translateY(-50%) scale(1.3)',
+          right: '-30px' // Position mostly outside with ~20% overlap
         }}
         onClick={() => scroll('right')}
       >

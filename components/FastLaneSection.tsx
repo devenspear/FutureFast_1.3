@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 // Speedometer component for visualizing tech metrics
@@ -18,7 +18,7 @@ const Speedometer = () => {
       setCurrentMetric((prev) => (prev + 1) % metrics.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [metrics.length]);
 
   const currentData = metrics[currentMetric];
 
@@ -149,7 +149,7 @@ export default function FastLaneSection() {
               className="text-base md:text-lg leading-7 text-gray-300 mb-8"
               variants={itemVariants}
             >
-              The world's most disruptive technologies are no longer creeping forward—they're accelerating in a blur. Artificial intelligence, blockchain, mixed‑reality, synthetic biology, and quantum computing are compounding so quickly that by the time you finish this paragraph, a new model, protocol, or headset spec will already be out. <span className="font-bold text-white">FutureFast</span> exists to help you keep up—then leap ahead.
+              The world&apos;s most disruptive technologies are no longer creeping forward—they&apos;re accelerating in a blur. Artificial intelligence, blockchain, mixed‑reality, synthetic biology, and quantum computing are compounding so quickly that by the time you finish this paragraph, a new model, protocol, or headset spec will already be out. <span className="font-bold text-white">FutureFast</span> exists to help you keep up—then leap ahead.
             </motion.p>
             
             <motion.h3 
@@ -170,7 +170,7 @@ export default function FastLaneSection() {
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>
-                <span className="text-gray-300">Blockchain is scaling at break‑neck speed – projected to reach <span className="font-bold text-white">$1.43 T</span> by 2030 (≈ 90% CAGR).</span>
+                <span className="text-gray-300">Blockchain is scaling at break‑neck speed – projected to reach <span className="font-bold text-white">$1.43 T</span> by 2030 (&asymp; 90% CAGR).</span>
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>

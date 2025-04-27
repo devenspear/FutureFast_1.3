@@ -33,7 +33,7 @@ export default function SubscriptionForm() {
 
     // Validate form
     if (!formData.firstName || !formData.lastName || !formData.email) {
-      setErrorMessage('Please fill in all required fields.');
+      setErrorMessage("Please fill in all required fields.");
       setIsSubmitting(false);
       setSubmitStatus('error');
       return;
@@ -42,7 +42,7 @@ export default function SubscriptionForm() {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setErrorMessage('Please enter a valid email address.');
+      setErrorMessage("Please enter a valid email address.");
       setIsSubmitting(false);
       setSubmitStatus('error');
       return;
@@ -81,7 +81,7 @@ export default function SubscriptionForm() {
       
       {submitStatus === 'success' ? (
         <div className="bg-green-900/30 border border-green-500 rounded-lg p-4 text-center text-green-300 mb-4">
-          Thank you for subscribing! We'll be in touch soon.
+          Thank you for subscribing! We&apos;ll be in touch soon.
         </div>
       ) : (
         <form 
@@ -90,7 +90,7 @@ export default function SubscriptionForm() {
         >
           {submitStatus === 'error' && (
             <div className="bg-red-900/30 border border-red-500 rounded-lg p-4 text-center text-red-300 mb-4">
-              {errorMessage || 'An error occurred. Please try again.'}
+              {errorMessage || `An error occurred. Please try again.`}
             </div>
           )}
           
@@ -161,7 +161,7 @@ export default function SubscriptionForm() {
                   Submitting...
                 </span>
               ) : (
-                'Subscribe'
+                `Subscribe`
               )}
             </button>
           </div>

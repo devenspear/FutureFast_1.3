@@ -7,7 +7,7 @@ This project is a professional, animated, mobile-first homepage for FutureFast.c
 - **Curated Library Cards:** Dynamic grid (Contentful integration planned)
 - **Featured Insight:** Highlight section
 - **Exponential Timeline:** Animated timeline
-- **Subscribe:** Substack integration
+- **Newsletter Subscription:** Custom form with Vercel Blob Storage integration
 - **About Me:** Bio, profile, quote, links
 - **Footer:** Socials, copyright, badge
 - **Mobile-first, dark mode**
@@ -15,6 +15,7 @@ This project is a professional, animated, mobile-first homepage for FutureFast.c
 ## Tech Stack
 - Next.js (App Router, TypeScript, v15+)
 - Tailwind CSS (animations, dark mode)
+- Vercel Blob Storage (newsletter subscriptions)
 - Contentful CMS (planned)
 
 ## Project Structure
@@ -43,7 +44,12 @@ FutureFast.1.1/
    ```bash
    npm install
    ```
-3. Start the dev server:
+3. Set up environment variables:
+   ```bash
+   cp env.sample .env.local
+   # Edit .env.local with your Vercel Blob Storage token
+   ```
+4. Start the dev server:
    ```bash
    npm run dev
    ```
@@ -55,6 +61,7 @@ FutureFast.1.1/
 - **Build Command:** (default) `next build`
 - **Output Directory:** (default)
 - **Install Command:** (default)
+- **Environment Variables:** Set up `BLOB_READ_WRITE_TOKEN` (see docs/BLOB_STORAGE_SETUP.md)
 
 ### Troubleshooting
 - If you see a 404 after deploy:

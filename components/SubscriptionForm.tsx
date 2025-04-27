@@ -93,7 +93,7 @@ export default function SubscriptionForm() {
               <input
                 type="text"
                 id="firstName"
-                name="entry.1234567890"
+                name="entry.1470198628"
                 value={formData.firstName}
                 onChange={handleChange}
                 required
@@ -106,7 +106,7 @@ export default function SubscriptionForm() {
               <input
                 type="text"
                 id="lastName"
-                name="entry.2345678901"
+                name="entry.326011048"
                 value={formData.lastName}
                 onChange={handleChange}
                 required
@@ -120,7 +120,7 @@ export default function SubscriptionForm() {
             <input
               type="email"
               id="email"
-              name="entry.3456789012"
+              name="entry.378636355"
               value={formData.email}
               onChange={handleChange}
               required
@@ -133,7 +133,7 @@ export default function SubscriptionForm() {
             <input
               type="text"
               id="company"
-              name="entry.4567890123"
+              name="entry.1151698974"
               value={formData.company}
               onChange={handleChange}
               className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"

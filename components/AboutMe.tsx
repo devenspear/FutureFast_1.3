@@ -1,47 +1,11 @@
 import React from 'react';
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
+import { defaultAboutMeContent, AboutMeContent } from '../lib/content';
 
-// Define the type for the About Me content
-interface AboutMeContent {
-  title: string;
-  headline: string;
-  image: string;
-  bio_paragraphs: string[];
-}
-
-// Function to get the content from the markdown file
-function getAboutMeContent(): AboutMeContent {
-  try {
-    // Read the markdown file
-    const filePath = path.join(process.cwd(), 'content', 'sections', 'about_me.md');
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    
-    // Parse the markdown file
-    const { data } = matter(fileContents);
-    
-    return data as AboutMeContent;
-  } catch (error) {
-    console.error('Error loading About Me content:', error);
-    
-    // Return default content if there's an error
-    return {
-      title: 'About Deven',
-      headline: 'About Deven',
-      image: '/DKS_Future_head.JPG',
-      bio_paragraphs: [
-        "Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, he builds ventures that bridge physical and digital worlds.",
-        "From smart homes to sacred geometry, from SaaS to spiritual systems, Deven sees the big picture and engineers what's next. He's the rare leader who fuses engineering precision with creative intuition—and delivers."
-      ]
-    };
-  }
-}
+// Use the default content directly in the client component
+// This will be replaced with server-side data fetching in a future update
+const content: AboutMeContent = defaultAboutMeContent;
 
 export default function AboutMe() {
-  // Get the content from the markdown file
-  const content = getAboutMeContent();
-  
   return (
     <section className="py-16 bg-black text-white" id="about">
       <div className="flex flex-col md:flex-row items-center gap-10 px-4 md:px-8 md:flex-row-reverse">

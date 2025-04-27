@@ -1,15 +1,17 @@
-import React from 'react';
+"use client";
 
-// Sampled hero image colors (example):
-// Blue: #1d5cff
-// Gold: #ffd700
+import React from 'react';
 
 export interface HeroContent {
   headline: string;
   subheadline: string;
 }
 
-export default function HeroSectionClient({ content }: { content: HeroContent }) {
+export interface HeroSectionClientProps {
+  content: HeroContent;
+}
+
+export default function HeroSectionClient({ content }: HeroSectionClientProps) {
   return (
     <section
       className="relative flex flex-col items-center justify-center min-h-[65vh] md:min-h-[85vh] w-full overflow-hidden bg-black"

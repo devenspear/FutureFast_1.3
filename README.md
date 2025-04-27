@@ -8,6 +8,7 @@ This project is a professional, animated, mobile-first homepage for FutureFast.c
 - **Featured Insight:** Highlight section
 - **Exponential Timeline:** Animated timeline
 - **Newsletter Subscription:** Custom form with Vercel Blob Storage integration
+- **Admin Dashboard:** Secure subscriber management with authentication
 - **About Me:** Bio, profile, quote, links
 - **Footer:** Socials, copyright, badge
 - **Mobile-first, dark mode**
@@ -47,7 +48,7 @@ FutureFast.1.1/
 3. Set up environment variables:
    ```bash
    cp env.sample .env.local
-   # Edit .env.local with your Vercel Blob Storage token
+   # Edit .env.local with your Vercel Blob Storage token and admin credentials
    ```
 4. Start the dev server:
    ```bash
@@ -61,7 +62,9 @@ FutureFast.1.1/
 - **Build Command:** (default) `next build`
 - **Output Directory:** (default)
 - **Install Command:** (default)
-- **Environment Variables:** Set up `BLOB_READ_WRITE_TOKEN` (see docs/BLOB_STORAGE_SETUP.md)
+- **Environment Variables:** 
+  - Set up `BLOB_READ_WRITE_TOKEN` (see docs/BLOB_STORAGE_SETUP.md)
+  - Set up `ADMIN_USERNAME` and `ADMIN_PASSWORD` (see docs/ADMIN_SECURITY.md)
 
 ### Troubleshooting
 - If you see a 404 after deploy:

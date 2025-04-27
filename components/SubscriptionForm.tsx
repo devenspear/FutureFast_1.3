@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import GoogleFormSubmitter from './GoogleFormSubmitter';
 
 export default function SubscriptionForm() {
   const [formData, setFormData] = useState({
@@ -18,20 +17,11 @@ export default function SubscriptionForm() {
   // Google Form configuration
   const googleFormId = '1FAIpQLSfvKmVdVXcZ1H7_e29KGaBYCQwsa313Ene5vmlzgGNTmV333g';
   
-  // These entry IDs need to be updated with the actual field IDs from your Google Form
-  // You'll need to inspect the Google Form HTML to get these values
-  const fieldMappings = {
-    firstName: 'entry.123456789', // Replace with actual entry ID
-    lastName: 'entry.234567890',  // Replace with actual entry ID
-    email: 'entry.345678901',     // Replace with actual entry ID
-    company: 'entry.456789012'    // Replace with actual entry ID
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [id]: value
     }));
   };
 
@@ -58,25 +48,20 @@ export default function SubscriptionForm() {
       return;
     }
 
-    // Form is valid, ready for submission
-    setIsSubmitting(true);
-  };
-
-  const handleFormSuccess = () => {
-    setSubmitStatus('success');
-    setIsSubmitting(false);
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      company: ''
-    });
-  };
-
-  const handleFormError = (message: string) => {
-    setSubmitStatus('error');
-    setErrorMessage(message);
-    setIsSubmitting(false);
+    // Form is valid, proceed with submission
+    // The actual submission will be handled by the form's action attribute
+    
+    // We'll simulate a delay to show the loading state
+    setTimeout(() => {
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        company: ''
+      });
+      setSubmitStatus('success');
+      setIsSubmitting(false);
+    }, 1000);
   };
 
   return (
@@ -90,7 +75,13 @@ export default function SubscriptionForm() {
           Thank you for subscribing! We'll be in touch soon.
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form 
+          action={`https://docs.google.com/forms/d/e/${googleFormId}/formResponse`}
+          method="POST"
+          target="_blank"
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           {submitStatus === 'error' && (
             <div className="bg-red-900/30 border border-red-500 rounded-lg p-4 text-center text-red-300 mb-4">
               {errorMessage || 'An error occurred. Please try again.'}
@@ -99,84 +90,67 @@ export default function SubscriptionForm() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="firstName" className="block text-purple-300 mb-1">
-                First Name <span className="text-pink-500">*</span>
-              </label>
               <input
                 type="text"
                 id="firstName"
-                name="firstName"
+                name="entry.1234567890"
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
-                placeholder="Your first name"
+                className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
+                placeholder="First Name *"
               />
             </div>
             
             <div>
-              <label htmlFor="lastName" className="block text-purple-300 mb-1">
-                Last Name <span className="text-pink-500">*</span>
-              </label>
               <input
                 type="text"
                 id="lastName"
-                name="lastName"
+                name="entry.2345678901"
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
-                placeholder="Your last name"
+                className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
+                placeholder="Last Name *"
               />
             </div>
           </div>
           
           <div>
-            <label htmlFor="email" className="block text-purple-300 mb-1">
-              Email <span className="text-pink-500">*</span>
-            </label>
             <input
               type="email"
               id="email"
-              name="email"
+              name="entry.3456789012"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
-              placeholder="your.email@example.com"
+              className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
+              placeholder="Email Address *"
             />
           </div>
           
           <div>
-            <label htmlFor="company" className="block text-purple-300 mb-1">
-              Company Name <span className="text-gray-500">(optional)</span>
-            </label>
             <input
               type="text"
               id="company"
-              name="company"
+              name="entry.4567890123"
               value={formData.company}
               onChange={handleChange}
-              className="w-full px-4 py-2 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
-              placeholder="Your company"
+              className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
+              placeholder="Company Name (Optional)"
             />
           </div>
           
           <div className="pt-2">
-            {!isSubmitting ? (
-              <GoogleFormSubmitter
-                formId={googleFormId}
-                fieldMappings={fieldMappings}
-                formData={formData}
-                onSuccess={handleFormSuccess}
-                onError={handleFormError}
-              />
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="w-full py-3 px-6 rounded-lg font-medium text-white bg-gray-700 cursor-not-allowed"
-              >
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 
+                ${isSubmitting 
+                  ? 'bg-gray-700 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg'}`}
+            >
+              {isSubmitting ? (
                 <span className="flex items-center justify-center">
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -184,8 +158,10 @@ export default function SubscriptionForm() {
                   </svg>
                   Submitting...
                 </span>
-              </button>
-            )}
+              ) : (
+                'Subscribe'
+              )}
+            </button>
           </div>
           
           <p className="text-center text-xs text-gray-400 mt-4">

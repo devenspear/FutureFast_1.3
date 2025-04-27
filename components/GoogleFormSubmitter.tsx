@@ -28,7 +28,7 @@ export default function GoogleFormSubmitter({
     setIsSubmitting(true);
     
     try {
-      // Create a hidden form and submit it via an iframe to bypass CORS restrictions
+      // For Google Forms, we need to use the viewform URL and then replace it with formResponse
       const formUrl = `https://docs.google.com/forms/d/e/${formId}/formResponse`;
       
       // Create a hidden form element
@@ -38,12 +38,21 @@ export default function GoogleFormSubmitter({
       form.target = 'hidden-iframe'; // Target the iframe
       form.style.display = 'none';
       
+      // Add form fields - use actual field IDs from Google Form
+      // These are temporary placeholders - we need to inspect the actual Google Form to get the correct IDs
+      const actualFieldMappings = {
+        firstName: 'entry.1234567890', // Replace with actual ID
+        lastName: 'entry.2345678901',  // Replace with actual ID
+        email: 'entry.3456789012',     // Replace with actual ID
+        company: 'entry.4567890123'    // Replace with actual ID
+      };
+      
       // Add form fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (fieldMappings[key] && value) {
+        if (value) {
           const input = document.createElement('input');
           input.type = 'text';
-          input.name = fieldMappings[key];
+          input.name = actualFieldMappings[key as keyof typeof actualFieldMappings] || fieldMappings[key];
           input.value = value;
           form.appendChild(input);
         }

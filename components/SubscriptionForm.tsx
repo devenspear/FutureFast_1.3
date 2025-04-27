@@ -48,29 +48,58 @@ export default function SubscriptionForm() {
       return;
     }
 
-    // Create the URL with query parameters
-    const formUrl = new URL(`https://docs.google.com/forms/d/e/${googleFormId}/formResponse`);
-    
-    // Add form data as query parameters
-    formUrl.searchParams.append('entry.1470198628', formData.firstName);
-    formUrl.searchParams.append('entry.326011048', formData.lastName);
-    formUrl.searchParams.append('entry.378636355', formData.email);
-    if (formData.company) {
-      formUrl.searchParams.append('entry.1151698974', formData.company);
+    try {
+      // Create a hidden form element
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `https://docs.google.com/forms/d/e/${googleFormId}/formResponse`;
+      form.target = '_blank'; // Submit in a new tab
+      form.style.display = 'none';
+      
+      // Add form fields with the correct entry IDs
+      const fieldMappings = [
+        { name: 'entry.1470198628', value: formData.firstName },
+        { name: 'entry.326011048', value: formData.lastName },
+        { name: 'entry.378636355', value: formData.email },
+        { name: 'entry.1151698974', value: formData.company },
+        { name: 'dlut', value: Date.now().toString() } // Add the dlut field with current timestamp
+      ];
+      
+      // Create and append input elements
+      fieldMappings.forEach(field => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = field.name;
+        input.value = field.value || '';
+        form.appendChild(input);
+      });
+      
+      // Append the form to the document body
+      document.body.appendChild(form);
+      
+      // Submit the form
+      form.submit();
+      
+      // Clean up - remove the form
+      setTimeout(() => {
+        document.body.removeChild(form);
+      }, 100);
+      
+      // Reset form and show success message
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        company: ''
+      });
+      setSubmitStatus('success');
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitStatus('error');
+      setErrorMessage("Something went wrong. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    // Open the URL in a new tab
-    window.open(formUrl.toString(), '_blank');
-    
-    // Show success message and reset form
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      company: ''
-    });
-    setSubmitStatus('success');
-    setIsSubmitting(false);
   };
 
   return (

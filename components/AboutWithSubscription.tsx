@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { defaultAboutFutureFastContent, AboutFutureFastContent } from '../lib/content';
-import SubscriptionForm from './SubscriptionForm';
+import GoogleFormEmbed from './GoogleFormEmbed';
 
 // Use the default content directly in the client component
 // This will be replaced with server-side data fetching in a future update
@@ -49,7 +49,12 @@ export default function AboutWithSubscription() {
           
           {/* Subscription form - Right side */}
           <div className="lg:w-2/5">
-            <SubscriptionForm />
+            <div className="w-full bg-gray-900/70 rounded-xl p-6 shadow-lg border border-purple-700/20">
+              <p className="text-lg text-purple-100 mb-6">
+                Sign up below to be added to our mailing list. You will receive updates and be invited to more content like this.
+              </p>
+              <GoogleFormEmbed />
+            </div>
           </div>
         </div>
       </div>

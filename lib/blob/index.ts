@@ -107,7 +107,7 @@ export async function checkEmailExists(email: string): Promise<boolean> {
 // Get all subscribers
 export async function getSubscribers(): Promise<SubscriberData[]> {
   try {
-    let subscribers: SubscriberData[] = [...localSubscribers]; // Start with in-memory subscribers
+    const subscribers: SubscriberData[] = [...localSubscribers]; // Start with in-memory subscribers
     
     // If Blob Storage is configured, get subscribers from there too
     if (isBlobConfigured()) {

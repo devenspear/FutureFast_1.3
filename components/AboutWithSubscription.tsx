@@ -63,7 +63,7 @@ export default function AboutWithSubscription() {
           company: ''
         });
       }
-    } catch (error) {
+    } catch {
       // Handle errors
       setSubmitResult({
         success: false,

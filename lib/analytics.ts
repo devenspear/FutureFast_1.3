@@ -1,3 +1,5 @@
+"use client";
+
 // Google Analytics event tracking utility
 
 // Define types for GA events

@@ -102,7 +102,7 @@ export default function NewsAndDisruptionSection() {
           >
             <div className="relative overflow-hidden rounded-xl border-2 border-cyan-400 transition-all duration-300 group-hover:shadow-cyan-500/30 group-hover:shadow-xl">
               <Image
-                src="/images/disruption-weekly.png"
+                src="https://placehold.co/600x338/0a192f/64ffda?text=Disruption+Weekly"
                 alt="Disruption Weekly Newsletter"
                 width={600}
                 height={338}

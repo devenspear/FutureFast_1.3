@@ -15,11 +15,11 @@ export default function SubscribeSection() {
           {content.headline}
         </h1>
         <p className="mb-10 text-lg md:text-xl text-purple-100 font-medium">
-          {content.main_text.includes('FutureFaster.ai') ? (
+          {content.main_text.includes('FutureFast.ai') ? (
             <>
-              {content.main_text.split('FutureFaster.ai')[0]}
-              <span className="text-purple-400 font-bold">FutureFaster.ai</span>
-              {content.main_text.split('FutureFaster.ai')[1]}
+              {content.main_text.split('FutureFast.ai')[0]}
+              <span className="text-purple-400 font-bold">FutureFast.ai</span>
+              {content.main_text.split('FutureFast.ai')[1]}
             </>
           ) : content.main_text}
         </p>

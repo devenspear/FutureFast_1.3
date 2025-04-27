@@ -2,7 +2,7 @@
 title: Why We Exist
 headline: Why We Exist
 description: "We're living in super‑exponential times, yet our brains—and calendars—aren't wired for that velocity."
-main_text: "We're living in super‑exponential times, yet our brains—and calendars—aren't wired for that velocity. FutureFaster.ai exists to bridge that gap for real‑estate owners, entrepreneurs, and small‑business executives who need to make smart bets on AI, Web3, AR/VR, robotics, and other disruptive forces without a PhD in computer science or 20 spare hours a week."
+main_text: "We're living in super‑exponential times, yet our brains—and calendars—aren't wired for that velocity. FutureFast.ai exists to bridge that gap for real‑estate owners, entrepreneurs, and small‑business executives who need to make smart bets on AI, Web3, AR/VR, robotics, and other disruptive forces without a PhD in computer science or 20 spare hours a week."
 what_we_deliver:
   - title: "Layered Learning"
     description: "60‑second headlines, 3‑minute briefs, and 5‑minute deep dives so you choose the depth you need."

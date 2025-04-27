@@ -48,20 +48,29 @@ export default function SubscriptionForm() {
       return;
     }
 
-    // Form is valid, proceed with submission
-    // The actual submission will be handled by the form's action attribute
+    // Create the URL with query parameters
+    const formUrl = new URL(`https://docs.google.com/forms/d/e/${googleFormId}/formResponse`);
     
-    // We'll simulate a delay to show the loading state
-    setTimeout(() => {
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        company: ''
-      });
-      setSubmitStatus('success');
-      setIsSubmitting(false);
-    }, 1000);
+    // Add form data as query parameters
+    formUrl.searchParams.append('entry.1470198628', formData.firstName);
+    formUrl.searchParams.append('entry.326011048', formData.lastName);
+    formUrl.searchParams.append('entry.378636355', formData.email);
+    if (formData.company) {
+      formUrl.searchParams.append('entry.1151698974', formData.company);
+    }
+    
+    // Open the URL in a new tab
+    window.open(formUrl.toString(), '_blank');
+    
+    // Show success message and reset form
+    setFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      company: ''
+    });
+    setSubmitStatus('success');
+    setIsSubmitting(false);
   };
 
   return (
@@ -76,9 +85,6 @@ export default function SubscriptionForm() {
         </div>
       ) : (
         <form 
-          action={`https://docs.google.com/forms/d/e/${googleFormId}/formResponse`}
-          method="POST"
-          target="_blank"
           onSubmit={handleSubmit}
           className="space-y-4"
         >
@@ -93,7 +99,6 @@ export default function SubscriptionForm() {
               <input
                 type="text"
                 id="firstName"
-                name="entry.1470198628"
                 value={formData.firstName}
                 onChange={handleChange}
                 required
@@ -106,7 +111,6 @@ export default function SubscriptionForm() {
               <input
                 type="text"
                 id="lastName"
-                name="entry.326011048"
                 value={formData.lastName}
                 onChange={handleChange}
                 required
@@ -120,7 +124,6 @@ export default function SubscriptionForm() {
             <input
               type="email"
               id="email"
-              name="entry.378636355"
               value={formData.email}
               onChange={handleChange}
               required
@@ -133,7 +136,6 @@ export default function SubscriptionForm() {
             <input
               type="text"
               id="company"
-              name="entry.1151698974"
               value={formData.company}
               onChange={handleChange}
               className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"

@@ -8,6 +8,24 @@ interface CarouselProps {
 
 const scrollAmount = 300;
 
+// Define keyframes for the pulse animation
+const pulseAnimation = `
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
+    transform: translateY(-50%) scale(1.3);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
+    transform: translateY(-50%) scale(1.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+    transform: translateY(-50%) scale(1.3);
+  }
+}
+`;
+
 const Carousel: React.FC<CarouselProps> = ({ cards }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -22,17 +40,25 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
 
   return (
     <div className="relative w-full min-h-[440px] md:min-h-[470px] lg:min-h-[500px] xl:min-h-[520px]">
+      {/* Add the keyframes animation to the head */}
+      <style>{pulseAnimation}</style>
+      
       <button
         aria-label="Scroll left"
-        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900 text-blue-200 shadow-md rounded-full p-3 hover:bg-blue-700 hover:text-white transition border border-blue-700"
-        style={{ opacity: 0.7, transform: 'translateY(-50%) scale(1.3)' }}
+        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
+        style={{ 
+          opacity: 0.85, 
+          animation: 'pulse-animation 2s infinite',
+          transform: 'translateY(-50%) scale(1.3)'
+        }}
         onClick={() => scroll('left')}
       >
-        <FaChevronLeft size={20} />
+        <FaChevronLeft size={24} />
       </button>
+      
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto gap-4 py-4 px-2 scrollbar-hide scroll-smooth"
+        className="flex overflow-x-auto gap-4 py-4 px-12 scrollbar-hide scroll-smooth"
         style={{ scrollBehavior: 'smooth' }}
       >
         {cards.map((card, idx) => (
@@ -44,13 +70,18 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
           </div>
         ))}
       </div>
+      
       <button
         aria-label="Scroll right"
-        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900 text-blue-200 shadow-md rounded-full p-3 hover:bg-blue-700 hover:text-white transition border border-blue-700"
-        style={{ opacity: 0.7, transform: 'translateY(-50%) scale(1.3)' }}
+        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
+        style={{ 
+          opacity: 0.85, 
+          animation: 'pulse-animation 2s infinite',
+          transform: 'translateY(-50%) scale(1.3)'
+        }}
         onClick={() => scroll('right')}
       >
-        <FaChevronRight size={20} />
+        <FaChevronRight size={24} />
       </button>
     </div>
   );

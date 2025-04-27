@@ -173,10 +173,10 @@ export default function ThoughtLeadersSection() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse bg-gray-900/50 rounded-xl overflow-hidden shadow-lg">
             <thead>
-              <tr className="bg-purple-900/40 text-left">
+              <tr className="bg-purple-900/20 text-left">
                 <th className="py-4 px-6 font-orbitron text-cyan-300">Name</th>
                 <th className="py-4 px-6 font-orbitron text-cyan-300">Area of Expertise</th>
-                <th className="py-4 px-6 font-orbitron text-cyan-300">Social Media</th>
+                <th className="py-4 px-6 font-orbitron text-cyan-300">Online Channels to Visit</th>
               </tr>
             </thead>
             <tbody>
@@ -187,19 +187,19 @@ export default function ThoughtLeadersSection() {
                     index % 2 === 0 ? 'bg-gray-900/30' : 'bg-gray-900/10'
                   }`}
                 >
-                  <td className="py-4 px-6 font-bold text-white">{leader.name}</td>
-                  <td className="py-4 px-6 text-gray-300">{leader.expertise}</td>
-                  <td className="py-4 px-6">
-                    <div className="flex flex-wrap gap-3">
+                  <td className="py-3 px-6 font-bold text-white">{leader.name}</td>
+                  <td className="py-3 px-6 text-gray-300">{leader.expertise}</td>
+                  <td className="py-3 px-6">
+                    <div className="flex flex-wrap gap-2">
                       {leader.socialLinks.map((link, linkIndex) => (
                         <Link 
                           key={linkIndex} 
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-gray-800 hover:bg-purple-800 transition-colors text-white text-sm"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-800 hover:bg-purple-800 transition-colors text-white text-xs"
                         >
-                          <span className="text-xl" role="img" aria-label={link.label}>{link.emoji}</span>
+                          <span className="text-base" role="img" aria-label={link.label}>{link.emoji}</span>
                           <span className="hidden sm:inline">{link.label}</span>
                         </Link>
                       ))}
@@ -211,7 +211,7 @@ export default function ThoughtLeadersSection() {
           </table>
         </div>
         
-        <div className="mt-8 text-center text-sm text-gray-400">
+        <div className="mt-6 text-center text-xs text-gray-500">
           <p>
             <span className="font-bold">Emoji Key:</span> 🐦 X (Twitter) • 📬 Substack • 📺 YouTube • 💼 LinkedIn • 📸 Instagram • 🎵 TikTok • 🌐 Website • 🎙️ Podcast
           </p>

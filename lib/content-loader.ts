@@ -21,11 +21,11 @@ export interface CatalogItem {
   image: string;
   url: string;
   body: string;
-  [key: string]: any; // For any additional fields
+  [key: string]: unknown; // For any additional fields
 }
 
 // Base function to load content from a markdown file
-export function loadMarkdownContent(filePath: string) {
+export function loadMarkdownContent(filePath: string): { data: Record<string, unknown>; content: string } {
   try {
     if (fs.existsSync(filePath)) {
       const fileContent = fs.readFileSync(filePath, 'utf8');
@@ -128,11 +128,11 @@ export function loadNewsItems(): NewsItem[] {
         const filePath = path.join(newsDir, file);
         const { data } = loadMarkdownContent(filePath);
         return {
-          title: data.title || '',
-          source: data.source || '',
-          url: data.url || '#',
-          publishedDate: data.publishedDate || new Date().toISOString(),
-          featured: data.featured || false,
+          title: data.title as string || '',
+          source: data.source as string || '',
+          url: data.url as string || '#',
+          publishedDate: data.publishedDate as string || new Date().toISOString(),
+          featured: data.featured as boolean || false,
         };
       })
       // Sort by date (newest first)
@@ -154,16 +154,16 @@ export function loadCatalogItems(): CatalogItem[] {
         const filePath = path.join(catalogDir, file);
         const { data, content } = loadMarkdownContent(filePath);
         return {
-          title: data.title || '',
-          description: data.description || '',
-          year: data.year || new Date().getFullYear(),
-          month: data.month || '',
-          type: data.type || '',
-          tag: data.tag || '',
-          image: data.image || '',
-          url: data.url || '#',
+          title: data.title as string || '',
+          description: data.description as string || '',
+          year: data.year as string || new Date().getFullYear(),
+          month: data.month as string || '',
+          type: data.type as string || '',
+          tag: data.tag as string || '',
+          image: data.image as string || '',
+          url: data.url as string || '#',
           body: content,
-          ...data
+          ...data as Record<string, unknown>
         };
       });
   }

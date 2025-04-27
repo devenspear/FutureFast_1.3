@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import Image from 'next/image';
 
 export interface AboutContent {
   headline: string;
@@ -28,12 +27,12 @@ export default function AboutFutureFastClient({ content }: AboutFutureFastClient
             
             <div className="bg-gray-900 p-6 rounded-lg border border-cyan-800 hover:border-cyan-400 transition-all duration-300">
               <h3 className="text-xl font-semibold mb-4 text-cyan-300">Neutral Librarian</h3>
-              <p className="text-gray-300">We curate all credible voices—McKinsey, CB Insights, podcasts, whitepapers—so you don't have to.</p>
+              <p className="text-gray-300">We curate all credible voices—McKinsey, CB Insights, podcasts, whitepapers—so you don&apos;t have to.</p>
             </div>
             
             <div className="bg-gray-900 p-6 rounded-lg border border-cyan-800 hover:border-cyan-400 transition-all duration-300">
               <h3 className="text-xl font-semibold mb-4 text-cyan-300">Radically Clear</h3>
-              <p className="text-gray-300">If a ninth-grader can't understand it, we rewrite it. Clarity is our obsession.</p>
+              <p className="text-gray-300">If a ninth-grader can&apos;t understand it, we rewrite it. Clarity is our obsession.</p>
             </div>
           </div>
         </div>

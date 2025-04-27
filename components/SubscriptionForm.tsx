@@ -80,12 +80,8 @@ export default function SubscriptionForm() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-gray-900/70 rounded-xl p-8 shadow-lg border border-purple-700/20">
-      <h2 className="font-orbitron text-2xl md:text-3xl font-bold text-center mb-6 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
-        Join Our Mailing List
-      </h2>
-      
-      <p className="text-center text-lg text-purple-100 mb-8">
+    <div className="w-full bg-gray-900/70 rounded-xl p-6 shadow-lg border border-purple-700/20">
+      <p className="text-lg text-purple-100 mb-6">
         Sign up below to be added to our mailing list. You will receive updates and be invited to more content like this.
       </p>
       

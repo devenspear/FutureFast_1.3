@@ -3,8 +3,7 @@ import NewsAndDisruptionSection from "../../components/NewsAndDisruptionSection"
 import QuotationsRibbonSection from "../../components/QuotationsRibbonSection";
 import LibraryGrid from "../../components/LibraryGrid";
 import ThoughtLeadersSection from "../../components/ThoughtLeadersSection";
-import AboutFutureFast from "../../components/AboutFutureFast";
-import SubscriptionSection from "../../components/SubscriptionSection";
+import AboutWithSubscription from "../../components/AboutWithSubscription";
 import Footer from "../../components/Footer";
 
 export default function Home() {
@@ -17,9 +16,8 @@ export default function Home() {
       <div className="w-full h-24 md:h-32 bg-gradient-to-b from-gray-950/90 via-purple-900/30 to-transparent blur-sm pointer-events-none -mb-8 md:-mb-16" aria-hidden="true" />
       <ThoughtLeadersSection />
       <div className="w-full h-24 md:h-32 bg-gradient-to-b from-transparent via-purple-900/40 to-gray-950/90 blur-sm pointer-events-none -mt-8 md:-mt-16" aria-hidden="true" />
-      <AboutFutureFast />
+      <AboutWithSubscription />
       <QuotationsRibbonSection />
-      <SubscriptionSection />
       <Footer />
     </main>
   );

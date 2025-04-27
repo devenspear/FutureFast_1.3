@@ -5,6 +5,6 @@ year: 2025
 month: December
 type: Report
 tag: Tech
-image: /uploads/cb-insights-tech-trends-2025.png
+image: /uploads/cb-insights-tech-trends-2025.jpg
 url: https://hkifoa.com/wp-content/uploads/2024/12/2025-tech-trends-cbinsights.pdf
 ---

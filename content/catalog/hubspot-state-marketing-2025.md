@@ -5,6 +5,6 @@ year: 2025
 month: April
 type: Report
 tag: Marketing
-image: /uploads/hubspot-state-marketing-2025.png
+image: /uploads/hubspot-state-marketing-2025.jpg
 url: https://www.hubspot.com/hubfs/2025%20State%20of%20Marketing%20from%20HubSpot.pdf
 ---

@@ -5,6 +5,6 @@ year: 2025
 month: January
 type: Report
 tag: Innovation
-image: /uploads/ark-big-ideas-2025.png
+image: /uploads/ark-big-ideas-2025.jpg
 url: https://research.ark-invest.com/hubfs/1_Download_Files_ARK-Invest/Big_Ideas/ARK%20Invest%20Big%20Ideas%202025.pdf
 ---

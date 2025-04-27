@@ -5,6 +5,6 @@ year: 2024
 month: October
 type: Report
 tag: Blockchain
-image: /uploads/tac-tokenization-2024.png
+image: /uploads/tac-tokenization-2024.jpg
 url: https://22049776.fs1.hubspotusercontent-na1.net/hubfs/22049776/TAC%20State%20of%20Tokenization%202024%20Report.pdf
 ---

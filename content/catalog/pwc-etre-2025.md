@@ -5,6 +5,6 @@ year: 2025
 month: January
 type: Report
 tag: RealEstate
-image: /uploads/pwc-etre-2025.png
+image: /uploads/pwc-etre-2025.jpg
 url: https://ulidigitalmarketing.blob.core.windows.net/ulidcnc/sites/19/2025/01/EmergingTrendsRE_PWc_1_23_2025.pdf
 ---

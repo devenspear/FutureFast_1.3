@@ -5,6 +5,6 @@ year: 2025
 month: March
 type: Report
 tag: Tech
-image: /uploads/deloitte-tech-trends-2025.png
+image: /uploads/deloitte-tech-trends-2025.jpg
 url: https://www2.deloitte.com/content/dam/insights/articles/us187540_tech-trends-2025/DI_Tech-trends-2025.pdf
 ---

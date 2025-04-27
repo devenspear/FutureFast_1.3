@@ -5,6 +5,6 @@ year: 2025
 month: May
 type: Report
 tag: Workforce
-image: /uploads/wef-future-jobs-2025.png
+image: /uploads/wef-future-jobs-2025.jpg
 url: https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf
 ---

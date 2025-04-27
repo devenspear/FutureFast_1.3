@@ -5,6 +5,6 @@ year: 2025
 month: February
 type: Report
 tag: AI
-image: /uploads/ai-future-of-work.png
+image: /uploads/ai-future-of-work.jpg
 url: https://nap.nationalacademies.org/download/27644
 ---

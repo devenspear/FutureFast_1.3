@@ -11,6 +11,14 @@ export interface SubscriberData {
   createdAt: string;
 }
 
+// In-memory fallback storage for development environments without Blob Storage configured
+const localSubscribers: SubscriberData[] = [];
+
+// Check if Vercel Blob is properly configured
+const isBlobConfigured = () => {
+  return process.env.BLOB_READ_WRITE_TOKEN !== undefined;
+};
+
 // Save subscriber data to Blob Storage
 export async function saveSubscriber(firstName: string, lastName: string, email: string, company: string = ''): Promise<{ success: boolean; message: string; id?: string }> {
   try {
@@ -30,15 +38,28 @@ export async function saveSubscriber(firstName: string, lastName: string, email:
     // Convert to JSON string
     const jsonData = JSON.stringify(subscriberData);
     
-    // Store in Blob Storage with email as part of the filename for easy lookup
-    // Using a folder structure: subscribers/email-id.json
-    const filename = `subscribers/${email.replace(/[^a-zA-Z0-9]/g, '_')}-${id}.json`;
-    
-    // Upload to Blob Storage
-    await put(filename, jsonData, {
-      access: 'public',
-      contentType: 'application/json'
-    });
+    // Check if Blob Storage is configured
+    if (isBlobConfigured()) {
+      try {
+        // Store in Blob Storage with email as part of the filename for easy lookup
+        // Using a folder structure: subscribers/email-id.json
+        const filename = `subscribers/${email.replace(/[^a-zA-Z0-9]/g, '_')}-${id}.json`;
+        
+        // Upload to Blob Storage
+        await put(filename, jsonData, {
+          access: 'public',
+          contentType: 'application/json'
+        });
+      } catch (blobError) {
+        console.error('Blob Storage error:', blobError);
+        // Fall back to in-memory storage
+        localSubscribers.push(subscriberData);
+      }
+    } else {
+      console.warn('Blob Storage not configured, using in-memory storage');
+      // Use in-memory storage as fallback
+      localSubscribers.push(subscriberData);
+    }
     
     return { 
       success: true, 
@@ -57,12 +78,26 @@ export async function saveSubscriber(firstName: string, lastName: string, email:
 // Check if an email already exists in the subscribers
 export async function checkEmailExists(email: string): Promise<boolean> {
   try {
-    // List all blobs in the subscribers folder
-    const { blobs } = await list({ prefix: 'subscribers/' });
+    // Check in-memory storage first
+    const emailExists = localSubscribers.some(sub => sub.email.toLowerCase() === email.toLowerCase());
+    if (emailExists) return true;
     
-    // Check if any blob contains this email in its filename
-    const emailPattern = email.replace(/[^a-zA-Z0-9]/g, '_');
-    return blobs.some(blob => blob.pathname.includes(emailPattern));
+    // If Blob Storage is configured, check there too
+    if (isBlobConfigured()) {
+      try {
+        // List all blobs in the subscribers folder
+        const { blobs } = await list({ prefix: 'subscribers/' });
+        
+        // Check if any blob contains this email in its filename
+        const emailPattern = email.replace(/[^a-zA-Z0-9]/g, '_');
+        return blobs.some(blob => blob.pathname.includes(emailPattern));
+      } catch (blobError) {
+        console.error('Blob Storage error:', blobError);
+        return false; // Assume email doesn't exist if there's an error
+      }
+    }
+    
+    return false; // Assume email doesn't exist if Blob Storage is not configured
   } catch (error) {
     console.error('Error checking email existence:', error);
     return false; // Assume email doesn't exist if there's an error
@@ -72,19 +107,35 @@ export async function checkEmailExists(email: string): Promise<boolean> {
 // Get all subscribers
 export async function getSubscribers(): Promise<SubscriberData[]> {
   try {
-    // List all blobs in the subscribers folder
-    const { blobs } = await list({ prefix: 'subscribers/' });
+    let subscribers: SubscriberData[] = [...localSubscribers]; // Start with in-memory subscribers
     
-    // Array to hold all subscriber data
-    const subscribers: SubscriberData[] = [];
-    
-    // Process each blob
-    for (const blob of blobs) {
-      // Fetch the blob content
-      const response = await fetch(blob.url);
-      if (response.ok) {
-        const subscriberData = await response.json();
-        subscribers.push(subscriberData);
+    // If Blob Storage is configured, get subscribers from there too
+    if (isBlobConfigured()) {
+      try {
+        // List all blobs in the subscribers folder
+        const { blobs } = await list({ prefix: 'subscribers/' });
+        
+        // Process each blob
+        for (const blob of blobs) {
+          // Fetch the blob content
+          const response = await fetch(blob.url);
+          if (response.ok) {
+            const subscriberData = await response.json();
+            
+            // Check if this subscriber is already in our list (from in-memory storage)
+            const existingIndex = subscribers.findIndex(sub => sub.id === subscriberData.id);
+            if (existingIndex >= 0) {
+              // Replace with the blob version
+              subscribers[existingIndex] = subscriberData;
+            } else {
+              // Add to our list
+              subscribers.push(subscriberData);
+            }
+          }
+        }
+      } catch (blobError) {
+        console.error('Blob Storage error:', blobError);
+        // Continue with just in-memory subscribers
       }
     }
     
@@ -94,26 +145,42 @@ export async function getSubscribers(): Promise<SubscriberData[]> {
     );
   } catch (error) {
     console.error('Error getting subscribers:', error);
-    return [];
+    return localSubscribers; // Return in-memory subscribers as fallback
   }
 }
 
 // Delete a subscriber by ID
 export async function deleteSubscriber(id: string): Promise<boolean> {
   try {
-    // List all blobs in the subscribers folder
-    const { blobs } = await list({ prefix: 'subscribers/' });
+    // Remove from in-memory storage
+    const initialLength = localSubscribers.length;
+    const filteredSubscribers = localSubscribers.filter(sub => sub.id !== id);
+    localSubscribers.length = 0;
+    localSubscribers.push(...filteredSubscribers);
     
-    // Find the blob that contains this ID
-    const targetBlob = blobs.find(blob => blob.pathname.includes(id));
+    const removedFromMemory = initialLength > localSubscribers.length;
     
-    if (targetBlob) {
-      // Delete the blob
-      await del(targetBlob.pathname);
-      return true;
+    // If Blob Storage is configured, delete from there too
+    if (isBlobConfigured()) {
+      try {
+        // List all blobs in the subscribers folder
+        const { blobs } = await list({ prefix: 'subscribers/' });
+        
+        // Find the blob that contains this ID
+        const targetBlob = blobs.find(blob => blob.pathname.includes(id));
+        
+        if (targetBlob) {
+          // Delete the blob
+          await del(targetBlob.pathname);
+          return true;
+        }
+      } catch (blobError) {
+        console.error('Blob Storage error:', blobError);
+        return removedFromMemory; // Return true if we at least removed from memory
+      }
     }
     
-    return false;
+    return removedFromMemory;
   } catch (error) {
     console.error('Error deleting subscriber:', error);
     return false;

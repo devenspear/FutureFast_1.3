@@ -74,32 +74,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => url && trackResourceClick(title, url)}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  padding: '0.5rem 0',
-                  borderRadius: '9999px',
-                  background: 'linear-gradient(90deg, #06b6d4 0%, #2563eb 100%)',
-                  color: '#fff',
-                  fontWeight: '600',
-                  fontSize: '1rem',
-                  textAlign: 'center',
-                  boxShadow: '0 2px 8px 0 rgba(59,130,246,0.10)',
-                  minHeight: '2.5rem',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  marginBottom: '15px' 
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(90deg, #2563eb 0%, #06b6d4 100%)';
-                  e.currentTarget.style.boxShadow = '0 4px 16px 0 rgba(59,130,246,0.18)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(90deg, #06b6d4 0%, #2563eb 100%)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px 0 rgba(59,130,246,0.10)';
-                }}
+                className="inline-block w-full py-3 px-6 rounded-lg font-medium text-white text-center transition-all duration-200 bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg"
               >
-                See Source...
+                See Source Here
               </a>
             )}
           </div>

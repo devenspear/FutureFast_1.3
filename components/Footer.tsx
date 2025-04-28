@@ -24,37 +24,18 @@ export default async function Footer() {
             <p className="text-gray-400 mt-2">Clarity in exponential disruption</p>
           </div>
           
-          <div className="flex flex-col items-center md:items-end">
-            <div className="flex space-x-4 mb-4">
-              {links.map((link) => (
-                <Link 
-                  key={link.label}
-                  href={link.href}
-                  className="text-gray-400 hover:text-cyan-400 transition-colors"
-                  target={link.href.startsWith('http') ? '_blank' : undefined}
-                  rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-            
-            <form className="w-full max-w-sm">
-              <div className="flex items-center border-b border-cyan-500 py-2">
-                <input 
-                  className="appearance-none bg-transparent border-none w-full text-gray-300 mr-3 py-1 px-2 leading-tight focus:outline-none" 
-                  type="email" 
-                  placeholder="Your email for updates" 
-                  aria-label="Email"
-                />
-                <button 
-                  className="flex-shrink-0 bg-cyan-500 hover:bg-cyan-700 border-cyan-500 hover:border-cyan-700 text-sm border-4 text-white py-1 px-2 rounded" 
-                  type="button"
-                >
-                  Subscribe
-                </button>
-              </div>
-            </form>
+          <div className="flex space-x-4">
+            {links.map((link) => (
+              <Link 
+                key={link.label}
+                href={link.href}
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                target={link.href.startsWith('http') ? '_blank' : undefined}
+                rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
         

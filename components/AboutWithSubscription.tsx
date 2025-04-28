@@ -30,34 +30,50 @@ export default function AboutWithSubscription() {
   };
   
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Reset submission state
     setIsSubmitting(true);
     setSubmitResult(null);
     
-    // Simulate form submission without making external API calls
-    // This prevents authentication popups while still giving users feedback
-    setTimeout(() => {
+    try {
+      // Submit data to the API
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const result = await response.json();
+      
       setIsSubmitting(false);
       setSubmitResult({
-        success: true,
-        message: "Thank you for subscribing! We'll be in touch soon."
+        success: result.success,
+        message: result.message || (result.success 
+          ? "Thank you for subscribing! We'll be in touch soon."
+          : "There was an error processing your subscription. Please try again.")
       });
       
       // Clear form if successful
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        company: ''
+      if (result.success) {
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          company: ''
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setIsSubmitting(false);
+      setSubmitResult({
+        success: false,
+        message: "There was an error connecting to our server. Please try again later."
       });
-      
-      // In a production environment, you would store this data locally
-      // or find a secure way to submit it without triggering auth popups
-      console.log("Subscription data:", formData);
-    }, 1000);
+    }
   };
   
   return (

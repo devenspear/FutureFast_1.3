@@ -37,10 +37,10 @@ export default async function HeroSection() {
             headline
           )}
         </h1>
-        <div className="mt-6 flex justify-center">
-          <span className="font-orbitron text-lg md:text-2xl max-w-3xl mx-auto px-12 py-4 rounded-xl bg-black/60 border border-cyan-400 shadow-lg text-cyan-200 tracking-wide animate-fade-in backdrop-blur-sm">
+        <div className="mt-6 flex justify-center w-full max-w-4xl mx-auto">
+          <div className="font-orbitron text-lg md:text-xl lg:text-2xl text-center w-full max-w-3xl mx-auto p-6 rounded-2xl bg-gradient-to-r from-black/70 via-indigo-950/60 to-black/70 border-2 border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.3)] text-cyan-100 tracking-wide backdrop-blur-md flex items-center justify-center h-[110px] animate-pulse-subtle">
             {subheadline}
-          </span>
+          </div>
         </div>
       </div>
     </section>

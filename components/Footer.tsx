@@ -7,8 +7,11 @@ import { loadSiteSettings } from '../lib/content-loader';
 const links = [
   { href: "https://www.linkedin.com/in/devenspear/", label: "LinkedIn" },
   { href: "https://twitter.com/DevenSpear", label: "Twitter" },
-  { href: "https://www.instagram.com/devenspear/", label: "Instagram" },
-  { href: "/admin", label: "Admin" },
+];
+
+const legalLinks = [
+  { href: "/terms", label: "Terms of Service" },
+  { href: "/privacy", label: "Privacy Policy" },
 ];
 
 export default async function Footer() {
@@ -39,8 +42,20 @@ export default async function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-gray-800 pt-6 text-center text-gray-500 text-sm">
-          <p>&copy; {footerText}</p>
+        <div className="border-t border-gray-800 pt-6 text-center">
+          <div className="flex justify-center space-x-6 mb-4">
+            {legalLinks.map((link) => (
+              <Link 
+                key={link.label}
+                href={link.href}
+                className="text-gray-500 hover:text-cyan-400 text-sm transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <p className="text-gray-500 text-sm"> {footerText}</p>
+          <p className="text-gray-600 text-xs mt-2">Designed by Deven Spear (the Human) and coded by AI</p>
         </div>
       </div>
     </footer>

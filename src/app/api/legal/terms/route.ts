@@ -5,7 +5,7 @@ import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Path to the markdown file
     const filePath = path.join(process.cwd(), 'content/legal/terms.md');

@@ -13,9 +13,6 @@ export default function SubscriptionForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-
-  // Google Form configuration
-  const googleFormId = '1FAIpQLSfvKmVdVXcZ1H7_e29KGaBYCQwsa313Ene5vmlzgGNTmV333g';
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -84,7 +81,7 @@ export default function SubscriptionForm() {
   return (
     <div className="w-full bg-gray-900/70 rounded-xl p-6 shadow-lg border border-purple-700/20">
       <div className="text-lg text-purple-100 mb-6">
-        <strong>Welcome to the Future of Faster Thinking.</strong> If you're ready to ride the wave instead of being swept away by it — You're in the right place! 👉 <strong>Join our private list</strong> for early access to disruptive ideas, tools, and strategies to stay <em>future-ready</em>. Be first to receive insights that help you outthink, outbuild, and outlast the competition.
+        <strong>Welcome to the Future of Faster Thinking.</strong> If you&apos;re ready to ride the wave instead of being swept away by it — You&apos;re in the right place! 👉 <strong>Join our private list</strong> for early access to disruptive ideas, tools, and strategies to stay <em>future-ready</em>. Be first to receive insights that help you outthink, outbuild, and outlast the competition.
       </div>
       
       {submitStatus === 'success' ? (

@@ -1,0 +1,24 @@
+@keyframes subtlePulse {
+  0%, 100% { background-color: rgba(0, 0, 0, 1); }
+  50% { background-color: rgba(10, 10, 20, 1); } /* Very subtle shift */
+}
+
+.animated-background {
+  animation: subtlePulse 20s ease-in-out infinite;
+  will-change: background-color;
+}
+
+/* Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animated-background {
+    animation: none;
+    background-color: #000000;
+  }
+}
+
+/* Optional: Simplify animation on lower-powered devices */
+@media (max-width: 768px) {
+  .animated-background {
+    animation-duration: 30s; /* Even slower on mobile */
+  }
+}

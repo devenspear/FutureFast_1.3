@@ -8,7 +8,7 @@ import Footer from "../../components/Footer";
 
 export default function Home() {
   return (
-    <main className="bg-black min-h-screen w-full">
+    <main className="bg-black min-h-screen w-full animated-background">
       <HeroSection />
       <FastLaneSection />
       <NewsAndDisruptionSection />

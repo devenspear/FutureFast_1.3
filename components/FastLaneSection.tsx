@@ -1,111 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-
-// Speedometer component for visualizing tech metrics
-const Speedometer = () => {
-  const [currentMetric, setCurrentMetric] = useState(0);
-  const metrics = [
-    { value: 2, label: "Skills now expire in ~2 years", color: "#00c8ff" },
-    { value: 67.2, label: "AI investment hit $67.2B", color: "#1d5cff" },
-    { value: 90, label: "Blockchain scaling at 90% CAGR", color: "#ffd700" },
-    { value: 41, label: "AR/VR shipments up 41%", color: "#ff00ff" }
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentMetric((prev) => (prev + 1) % metrics.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [metrics.length]);
-
-  const currentData = metrics[currentMetric];
-
-  return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center">
-      {/* Speedometer visualization */}
-      <div className="relative w-64 h-64">
-        {/* Speedometer background */}
-        <svg className="w-full h-full" viewBox="0 0 200 200">
-          <defs>
-            <linearGradient id="speedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#1d5cff" stopOpacity="0.7" />
-              <stop offset="100%" stopColor="#00c8ff" stopOpacity="0.7" />
-            </linearGradient>
-          </defs>
-          
-          {/* Speedometer track */}
-          <circle 
-            cx="100" 
-            cy="100" 
-            r="80" 
-            fill="none" 
-            stroke="rgba(80,220,255,0.2)" 
-            strokeWidth="10" 
-            strokeLinecap="round"
-          />
-          
-          {/* Animated arc */}
-          <motion.path
-            d={`M 30 100 A 70 70 0 1 1 170 100`}
-            fill="none"
-            stroke="url(#speedGradient)"
-            strokeWidth="10"
-            strokeLinecap="round"
-            strokeDasharray="440"
-            initial={{ strokeDashoffset: 440 }}
-            animate={{ 
-              strokeDashoffset: 440 - (440 * currentData.value / 100),
-              stroke: currentData.color
-            }}
-            transition={{ duration: 1, ease: "easeOut" }}
-          />
-          
-          {/* Center circle */}
-          <circle 
-            cx="100" 
-            cy="100" 
-            r="60" 
-            fill="#000000" 
-            stroke="rgba(80,220,255,0.3)" 
-            strokeWidth="1" 
-          />
-        </svg>
-        
-        {/* Value display */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <motion.div 
-            className="font-orbitron text-5xl font-bold bg-gradient-to-r from-[#1d5cff] to-[#00c8ff] bg-clip-text text-transparent"
-            key={currentData.value}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.5 }}
-          >
-            {currentData.value}
-            <span className="text-2xl">{currentData.value === 90 ? '%' : ''}</span>
-          </motion.div>
-        </div>
-      </div>
-      
-      {/* Metric label */}
-      <motion.div 
-        className="mt-6 text-center text-lg font-futureTech text-cyan-200"
-        key={currentData.label}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {currentData.label}
-      </motion.div>
-    </div>
-  );
-};
 
 // Main FastLaneSection component
 export default function FastLaneSection() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  useEffect(() => {
+    // Ensure video loops continuously
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.error("Video autoplay error:", error);
+      });
+    }
+  }, []);
+
   // Animation variants for staggered text reveal
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -136,8 +46,26 @@ export default function FastLaneSection() {
           viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants}
         >
-          {/* Left column: Content */}
-          <div className="lg:w-1/2">
+          {/* Left column: Video */}
+          <motion.div 
+            className="lg:w-2/5 flex justify-center order-2 lg:order-1"
+            variants={itemVariants}
+          >
+            <div className="w-full max-w-md aspect-square bg-black border border-[#00c8ff]/20 shadow-lg rounded-2xl overflow-hidden">
+              <video 
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                src="/images/FutureFastVideoLoop.mp4"
+              />
+            </div>
+          </motion.div>
+          
+          {/* Right column: Content */}
+          <div className="lg:w-1/2 order-1 lg:order-2">
             <motion.h2 
               className="font-orbitron text-4xl md:text-5xl font-bold tracking-tight mb-6 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent pb-1"
               variants={itemVariants}
@@ -185,16 +113,6 @@ export default function FastLaneSection() {
               Most executives see the headlines but miss the velocity. Our mission is to translate that speed into clear insight and practical next steps—so you can build, invest, and lead before the curve.
             </motion.p>
           </div>
-          
-          {/* Right column: Speedometer */}
-          <motion.div 
-            className="lg:w-2/5 flex justify-center"
-            variants={itemVariants}
-          >
-            <div className="w-full max-w-md aspect-square bg-black border border-[#00c8ff]/20 shadow-lg p-6 flex items-center justify-center rounded-2xl">
-              <Speedometer />
-            </div>
-          </motion.div>
         </motion.div>
       </div>
     </section>

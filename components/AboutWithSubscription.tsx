@@ -92,6 +92,11 @@ export default function AboutWithSubscription() {
                   {content.bio_paragraphs.slice(Math.ceil(content.bio_paragraphs.length / 2)).map((paragraph, index) => (
                     <p key={index} className="mb-4">{paragraph}</p>
                   ))}
+                  
+                  {/* Subscription text integrated without background */}
+                  <p className="mb-4 text-lg text-gray-300">
+                    <strong className="text-purple-100">Welcome to the Future of Faster Thinking.</strong> If you're ready to ride the wave instead of being swept away by it — You're in the right place! 👉 <strong className="text-purple-100">Join our private list</strong> for early access to disruptive ideas, tools, and strategies to stay <em>future-ready</em>. Be first to receive insights that help you outthink, outbuild, and outlast the competition.
+                  </p>
                 </div>
               </div>
             </div>
@@ -100,10 +105,6 @@ export default function AboutWithSubscription() {
           {/* Subscription form - Right side */}
           <div className="lg:w-2/5">
             <div className="w-full bg-gray-900/70 rounded-xl p-6 shadow-lg border border-purple-700/20">
-              <p className="text-lg text-purple-100 mb-6">
-                Sign up below to be added to our mailing list. You will receive updates and be invited to more content like this.
-              </p>
-              
               {/* Newsletter subscription form */}
               <div className="w-full rounded-xl overflow-hidden bg-gray-800 p-8">
                 <h3 className="text-xl font-bold text-white mb-4 text-center">Join Our Mailing List</h3>

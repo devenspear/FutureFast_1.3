@@ -37,11 +37,12 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: "FutureFast: Empowering Speed", description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.", images: ["https://futurefast.com/twitter-share.png"] },
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "" },
+  viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="overflow-x-hidden">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -66,8 +67,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             sameAs: ["https://twitter.com/yourprofile","https://www.linkedin.com/in/yourprofile"]
           }) }}
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden max-w-[100vw]`}>{children}</body>
     </html>
   );
 }

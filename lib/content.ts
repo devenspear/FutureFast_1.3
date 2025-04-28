@@ -71,7 +71,7 @@ export const defaultAboutFutureFastContent: AboutFutureFastContent = {
   headline: 'About FutureFast',
   image: '/DKS_Future_head.JPG',
   bio_paragraphs: [
-    "Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, he builds ventures that bridge physical and digital worlds.",
-    "From smart homes to sacred geometry, from SaaS to spiritual systems, Deven sees the big picture and engineers what's next. He's the rare leader who fuses engineering precision with creative intuition—and delivers."
+    "Deven Spear is a serial entrepreneur with three decades of experience transforming disruption into opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, Deven builds ideas into ventures that bridge physical and digital worlds. From smart homes to sacred geometry, from online platforms to metaphysical systems, he sees patterns where others see noise — engineering the future with a blend of precision, intuition, and imagination.",
+    "FutureFast is the next evolution of that personal journey: A platform designed to empower leaders, creators, and changemakers to navigate—and master—the exponential speed of innovation ahead."
   ]
 };

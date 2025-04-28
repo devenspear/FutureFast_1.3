@@ -49,41 +49,20 @@ export default function SubscriptionForm() {
     }
 
     try {
-      // Create a hidden form element
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = `https://docs.google.com/forms/d/e/${googleFormId}/formResponse`;
-      form.target = '_blank'; // Submit in a new tab
-      form.style.display = 'none';
-      
-      // Add form fields with the correct entry IDs
-      const fieldMappings = [
-        { name: 'entry.1470198628', value: formData.firstName },
-        { name: 'entry.326011048', value: formData.lastName },
-        { name: 'entry.378636355', value: formData.email },
-        { name: 'entry.1151698974', value: formData.company },
-        { name: 'dlut', value: Date.now().toString() } // Add the dlut field with current timestamp
-      ];
-      
-      // Create and append input elements
-      fieldMappings.forEach(field => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = field.name;
-        input.value = field.value || '';
-        form.appendChild(input);
+      // Send data to our API endpoint instead of Google Forms
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
       });
       
-      // Append the form to the document body
-      document.body.appendChild(form);
+      const result = await response.json();
       
-      // Submit the form
-      form.submit();
-      
-      // Clean up - remove the form
-      setTimeout(() => {
-        document.body.removeChild(form);
-      }, 100);
+      if (!response.ok) {
+        throw new Error(result.message || 'Something went wrong');
+      }
       
       // Reset form and show success message
       setFormData({
@@ -96,7 +75,7 @@ export default function SubscriptionForm() {
     } catch (error) {
       console.error('Form submission error:', error);
       setSubmitStatus('error');
-      setErrorMessage("Something went wrong. Please try again later.");
+      setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
@@ -104,9 +83,9 @@ export default function SubscriptionForm() {
 
   return (
     <div className="w-full bg-gray-900/70 rounded-xl p-6 shadow-lg border border-purple-700/20">
-      <p className="text-lg text-purple-100 mb-6">
-        Sign up below to be added to our mailing list. You will receive updates and be invited to more content like this.
-      </p>
+      <div className="text-lg text-purple-100 mb-6">
+        <strong>Welcome to the Future of Faster Thinking.</strong> If you're ready to ride the wave instead of being swept away by it — You're in the right place! 👉 <strong>Join our private list</strong> for early access to disruptive ideas, tools, and strategies to stay <em>future-ready</em>. Be first to receive insights that help you outthink, outbuild, and outlast the competition.
+      </div>
       
       {submitStatus === 'success' ? (
         <div className="bg-green-900/30 border border-green-500 rounded-lg p-4 text-center text-green-300 mb-4">

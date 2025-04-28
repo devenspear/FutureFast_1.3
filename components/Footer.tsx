@@ -1,66 +1,67 @@
+'use server';
+
 import React from 'react';
+import Link from 'next/link';
+import { loadSiteSettings } from '../lib/content-loader';
 
 const links = [
-  {
-    href: "https://www.linkedin.com/in/devenspear/",
-    label: "LinkedIn",
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="inline align-middle"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V24h-4V8zm7.5 0h3.8v2.2h.05c.53-1 1.82-2.2 3.75-2.2 4.01 0 4.75 2.64 4.75 6.08V24h-4v-7.09c0-1.69-.03-3.87-2.36-3.87-2.36 0-2.72 1.85-2.72 3.76V24h-4V8z" fill="currentColor"/></svg>
-    ),
-  },
-  {
-    href: "https://x.com/DevenSpear",
-    label: "X",
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="inline align-middle"><path d="M17.53 2H21.5l-7.39 8.43L22.5 22h-6.79l-5.32-6.61L4 22H0l7.93-9.04L1 2h6.89l4.89 6.07L17.53 2zm-2.06 16.75h1.88l-6.06-7.53-1.89 2.18L15.47 18.75zm-7.4-13.5l5.6 6.97 1.6-1.87-5.36-6.6H8.07zm13.37 0h-1.85l-5.6 6.97 1.6 1.87 5.85-7.84zm-8.44 9.83l-6.06 7.53h1.88l6.07-7.53-1.89-2.18z" fill="currentColor"/></svg>
-    ),
-  },
-  {
-    href: "https://substack.com/@devenkspear",
-    label: "Substack",
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="inline align-middle"><rect width="24" height="24" rx="4" fill="currentColor"/><rect x="4" y="7" width="16" height="2" fill="#fff"/><rect x="4" y="11" width="16" height="2" fill="#fff"/><rect x="4" y="15" width="16" height="2" fill="#fff"/></svg>
-    ),
-  },
-  {
-    href: "https://www.linkedin.com/newsletters/disruption-weekly-7120892654304776192/",
-    label: "Newsletter",
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="inline align-middle"><rect width="24" height="24" rx="4" fill="currentColor"/><path d="M6 8h12v2H6V8zm0 4h12v2H6v-2zm0 4h8v2H6v-2z" fill="#fff"/></svg>
-    ),
-  },
-  {
-    href: "https://www.youtube.com/@deven_spear/videos",
-    label: "YouTube",
-    icon: (
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="inline align-middle"><rect width="24" height="24" rx="4" fill="currentColor"/><path d="M10 16.5l6-4.5-6-4.5v9z" fill="#fff"/></svg>
-    ),
-  },
+  { href: "https://www.linkedin.com/in/devenspear/", label: "LinkedIn" },
+  { href: "https://twitter.com/DevenSpear", label: "Twitter" },
+  { href: "https://www.instagram.com/devenspear/", label: "Instagram" },
+  { href: "/admin", label: "Admin" },
 ];
 
-export default function Footer() {
+export default async function Footer() {
+  // Load site settings from Markdown
+  const { siteTitle, footerText } = await loadSiteSettings();
+  
   return (
-    <footer className="bg-black py-8 text-gray-400 text-center border-t border-gray-800">
-      <div className="flex justify-center space-x-6 mb-4">
-        {links.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
-            aria-label={link.label}
-          >
-            {link.icon}
-          </a>
-        ))}
+    <footer className="bg-black text-white pt-12 pb-6 border-t border-gray-800">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+          <div className="mb-6 md:mb-0">
+            <h2 className="text-2xl font-bold text-cyan-400 font-orbitron">{siteTitle}</h2>
+            <p className="text-gray-400 mt-2">Clarity in exponential disruption</p>
+          </div>
+          
+          <div className="flex flex-col items-center md:items-end">
+            <div className="flex space-x-4 mb-4">
+              {links.map((link) => (
+                <Link 
+                  key={link.label}
+                  href={link.href}
+                  className="text-gray-400 hover:text-cyan-400 transition-colors"
+                  target={link.href.startsWith('http') ? '_blank' : undefined}
+                  rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            
+            <form className="w-full max-w-sm">
+              <div className="flex items-center border-b border-cyan-500 py-2">
+                <input 
+                  className="appearance-none bg-transparent border-none w-full text-gray-300 mr-3 py-1 px-2 leading-tight focus:outline-none" 
+                  type="email" 
+                  placeholder="Your email for updates" 
+                  aria-label="Email"
+                />
+                <button 
+                  className="flex-shrink-0 bg-cyan-500 hover:bg-cyan-700 border-cyan-500 hover:border-cyan-700 text-sm border-4 text-white py-1 px-2 rounded" 
+                  type="button"
+                >
+                  Subscribe
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <div className="border-t border-gray-800 pt-6 text-center text-gray-500 text-sm">
+          <p>&copy; {footerText}</p>
+        </div>
       </div>
-      <div className="mb-2 text-xs text-gray-400">2025 &copy; FutureFast.AI. All Rights Reserved.</div>
-      <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-400 mb-2">
-        <a href="/terms" className="hover:text-white underline">Terms & Conditions</a>
-        <a href="/privacy" className="hover:text-white underline">Privacy Policy</a>
-      </div>
-      <div className="text-xs text-gray-400">Made by Deven Spear with AI Coding Team</div>
     </footer>
   );
 }

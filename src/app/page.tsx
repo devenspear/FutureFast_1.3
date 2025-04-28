@@ -1,17 +1,17 @@
-import HeroSectionServer from "../../components/HeroSection.server";
+import HeroSection from "../../components/HeroSection";
 import FastLaneSection from "../../components/FastLaneSection";
 import NewsAndDisruptionSection from "../../components/NewsAndDisruptionSection";
-import ScrollingQuotesServer from "../../components/ScrollingQuotes.server";
+import QuotationsRibbonSection from "../../components/QuotationsRibbonSection";
 import LibraryGrid from "../../components/LibraryGrid";
 import ThoughtLeadersSection from "../../components/ThoughtLeadersSection";
 import AboutWithSubscription from "../../components/AboutWithSubscription";
-import FooterServer from "../../components/Footer.server";
-import AboutFutureFastServer from "../../components/AboutFutureFast.server";
+import Footer from "../../components/Footer";
+import AboutFutureFast from "../../components/AboutFutureFast";
 
 export default function Home() {
   return (
     <main className="bg-black min-h-screen w-full">
-      <HeroSectionServer />
+      <HeroSection />
       <FastLaneSection />
       <div className="w-full h-24 md:h-32 bg-gradient-to-b from-black via-purple-900/40 to-transparent blur-sm pointer-events-none -mb-8 md:-mb-16" aria-hidden="true" />
       <NewsAndDisruptionSection />
@@ -20,10 +20,10 @@ export default function Home() {
       <div className="w-full h-24 md:h-32 bg-gradient-to-b from-black via-purple-900/30 to-transparent blur-sm pointer-events-none -mb-8 md:-mb-16" aria-hidden="true" />
       <ThoughtLeadersSection />
       <div className="w-full h-24 md:h-32 bg-gradient-to-b from-transparent via-purple-900/40 to-black blur-sm pointer-events-none -mt-8 md:-mt-16" aria-hidden="true" />
-      <AboutFutureFastServer />
-      <ScrollingQuotesServer />
+      <AboutFutureFast />
+      <QuotationsRibbonSection />
       <AboutWithSubscription />
-      <FooterServer />
+      <Footer />
     </main>
   );
 }

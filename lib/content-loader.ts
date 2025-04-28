@@ -1,6 +1,10 @@
-import fs from 'fs';
+'use server';
+
+import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
+import 'server-only';
+import { existsSync } from 'fs';
 
 // Define types for the content
 export interface NewsItem {
@@ -24,16 +28,28 @@ export interface CatalogItem {
   [key: string]: unknown; // For any additional fields
 }
 
+export interface HeroContent {
+  headline: string;
+  subheadline: string;
+}
+
+export interface AboutContent {
+  headline: string;
+  subheadline: string;
+  features: { title: string; description: string }[];
+}
+
+export interface SiteSettings {
+  siteTitle: string;
+  footerText: string;
+}
+
 // Base function to load content from a markdown file
-export function loadMarkdownContent(filePath: string): { data: Record<string, unknown>; content: string } {
+export async function loadMarkdownContent(filePath: string): Promise<{ data: Record<string, unknown>; content: string }> {
   try {
-    if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      const { data, content } = matter(fileContent);
-      return { data, content };
-    }
-    console.warn(`File not found: ${filePath}`);
-    return { data: {}, content: '' };
+    const fileContent = await fs.readFile(filePath, 'utf8');
+    const { data, content } = matter(fileContent);
+    return { data, content };
   } catch (error) {
     console.error(`Error loading content from ${filePath}:`, error);
     return { data: {}, content: '' };
@@ -41,67 +57,93 @@ export function loadMarkdownContent(filePath: string): { data: Record<string, un
 }
 
 // Load site settings
-export function loadSiteSettings() {
+export async function loadSiteSettings(): Promise<SiteSettings> {
   const filePath = path.join(process.cwd(), 'content/site/settings.md');
-  const { data } = loadMarkdownContent(filePath);
+  const { data } = await loadMarkdownContent(filePath);
   return {
-    siteTitle: data.site_title || 'FutureFast',
-    footerText: data.footer_text || '2025 Deven Spear | All Rights Reserved',
+    siteTitle: String(data.site_title || 'FutureFast'),
+    footerText: String(data.footer_text || '2025 Deven Spear | All Rights Reserved'),
   };
 }
 
 // Load hero section content
-export function loadHeroContent() {
+export async function loadHeroContent(): Promise<HeroContent> {
   const filePath = path.join(process.cwd(), 'content/sections/hero.md');
-  const { data } = loadMarkdownContent(filePath);
+  const { data } = await loadMarkdownContent(filePath);
   return {
-    headline: data.headline || 'Win the Race of Exponential Disruption',
-    subheadline: data.subheadline || 'Executive-level insights on AI, Web3, Robotics & beyond',
+    headline: String(data.headline || 'Win the Race of Exponential Disruption'),
+    subheadline: String(data.subheadline || 'Executive-level insights on AI, Web3, Robotics & beyond'),
   };
 }
 
 // Load about section content
-export function loadAboutContent() {
+export async function loadAboutContent(): Promise<AboutContent> {
   const filePath = path.join(process.cwd(), 'content/sections/about.md');
-  const { data } = loadMarkdownContent(filePath);
+  const { data } = await loadMarkdownContent(filePath);
   return {
-    headline: data.headline || 'About FutureFast',
-    subheadline: data.subheadline || 'Our mission is to empower leaders with clarity in a world of exponential change.',
+    headline: String(data.headline || 'About FutureFast'),
+    subheadline: String(data.subheadline || 'Our mission is to empower leaders with clarity in a world of exponential change.'),
+    features: Array.isArray(data.features) ? data.features : [
+      {
+        title: 'Executive-First',
+        description: 'Written for decision-makers, not developers. No code, just clarity.'
+      },
+      {
+        title: 'Neutral Librarian',
+        description: 'We curate all credible voices—McKinsey, CB Insights, podcasts, whitepapers—so you don\'t have to.'
+      },
+      {
+        title: 'Radically Clear',
+        description: 'If a ninth-grader can\'t understand it, we rewrite it. Clarity is our obsession.'
+      }
+    ]
   };
 }
 
 // Load about me content
-export function loadAboutMeContent() {
+export async function loadAboutMeContent() {
   const filePath = path.join(process.cwd(), 'content/sections/about_me.md');
-  const { data } = loadMarkdownContent(filePath);
+  const { data } = await loadMarkdownContent(filePath);
   return {
-    title: data.title || 'About Deven',
-    headline: data.headline || 'About Deven',
-    image: data.image || '/DKS_Future_head.JPG',
-    bio_paragraphs: data.bio_paragraphs || [
+    title: String(data.title || 'About Deven'),
+    headline: String(data.headline || 'About Deven'),
+    image: String(data.image || '/DKS_Future_head.JPG'),
+    bio_paragraphs: Array.isArray(data.bio_paragraphs) ? data.bio_paragraphs : [
       "Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity."
     ],
   };
 }
 
 // Load why we exist content
-export function loadWhyWeExistContent() {
+export async function loadWhyWeExistContent() {
   const filePath = path.join(process.cwd(), 'content/sections/why_we_exist.md');
-  const { data } = loadMarkdownContent(filePath);
+  const { data } = await loadMarkdownContent(filePath);
   return {
-    headline: data.headline || 'Why We Exist',
-    subheadline: data.subheadline || '',
-    problem_statement: data.problem_statement || '',
-    solution_statement: data.solution_statement || '',
-    how_different: data.how_different || [],
+    headline: String(data.headline || 'Why We Exist'),
+    subheadline: String(data.subheadline || ''),
+    problem_statement: String(data.problem_statement || ''),
+    solution_statement: String(data.solution_statement || ''),
+    how_different: Array.isArray(data.how_different) ? data.how_different : [],
   };
 }
 
 // Load quotes for scrolling quotes section
-export function loadScrollingQuotes() {
+export async function loadScrollingQuotes() {
   const filePath = path.join(process.cwd(), 'content/quotes/scrolling_quotes.md');
-  const { data } = loadMarkdownContent(filePath);
-  return data.quotes || [
+  const { data } = await loadMarkdownContent(filePath);
+  
+  // Check if we have quotes_with_attribution (preferred format)
+  if (Array.isArray(data.quotes_with_attribution)) {
+    return data.quotes_with_attribution;
+  }
+  
+  // Fall back to simple quotes if available
+  if (Array.isArray(data.quotes)) {
+    return data.quotes.map(quote => ({ text: String(quote), author: "" }));
+  }
+  
+  // Default quotes if none found
+  return [
     { text: "The best way to predict the future is to create it.", author: "Alan Kay" },
     { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
     { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
@@ -110,62 +152,62 @@ export function loadScrollingQuotes() {
 }
 
 // Load thought leaders
-export function loadThoughtLeaders() {
+export async function loadThoughtLeaders() {
   const filePath = path.join(process.cwd(), 'content/thought-leaders/thought-leaders.md');
-  const { data } = loadMarkdownContent(filePath);
-  return data.leaders || [];
+  const { data } = await loadMarkdownContent(filePath);
+  return Array.isArray(data.leaders) ? data.leaders : [];
 }
 
 // Load all news items
-export function loadNewsItems(): NewsItem[] {
+export async function loadNewsItems(): Promise<NewsItem[]> {
   const newsDir = path.join(process.cwd(), 'content/news');
-  let newsItems: NewsItem[] = [];
+  const newsItems: NewsItem[] = [];
   
-  if (fs.existsSync(newsDir)) {
-    newsItems = fs.readdirSync(newsDir)
-      .filter((file) => file.endsWith('.md') && !file.startsWith('_'))
-      .map((file) => {
+  if (existsSync(newsDir)) {
+    const files = await fs.readdir(newsDir);
+    for (const file of files) {
+      if (file.endsWith('.md') && !file.startsWith('_')) {
         const filePath = path.join(newsDir, file);
-        const { data } = loadMarkdownContent(filePath);
-        return {
-          title: data.title as string || '',
-          source: data.source as string || '',
-          url: data.url as string || '#',
-          publishedDate: data.publishedDate as string || new Date().toISOString(),
-          featured: data.featured as boolean || false,
-        };
-      })
-      // Sort by date (newest first)
-      .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
+        const { data } = await loadMarkdownContent(filePath);
+        newsItems.push({
+          title: String(data.title || ''),
+          source: String(data.source || ''),
+          url: String(data.url || '#'),
+          publishedDate: String(data.publishedDate || new Date().toISOString()),
+          featured: Boolean(data.featured || false),
+        });
+      }
+    }
   }
   
-  return newsItems;
+  return newsItems.sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
 }
 
 // Load all catalog items
-export function loadCatalogItems(): CatalogItem[] {
+export async function loadCatalogItems(): Promise<CatalogItem[]> {
   const catalogDir = path.join(process.cwd(), 'content/catalog');
-  let catalogItems: CatalogItem[] = [];
+  const catalogItems: CatalogItem[] = [];
   
-  if (fs.existsSync(catalogDir)) {
-    catalogItems = fs.readdirSync(catalogDir)
-      .filter((file) => file.endsWith('.md') && !file.startsWith('_'))
-      .map((file) => {
+  if (existsSync(catalogDir)) {
+    const files = await fs.readdir(catalogDir);
+    for (const file of files) {
+      if (file.endsWith('.md') && !file.startsWith('_')) {
         const filePath = path.join(catalogDir, file);
-        const { data, content } = loadMarkdownContent(filePath);
-        return {
-          title: data.title as string || '',
-          description: data.description as string || '',
-          year: data.year as string || new Date().getFullYear(),
-          month: data.month as string || '',
-          type: data.type as string || '',
-          tag: data.tag as string || '',
-          image: data.image as string || '',
-          url: data.url as string || '#',
+        const { data, content } = await loadMarkdownContent(filePath);
+        catalogItems.push({
+          title: String(data.title || ''),
+          description: String(data.description || ''),
+          year: data.year ? Number(data.year) : new Date().getFullYear(),
+          month: String(data.month || ''),
+          type: String(data.type || ''),
+          tag: String(data.tag || ''),
+          image: String(data.image || ''),
+          url: String(data.url || '#'),
           body: content,
           ...data as Record<string, unknown>
-        };
-      });
+        });
+      }
+    }
   }
   
   return catalogItems;

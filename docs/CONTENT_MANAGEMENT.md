@@ -52,7 +52,7 @@ Controls global site settings like the site title and footer text.
 ```markdown
 ---
 site_title: FutureFast
-footer_text: 2025 Deven Spear | All Rights Reserved | IIVVCMIV
+footer_text: 2025 Deven Spear | All Rights Reserved
 ---
 ```
 
@@ -63,24 +63,24 @@ Controls the main headline and subheadline on the homepage.
 ```markdown
 ---
 headline: Win the Race of Exponential Disruption
-subheadline: Executive-level insights on AI, Web3, Robotics & beyond—delivered in minutes, not years
+subheadline: Executive-level insights on AI, Web3, Robotics & beyond
 ---
 ```
 
 ### About Section (`/content/sections/about.md`)
 
-Controls the "About FutureFast" section content.
+Controls the headline and subheadline in the About FutureFast section.
 
 ```markdown
 ---
-headline: "About FutureFast"
-subheadline: "Our mission is to empower leaders with clarity in a world of exponential change."
+headline: About FutureFast
+subheadline: Our mission is to empower leaders with clarity in a world of exponential change.
 ---
 ```
 
-### About Me Section (`/content/sections/about_me.md`)
+### About Me (`/content/sections/about_me.md`)
 
-Controls the "About Deven" section content.
+Controls the content in the About Deven section.
 
 ```markdown
 ---
@@ -88,35 +88,41 @@ title: About Deven
 headline: About Deven
 image: /DKS_Future_head.JPG
 bio_paragraphs:
-  - "Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, he builds ventures that bridge physical and digital worlds."
+  - "Deven is a six-time founder with 30+ years of experience turning disruption into scalable opportunity."
+  - "Second paragraph about Deven goes here."
 ---
 ```
 
-### Why We Exist Section (`/content/sections/why_we_exist.md`)
+### Why We Exist (`/content/sections/why_we_exist.md`)
 
-Controls the "Why We Exist" section content.
+Controls the content in the Why We Exist section.
 
 ```markdown
 ---
 headline: Why We Exist
-subheadline: Navigating exponential change requires exponential clarity.
-problem_statement: "Most executives are drowning in information but starving for insight. The signal-to-noise ratio is worse than ever."
-solution_statement: "FutureFast curates only the highest-quality sources, distills complex topics into executive summaries, and delivers them in a mobile-first experience."
+subheadline: Our purpose statement
+problem_statement: The problem we're solving
+solution_statement: How we solve it
 how_different:
-  - title: "Executive First"
-    description: "Written for decision‑makers, not developers."
-  - title: "Neutral Librarian"
-    description: "We curate all credible voices—McKinsey, CB Insights, podcasts, whitepapers—so you don't have to."
+  - "First differentiator"
+  - "Second differentiator"
+  - "Third differentiator"
 ---
 ```
 
 ### Scrolling Quotes (`/content/quotes/scrolling_quotes.md`)
 
-Controls the quotes that scroll in the quotation ribbon.
+Controls the quotes that scroll across the screen.
 
 ```markdown
 ---
+# You can use either simple quotes or quotes with attribution
 quotes:
+  - "The best way to predict the future is to create it."
+  - "Innovation distinguishes between a leader and a follower."
+
+# Preferred format with attribution
+quotes_with_attribution:
   - text: "The best way to predict the future is to create it."
     author: "Alan Kay"
   - text: "Innovation distinguishes between a leader and a follower."
@@ -124,87 +130,89 @@ quotes:
 ---
 ```
 
-### News Items (`/content/news/*.md`)
-
-Each file in this directory represents a news item. Use the `_template.md` file as a starting point.
-
-```markdown
----
-title: "AI Breakthroughs in 2025: What Business Leaders Need to Know"
-source: "TechCrunch"
-url: "https://techcrunch.com/ai-breakthroughs-2025"
-publishedDate: "2025-01-15T09:30:00.000Z"
-featured: true
----
-```
-
-### Catalog Items (`/content/catalog/*.md`)
-
-Each file in this directory represents a resource card in the library grid. Use the `_template.md` file as a starting point.
-
-```markdown
----
-title: CB Insights Tech Trends 2025
-description: "Fifteen inflection points—agentic AI, quantum-safe encryption, ambient robotics, bio-foundries—mapped via funding, patent, and hiring signals."
-year: 2025
-month: December
-type: Report
-tag: Tech
-image: /uploads/cb-insights-tech-trends-2025.jpg
-url: https://example.com/report.pdf
----
-```
-
 ### Thought Leaders (`/content/thought-leaders/thought-leaders.md`)
 
-Controls the thought leaders section.
+Controls the thought leaders displayed in the Thought Leaders section.
 
 ```markdown
 ---
 leaders:
-  - name: "Robert Breedlove"
-    expertise: "Bitcoin, Monetary Theory"
-    socialLinks:
-      - emoji: "🐦"
-        label: "Breedlove22"
-        url: "https://x.com/Breedlove22"
-      - emoji: "📺"
-        label: "What is Money? YouTube"
-        url: "https://www.youtube.com/@Robert_Breedlove"
+  - name: "Jane Doe"
+    title: "AI Researcher"
+    company: "Tech Innovations"
+    image: "/images/jane-doe.jpg"
+  - name: "John Smith"
+    title: "Blockchain Expert"
+    company: "Future Finance"
+    image: "/images/john-smith.jpg"
 ---
+```
+
+### News Items (`/content/news/*.md`)
+
+Each file in this directory represents a news item. The filename doesn't matter as long as it ends with `.md`.
+
+```markdown
+---
+title: "Major AI Breakthrough Announced"
+source: "Tech News Daily"
+url: "https://example.com/news/ai-breakthrough"
+publishedDate: "2025-04-15"
+featured: true
+---
+
+Optional content about the news item can go here.
+```
+
+### Catalog Items (`/content/catalog/*.md`)
+
+Each file in this directory represents a catalog/library item. The filename doesn't matter as long as it ends with `.md`.
+
+```markdown
+---
+title: "The Future of Work"
+description: "How AI will transform jobs in the next decade"
+year: 2025
+month: "April"
+type: "Report"
+tag: "AI"
+image: "/images/future-work.jpg"
+url: "https://example.com/reports/future-work"
+---
+
+Full content of the report can go here in Markdown format.
 ```
 
 ## CloudCannon Integration
 
-All content files are accessible and editable through CloudCannon's content management interface. CloudCannon provides a user-friendly way to edit the Markdown files without having to use Git directly.
+This content structure is fully compatible with CloudCannon CMS. When connected to CloudCannon:
 
-To access the CloudCannon editor:
+1. Each Markdown file will be editable through CloudCannon's visual editor
+2. The frontmatter will be presented as form fields
+3. Arrays (like `bio_paragraphs` or `quotes`) will be presented as repeatable items
+4. Images can be uploaded directly through CloudCannon's interface
 
-1. Log in to your CloudCannon account
-2. Select the FutureFast project
-3. Navigate to the "Content" section
-4. Choose the file you want to edit
-5. Make your changes in the visual editor
-6. Save your changes
+To set up CloudCannon:
 
-CloudCannon will automatically commit and push your changes to GitHub, triggering a new deployment on Vercel.
+1. Connect your GitHub repository to CloudCannon
+2. Configure the content collections to match the structure in `/content`
+3. Define schemas for each content type based on the examples above
+4. Invite editors to your CloudCannon project
 
 ## Best Practices
 
-1. **Use Templates**: When creating new content files, start with the appropriate `_template.md` file
-2. **Maintain Formatting**: Keep the frontmatter structure consistent
-3. **Optimize Images**: Compress images before uploading to keep the site fast
-4. **Preview Changes**: Use the CloudCannon preview feature to see how your changes will look before publishing
-5. **Validate Links**: Ensure all URLs are correct and working before saving
+1. Always preview changes before publishing to production
+2. Use descriptive filenames for new content items
+3. Keep frontmatter properties consistent with the examples
+4. When adding new content types, update this documentation
+5. Images should be optimized before uploading
 
 ## Troubleshooting
 
-If your content changes aren't appearing on the site:
+If content changes aren't appearing on the site:
 
-1. Check that you saved the file
-2. Verify that the frontmatter format is correct (proper indentation, no missing colons)
-3. Ensure the file is in the correct location
-4. Check if there are any build errors in the Vercel deployment logs
-5. Clear your browser cache to ensure you're seeing the latest version
-
-For more complex issues, consult the development team.
+1. Make sure the file is saved with the correct format and extension
+2. Verify that all required frontmatter properties are present
+3. Check that the file is in the correct directory
+4. Ensure the changes have been committed and pushed to GitHub
+5. Wait a few minutes for the Vercel deployment to complete

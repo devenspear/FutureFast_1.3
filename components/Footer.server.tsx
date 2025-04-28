@@ -8,7 +8,7 @@ const FooterClient = dynamic(() => import('./Footer.client'), {
   loading: () => <footer className="bg-black py-8 text-gray-400 text-center border-t border-gray-800">Loading...</footer>
 });
 
-export default function FooterServer() {
-  const siteSettings = loadSiteSettings();
+export default async function FooterServer() {
+  const siteSettings = await loadSiteSettings();
   return <FooterClient settings={siteSettings} />;
 }

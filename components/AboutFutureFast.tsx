@@ -1,35 +1,25 @@
-"use client";
+"use server";
 
 import React from 'react';
-import Image from 'next/image';
-import { defaultAboutFutureFastContent, AboutFutureFastContent } from '../lib/content';
+import { loadAboutContent } from '../lib/content-loader';
 
-// Use the default content directly in the client component
-// This will be replaced with server-side data fetching in a future update
-const content: AboutFutureFastContent = defaultAboutFutureFastContent;
-
-export default function AboutFutureFast() {
+export default async function AboutFutureFast() {
+  // Load content from Markdown file
+  const { headline, subheadline, features } = await loadAboutContent();
+  
   return (
-    <section className="py-16 bg-black text-white" id="about">
-      <div className="flex flex-col md:flex-row items-center gap-10 px-4 md:px-8 md:flex-row-reverse">
-        {/* Photo block */}
-        <div className="flex-shrink-0 w-40 h-40 rounded-2xl shadow-lg bg-gradient-to-br from-purple-700 to-indigo-900 overflow-hidden flex items-center justify-center md:ml-8">
-          {/* Use next/image instead of img */}
-          <Image
-            src={content.image}
-            alt="FutureFast"
-            width={160}
-            height={160}
-            className="object-cover"
-          />
-        </div>
-        <div className="flex-1 flex flex-col items-center md:items-start">
-          <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center md:text-left mb-6 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
-            {content.headline}
-          </h1>
-          <div className="space-y-4 text-lg text-gray-300">
-            {content.bio_paragraphs.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
+    <section className="w-full py-20 bg-black text-white">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-cyan-300">{headline}</h2>
+          <p className="text-xl md:text-2xl mb-12 text-gray-300">{subheadline}</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-gray-900 p-6 rounded-lg border border-cyan-800 hover:border-cyan-400 transition-all duration-300">
+                <h3 className="text-xl font-semibold mb-4 text-cyan-300">{feature.title}</h3>
+                <p className="text-gray-300">{feature.description}</p>
+              </div>
             ))}
           </div>
         </div>

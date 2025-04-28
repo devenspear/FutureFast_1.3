@@ -8,7 +8,10 @@ const AboutFutureFastClient = dynamic(() => import('./AboutFutureFast.client'), 
   loading: () => <div className="w-full py-20 bg-black text-white">Loading...</div>
 });
 
-export default function AboutFutureFastServer() {
-  const aboutContent = loadAboutContent();
-  return <AboutFutureFastClient content={aboutContent} />;
+export default async function AboutFutureFastServer() {
+  const aboutContent = await loadAboutContent();
+  return <AboutFutureFastClient content={{
+    headline: String(aboutContent.headline || ''),
+    subheadline: String(aboutContent.subheadline || '')
+  }} />;
 }

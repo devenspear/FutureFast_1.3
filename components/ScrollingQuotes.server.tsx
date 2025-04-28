@@ -8,7 +8,7 @@ const ScrollingQuotesClient = dynamic(() => import('./ScrollingQuotes.client'), 
   loading: () => <section className="w-full bg-black py-8">Loading quotes...</section>
 });
 
-export default function ScrollingQuotesServer() {
-  const quotes = loadScrollingQuotes();
+export default async function ScrollingQuotesServer() {
+  const quotes = await loadScrollingQuotes();
   return <ScrollingQuotesClient quotes={quotes} />;
 }

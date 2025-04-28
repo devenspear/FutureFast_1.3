@@ -6,7 +6,6 @@ import LibraryGrid from "../../components/LibraryGrid";
 import ThoughtLeadersSection from "../../components/ThoughtLeadersSection";
 import AboutWithSubscription from "../../components/AboutWithSubscription";
 import Footer from "../../components/Footer";
-import AboutFutureFast from "../../components/AboutFutureFast";
 
 export default function Home() {
   return (
@@ -20,7 +19,6 @@ export default function Home() {
       <div className="w-full h-24 md:h-32 bg-gradient-to-b from-black via-purple-900/30 to-transparent blur-sm pointer-events-none -mb-8 md:-mb-16" aria-hidden="true" />
       <ThoughtLeadersSection />
       <div className="w-full h-24 md:h-32 bg-gradient-to-b from-transparent via-purple-900/40 to-black blur-sm pointer-events-none -mt-8 md:-mt-16" aria-hidden="true" />
-      <AboutFutureFast />
       <QuotationsRibbonSection />
       <AboutWithSubscription />
       <Footer />

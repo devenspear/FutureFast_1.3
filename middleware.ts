@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   // Only protect admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) {
     console.log('Middleware triggered for admin route');
     
     // Check if the user is authenticated
@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
       return new NextResponse('Authentication required', {
         status: 401,
         headers: {
-          'WWW-Authenticate': 'Basic realm="Secure Admin Area"',
+          'WWW-Authenticate': 'Basic realm="FutureFast Admin"',
         },
       });
     }
@@ -30,7 +30,7 @@ export function middleware(request: NextRequest) {
 
 // Configure which paths should be protected by this middleware
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*'],
 };
 
 // Validate the authorization header

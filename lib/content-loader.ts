@@ -33,6 +33,15 @@ export interface HeroContent {
   subheadline: string;
 }
 
+export interface FastLaneContent {
+  headline: string;
+  intro: string;
+  why_it_matters_heading: string;
+  bullet_points: string[];
+  closing_text: string;
+  call_to_action: string;
+}
+
 export interface AboutContent {
   headline: string;
   subheadline: string;
@@ -73,6 +82,20 @@ export async function loadHeroContent(): Promise<HeroContent> {
   return {
     headline: String(data.headline || 'Win the Race of Exponential Disruption'),
     subheadline: String(data.subheadline || 'Executive-level insights on AI, Web3, Robotics & beyond'),
+  };
+}
+
+// Load fast lane section content
+export async function loadFastLaneContent(): Promise<FastLaneContent> {
+  const filePath = path.join(process.cwd(), 'content/sections/fast_lane.md');
+  const { data } = await loadMarkdownContent(filePath);
+  return {
+    headline: String(data.headline || 'Welcome to the Fast Lane'),
+    intro: String(data.intro || ''),
+    why_it_matters_heading: String(data.why_it_matters_heading || 'Why It Matters'),
+    bullet_points: Array.isArray(data.bullet_points) ? data.bullet_points.map(String) : [],
+    closing_text: String(data.closing_text || ''),
+    call_to_action: String(data.call_to_action || '')
   };
 }
 

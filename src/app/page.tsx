@@ -14,8 +14,6 @@ export default function Home() {
       <NewsAndDisruptionSection />
       <LibraryGrid />
       <ThoughtLeadersSection />
-      {/* Keep only this gradient divider below Thought Leaders */}
-      <div className="w-full h-24 md:h-32 bg-gradient-to-b from-transparent via-purple-900/40 to-black blur-sm pointer-events-none -mt-8 md:-mt-16" aria-hidden="true" />
       <AboutWithSubscription />
       <Footer />
     </main>

@@ -1,11 +1,24 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 // Main FastLaneSection component
 export default function FastLaneSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [content, setContent] = useState({
+    headline: "Welcome to the Fast Lane",
+    intro: "I've spent years tracking the thinkers who keep shouting \"Everything is speeding up!\"—yet in boardrooms and project meetings the urgency rarely lands. That disconnect is why FutureFast exists: to translate the hum of exponential change into something you can actually act on before it blindsides your business.",
+    why_it_matters_heading: "Why It Matters",
+    bullet_points: [
+      "Product cycles now shrink from years → months",
+      "AI models leap a generation ahead every season",
+      "Digital + physical worlds are merging in real time",
+      "Skills you master today can be obsolete by next quarter"
+    ],
+    closing_text: "Most leaders skim headlines; few feel the velocity. Let this site be your clutch and accelerator—cutting the noise, surfacing the signals, and giving you the frameworks to build, invest, and lead ahead of the curve.",
+    call_to_action: "Ready to keep pace? Scroll down and let's move. ⚡️"
+  });
   
   useEffect(() => {
     // Ensure video loops continuously
@@ -70,47 +83,44 @@ export default function FastLaneSection() {
               className="font-orbitron text-4xl md:text-5xl font-bold tracking-tight mb-6 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent pb-1"
               variants={itemVariants}
             >
-              Welcome to the Fast Lane
+              {content.headline}
             </motion.h2>
             
             <motion.p 
               className="text-base md:text-lg leading-7 text-gray-300 mb-8"
               variants={itemVariants}
             >
-              The world&apos;s most disruptive technologies are no longer creeping forward—they&apos;re accelerating in a blur. Artificial intelligence, blockchain, mixed‑reality, synthetic biology, and quantum computing are compounding so quickly that by the time you finish this paragraph, a new model, protocol, or headset spec will already be out. <span className="font-bold text-white">FutureFast</span> exists to help you keep up—then leap ahead.
+              {content.intro}
             </motion.p>
             
             <motion.h3 
               className="font-orbitron text-2xl font-bold mb-4 text-white"
               variants={itemVariants}
             >
-              Why This Matters
+              {content.why_it_matters_heading}
             </motion.h3>
             
             <motion.ul className="space-y-3 mb-8" variants={itemVariants}>
-              <li className="flex items-start">
-                <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>
-                <span className="text-gray-300">Skills now expire in ~2 years – the technical &ldquo;half‑life&rdquo; has shrunk from a decade to &lt; 30 months.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>
-                <span className="text-gray-300">AI investment is exploding – U.S. spending hit <span className="font-bold text-white">$67.2 B</span> last year, dwarfing every other nation.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>
-                <span className="text-gray-300">Blockchain is scaling at break‑neck speed – projected to reach <span className="font-bold text-white">$1.43 T</span> by 2030 (&asymp; 90% CAGR).</span>
-              </li>
-              <li className="flex items-start">
-                <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>
-                <span className="text-gray-300">AR/VR shipments rebound – forecast to jump <span className="font-bold text-white">41%</span> in 2025 on the path to <span className="font-bold text-white">22.9 M</span> units by 2028.</span>
-              </li>
+              {content.bullet_points.map((point, index) => (
+                <li key={index} className="flex items-start">
+                  <span className="inline-block w-5 h-5 mr-2 text-[#00c8ff] font-bold">•</span>
+                  <span className="text-gray-300">{point}</span>
+                </li>
+              ))}
             </motion.ul>
             
             <motion.p 
               className="text-base md:text-lg leading-7 text-gray-300"
               variants={itemVariants}
             >
-              Most executives see the headlines but miss the velocity. Our mission is to translate that speed into clear insight and practical next steps—so you can build, invest, and lead before the curve.
+              {content.closing_text}
+            </motion.p>
+            
+            <motion.p 
+              className="text-base md:text-lg leading-7 text-gray-300 mt-4 font-semibold"
+              variants={itemVariants}
+            >
+              {content.call_to_action}
             </motion.p>
           </div>
         </motion.div>

@@ -124,9 +124,6 @@ export default function AboutWithSubscription() {
               {/* Newsletter subscription form */}
               <div className="w-full rounded-xl overflow-hidden bg-gray-800 p-8">
                 <h3 className="text-xl font-bold text-white mb-4 text-center">Join Our Mailing List</h3>
-                <p className="text-gray-300 mb-6 text-center">
-                  Get exclusive updates, early access to resources, and invitations to special events.
-                </p>
                 
                 {submitResult ? (
                   <div className={`p-4 mb-6 rounded-lg ${submitResult.success ? 'bg-green-900/50 text-green-100' : 'bg-red-900/50 text-red-100'}`}>
@@ -144,9 +141,6 @@ export default function AboutWithSubscription() {
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-1">
-                          First Name*
-                        </label>
                         <input
                           type="text"
                           id="firstName"
@@ -155,13 +149,10 @@ export default function AboutWithSubscription() {
                           onChange={handleChange}
                           required
                           className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
-                          placeholder="John"
+                          placeholder="First Name*"
                         />
                       </div>
                       <div>
-                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-1">
-                          Last Name*
-                        </label>
                         <input
                           type="text"
                           id="lastName"
@@ -170,15 +161,12 @@ export default function AboutWithSubscription() {
                           onChange={handleChange}
                           required
                           className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
-                          placeholder="Doe"
+                          placeholder="Last Name*"
                         />
                       </div>
                     </div>
                     
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-                        Email Address*
-                      </label>
                       <input
                         type="email"
                         id="email"
@@ -187,14 +175,11 @@ export default function AboutWithSubscription() {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
-                        placeholder="john.doe@example.com"
+                        placeholder="Email Address*"
                       />
                     </div>
                     
                     <div>
-                      <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-1">
-                        Company
-                      </label>
                       <input
                         type="text"
                         id="company"
@@ -202,7 +187,7 @@ export default function AboutWithSubscription() {
                         value={formData.company}
                         onChange={handleChange}
                         className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
-                        placeholder="Acme Inc."
+                        placeholder="Company"
                       />
                     </div>
                     

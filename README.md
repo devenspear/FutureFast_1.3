@@ -19,6 +19,13 @@ This project is a professional, animated, mobile-first homepage for FutureFast.c
 - Vercel Blob Storage (newsletter subscriptions)
 - Contentful CMS (planned)
 
+## Content Management
+The site uses a mixed approach for content management:
+
+- **Markdown Files**: Some sections (Hero, About, Footer) use markdown files in the `content/sections/` directory
+- **Component State**: Interactive sections that use client-side libraries (Fast Lane, Subscription Form) have content defined in component state
+- **See [chat-log-content-management-april-28-2025.md](./chat-log-content-management-april-28-2025.md) for detailed guidance on content updates**
+
 ## Project Structure
 ```
 FutureFast.1.1/

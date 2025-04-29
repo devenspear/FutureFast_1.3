@@ -19,15 +19,7 @@ export default function ExponentialGrowthChart() {
       // Clear existing grid
       grid.innerHTML = '';
       
-      // Create horizontal grid lines (X axis)
-      for (let i = 0; i <= gridSize; i++) {
-        const gridLine = document.createElement('div');
-        gridLine.className = 'grid-line grid-line-x';
-        gridLine.style.top = `${i * cellSize}%`;
-        grid.appendChild(gridLine);
-      }
-      
-      // Create depth grid lines (Z axis)
+      // Only create vertical grid lines (Z axis) - remove horizontal lines
       for (let i = 0; i <= gridSize; i++) {
         const gridLine = document.createElement('div');
         gridLine.className = 'grid-line grid-line-z';
@@ -72,7 +64,8 @@ export default function ExponentialGrowthChart() {
       point.className = `moving-point moving-point-${type}`;
       
       // Position based on step (horizontal) and value (vertical)
-      const xPos = (step / 10) * 80 + 10; // 10-90% of width
+      // Adjust to spread dots evenly with padding on both sides to prevent cropping
+      const xPos = 5 + ((step - 1) / 9 * 90); // This spreads positions 1-10 from 5% to 95% of width
       point.style.left = `${xPos}%`;
       point.style.bottom = `${cappedHeight}%`;
       

@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "../../styles/animation.css";
+import "../../styles/exponential-chart.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

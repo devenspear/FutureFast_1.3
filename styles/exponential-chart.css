@@ -1,0 +1,139 @@
+/* Exponential Growth Chart Styles */
+:root {
+  --blue-color: #00c8ff;
+  --gold-color: #D4AF37;
+}
+
+/* 3D Transformation Styles */
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-1200px {
+  perspective: 1200px;
+}
+
+/* Grid Styles */
+.grid-line {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.grid-line-x {
+  height: 1px;
+  width: 100%;
+}
+
+.grid-line-z {
+  height: 100%;
+  width: 1px;
+  transform: rotateY(90deg);
+}
+
+/* Moving Points */
+.moving-point {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  opacity: 0;
+  z-index: 20;
+}
+
+.moving-point-linear {
+  background-color: var(--blue-color);
+  box-shadow: 0 0 20px var(--blue-color);
+  animation: moveForward 8s linear forwards;
+}
+
+.moving-point-exponential {
+  background-color: var(--gold-color);
+  box-shadow: 0 0 20px var(--gold-color);
+  width: 24px;
+  height: 24px;
+  animation: moveForward 8s linear forwards;
+}
+
+/* Legend Styles */
+.legend-dot-linear {
+  background-color: var(--blue-color);
+  box-shadow: 0 0 10px var(--blue-color);
+}
+
+.legend-dot-exponential {
+  background-color: var(--gold-color);
+  box-shadow: 0 0 10px var(--gold-color);
+}
+
+/* Value Labels */
+.value-label {
+  position: absolute;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  transform: rotateX(-60deg);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+}
+
+.value-label-linear {
+  font-family: 'Roboto Mono', monospace;
+  color: var(--blue-color);
+  text-shadow: 0 0 5px var(--blue-color);
+}
+
+.value-label-exponential {
+  font-family: 'Rajdhani', sans-serif;
+  color: var(--gold-color);
+  text-shadow: 0 0 5px var(--gold-color);
+  font-weight: bold;
+}
+
+/* Animations */
+@keyframes moveForward {
+  0% { transform: translateZ(-500px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateZ(300px); opacity: 0.9; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .moving-point {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .moving-point-exponential {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .value-label {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .moving-point {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .moving-point-exponential {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .value-label {
+    font-size: 0.8rem;
+  }
+}

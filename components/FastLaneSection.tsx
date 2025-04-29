@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
+import ExponentialGrowthChart from './ExponentialGrowthChart';
 
 // Main FastLaneSection component
 export default function FastLaneSection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const content = {
     headline: "Welcome to the Fast Lane",
     intro: "I've spent years tracking the thinkers who keep shouting \"Everything is speeding up!\"—yet in boardrooms and project meetings the urgency rarely lands. That disconnect is why FutureFast exists: to translate the hum of exponential change into something you can actually act on before it blindsides your business.",
@@ -19,15 +19,6 @@ export default function FastLaneSection() {
     closing_text: "Most leaders skim headlines; few feel the velocity. Let this site be your clutch and accelerator—cutting the noise, surfacing the signals, and giving you the frameworks to build, invest, and lead ahead of the curve.",
     call_to_action: "Ready to keep pace? Scroll down and let's move. ⚡️"
   };
-  
-  useEffect(() => {
-    // Ensure video loops continuously
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.error("Video autoplay error:", error);
-      });
-    }
-  }, []);
 
   // Animation variants for staggered text reveal
   const containerVariants = {
@@ -59,21 +50,13 @@ export default function FastLaneSection() {
           viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants}
         >
-          {/* Left column: Video */}
+          {/* Left column: Exponential Growth Chart (replacing video) */}
           <motion.div 
-            className="lg:w-2/5 flex justify-center order-2 lg:order-1"
+            className="lg:w-2/5 flex justify-center items-center order-2 lg:order-1 mx-auto w-full"
             variants={itemVariants}
           >
-            <div className="w-full max-w-md aspect-square bg-black border border-[#00c8ff]/20 shadow-lg rounded-2xl overflow-hidden">
-              <video 
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                src="/images/FutureFastVideoLoop.mp4"
-              />
+            <div className="w-full flex justify-center items-center">
+              <ExponentialGrowthChart />
             </div>
           </motion.div>
           

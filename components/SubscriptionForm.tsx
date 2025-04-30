@@ -46,6 +46,8 @@ export default function SubscriptionForm() {
     }
 
     try {
+      console.log('Submitting form data:', formData);
+      
       // Send data to our API endpoint instead of Google Forms
       const response = await fetch('/api/subscribe', {
         method: 'POST',
@@ -55,7 +57,10 @@ export default function SubscriptionForm() {
         body: JSON.stringify(formData)
       });
       
+      console.log('API response status:', response.status);
+      
       const result = await response.json();
+      console.log('API response data:', result);
       
       if (!response.ok) {
         throw new Error(result.message || 'Something went wrong');
@@ -70,7 +75,7 @@ export default function SubscriptionForm() {
       });
       setSubmitStatus('success');
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error('Form submission error details:', error);
       setSubmitStatus('error');
       setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again later.");
     } finally {

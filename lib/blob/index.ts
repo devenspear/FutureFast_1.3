@@ -16,7 +16,10 @@ const localSubscribers: SubscriberData[] = [];
 
 // Check if Vercel Blob is properly configured
 const isBlobConfigured = () => {
-  return process.env.BLOB_READ_WRITE_TOKEN !== undefined;
+  const isConfigured = process.env.BLOB_READ_WRITE_TOKEN !== undefined;
+  console.log('Blob Storage configured:', isConfigured);
+  console.log('Environment:', process.env.NODE_ENV);
+  return isConfigured;
 };
 
 // Save subscriber data to Blob Storage
@@ -24,6 +27,7 @@ export async function saveSubscriber(firstName: string, lastName: string, email:
   try {
     // Create a unique ID for the subscriber
     const id = uuidv4();
+    console.log('Generated subscriber ID:', id);
     
     // Create subscriber data object
     const subscriberData: SubscriberData = {
@@ -44,15 +48,23 @@ export async function saveSubscriber(firstName: string, lastName: string, email:
         // Store in Blob Storage with email as part of the filename for easy lookup
         // Using a folder structure: subscribers/email-id.json
         const filename = `subscribers/${email.replace(/[^a-zA-Z0-9]/g, '_')}-${id}.json`;
+        console.log('Attempting to save to Blob Storage with filename:', filename);
         
         // Upload to Blob Storage
-        await put(filename, jsonData, {
+        const putResult = await put(filename, jsonData, {
           access: 'public',
           contentType: 'application/json'
         });
+        console.log('Blob Storage put result:', putResult);
       } catch (blobError) {
-        console.error('Blob Storage error:', blobError);
+        console.error('Blob Storage error details:', blobError);
+        if (blobError instanceof Error) {
+          console.error('Blob error name:', blobError.name);
+          console.error('Blob error message:', blobError.message);
+          console.error('Blob error stack:', blobError.stack);
+        }
         // Fall back to in-memory storage
+        console.log('Falling back to in-memory storage');
         localSubscribers.push(subscriberData);
       }
     } else {
@@ -67,7 +79,12 @@ export async function saveSubscriber(firstName: string, lastName: string, email:
       id
     };
   } catch (error) {
-    console.error('Error saving subscriber:', error);
+    console.error('Error saving subscriber details:', error);
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return { 
       success: false, 
       message: 'An error occurred while processing your subscription. Please try again later.' 

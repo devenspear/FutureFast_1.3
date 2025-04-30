@@ -33,11 +33,11 @@ export const metadata: Metadata = {
     description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.",
     url: "https://futurefast.com",
     siteName: "FutureFast",
-    images: [{ url: "https://futurefast.com/social-share.png", width: 1200, height: 630, alt: "FutureFast Social Share Image" }],
+    images: [{ url: "https://futurefast.com/social-share.png?v=20250429", width: 1200, height: 630, alt: "FutureFast Social Share Image" }],
     locale: "en_US",
     type: "website",
   },
-  twitter: { card: "summary_large_image", title: "FutureFast: Empowering Speed", description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.", images: ["https://futurefast.com/twitter-share.png"] },
+  twitter: { card: "summary_large_image", title: "FutureFast: Empowering Speed", description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.", images: ["https://futurefast.com/twitter-share.png?v=20250429"] },
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "" },
   viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 };

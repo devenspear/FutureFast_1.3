@@ -1,13 +1,22 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { FaExternalLinkAlt, FaCalendarAlt, FaNewspaper } from 'react-icons/fa';
 import { trackNewsClick, trackDisruptionWeeklyClick } from '../lib/analytics';
 
-// News items are now loaded from markdown files in /content/news/
-// This hardcoded data is just for development/preview
-const newsItems = [
+// Define the NewsItem type
+interface NewsItem {
+  title: string;
+  source: string;
+  date: string;
+  url: string;
+  icon: string;
+  featured?: boolean;
+}
+
+// Default news items as fallback
+const defaultNewsItems: NewsItem[] = [
   {
     title: 'xAI\'s Grok chatbot can now \'see\' the world around it',
     source: 'TechCrunch',
@@ -39,6 +48,31 @@ const newsItems = [
 ];
 
 export default function NewsAndDisruptionSection() {
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(defaultNewsItems);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Fetch news items from the API endpoint
+    fetch('/api/news')
+      .then(response => {
+        console.log('API response status:', response.status);
+        return response.json();
+      })
+      .then(data => {
+        console.log('Fetched news items:', data);
+        if (Array.isArray(data) && data.length > 0) {
+          // Limit to 4 items for display
+          const limitedItems = data.slice(0, 4);
+          setNewsItems(limitedItems);
+        }
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching news items:', error);
+        setIsLoading(false);
+      });
+  }, []);
+
   return (
     <section className="py-16 bg-black text-white" id="news-and-disruption">
       <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">In The News</h1>
@@ -46,47 +80,51 @@ export default function NewsAndDisruptionSection() {
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
         {/* News Articles - Left Side */}
         <div className="lg:w-1/2">
-          <ul>
-            {newsItems.map((item, idx) => (
-              <li 
-                key={idx} 
-                className="py-4 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg"
-              >
-                <a 
-                  href={item.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  onClick={() => trackNewsClick(item.title, item.source, item.url)}
-                  className="flex flex-col md:flex-row md:items-center gap-2 w-full group"
+          {isLoading ? (
+            <div className="text-center py-8">Loading news...</div>
+          ) : (
+            <ul>
+              {newsItems.map((item, idx) => (
+                <li 
+                  key={idx} 
+                  className="py-4 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg"
                 >
-                  <div className="flex-1">
-                    <h2 className="text-lg font-bold group-hover:text-cyan-400 transition-colors">
-                      {item.icon && <span className="mr-2" style={{fontSize: '1.25rem'}}>{item.icon}</span>}
-                      {item.title}
-                    </h2>
-                    
-                    <div className="flex flex-wrap items-center mt-1 text-xs text-gray-400 gap-3">
-                      <div className="flex items-center gap-1">
-                        <FaNewspaper className="text-cyan-500" />
-                        <span>{item.source}</span>
-                      </div>
+                  <a 
+                    href={item.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    onClick={() => trackNewsClick(item.title, item.source, item.url)}
+                    className="flex flex-col md:flex-row md:items-center gap-2 w-full group"
+                  >
+                    <div className="flex-1">
+                      <h2 className="text-lg font-bold group-hover:text-cyan-400 transition-colors">
+                        {item.icon && <span className="mr-2" style={{fontSize: '1.25rem'}}>{item.icon}</span>}
+                        {item.title}
+                      </h2>
                       
-                      <div className="flex items-center gap-1">
-                        <FaCalendarAlt className="text-cyan-500" />
-                        <span>{item.date}</span>
+                      <div className="flex flex-wrap items-center mt-1 text-xs text-gray-400 gap-3">
+                        <div className="flex items-center gap-1">
+                          <FaNewspaper className="text-cyan-500" />
+                          <span>{item.source}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
+                          <FaCalendarAlt className="text-cyan-500" />
+                          <span>{item.date}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-end">
-                    <span className="text-cyan-500 group-hover:translate-x-1 transition-transform duration-200">
-                      <FaExternalLinkAlt />
-                    </span>
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ul>
+                    
+                    <div className="flex items-center justify-end">
+                      <span className="text-cyan-500 group-hover:translate-x-1 transition-transform duration-200">
+                        <FaExternalLinkAlt />
+                      </span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         
         {/* Disruption Weekly - Right Side */}

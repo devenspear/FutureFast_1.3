@@ -48,8 +48,8 @@ export default function SubscriptionForm() {
     try {
       console.log('Submitting form data:', formData);
       
-      // Send data to our API endpoint instead of Google Forms
-      const response = await fetch('/api/subscribe', {
+      // Send data to our API endpoint with explicit www subdomain
+      const response = await fetch('https://www.futurefast.ai/api/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

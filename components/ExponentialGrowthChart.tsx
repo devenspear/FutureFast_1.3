@@ -98,7 +98,6 @@ export default function ExponentialGrowthChart() {
     };
     
     const startAnimationLoop = () => {
-      const linearDuration = 3000; // 40% faster (5000 * 0.6 = 3000)
       const exponentialDuration = 3000; // 40% faster (5000 * 0.6 = 3000)
       const displayDuration = 2000;
       

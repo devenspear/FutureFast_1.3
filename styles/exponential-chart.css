@@ -44,7 +44,7 @@
 .moving-point-linear {
   background-color: var(--blue-color);
   box-shadow: 0 0 20px var(--blue-color);
-  animation: moveForward 8s linear forwards;
+  animation: moveForward 4.8s linear forwards;
 }
 
 .moving-point-exponential {
@@ -52,7 +52,7 @@
   box-shadow: 0 0 20px var(--gold-color);
   width: 24px;
   height: 24px;
-  animation: moveForward 8s linear forwards;
+  animation: moveForward 4.8s linear forwards;
 }
 
 /* Legend Styles */

@@ -87,19 +87,19 @@ export default function ExponentialGrowthChart() {
     
     const animateLinearGrowth = () => {
       for (let i = 1; i <= 10; i++) {
-        createMovingPoint('linear', i, i, (i - 1) * 0.3);
+        createMovingPoint('linear', i, i, (i - 1) * 0.18); // 40% faster (0.3 * 0.6 = 0.18)
       }
     };
     
     const animateExponentialGrowth = () => {
       for (let i = 1; i <= 10; i++) {
-        createMovingPoint('exponential', i, Math.pow(2, i), (i - 1) * 0.3);
+        createMovingPoint('exponential', i, Math.pow(2, i), (i - 1) * 0.18); // 40% faster (0.3 * 0.6 = 0.18)
       }
     };
     
     const startAnimationLoop = () => {
-      const linearDuration = 5000;
-      const exponentialDuration = 5000;
+      const linearDuration = 3000; // 40% faster (5000 * 0.6 = 3000)
+      const exponentialDuration = 3000; // 40% faster (5000 * 0.6 = 3000)
       const displayDuration = 2000;
       
       function runAnimation() {
@@ -107,15 +107,14 @@ export default function ExponentialGrowthChart() {
         
         animateLinearGrowth();
         
+        // Remove delay between linear and exponential animations
+        animateExponentialGrowth();
+        
         setTimeout(() => {
-          animateExponentialGrowth();
-          
           setTimeout(() => {
-            setTimeout(() => {
-              runAnimation();
-            }, displayDuration);
-          }, exponentialDuration);
-        }, linearDuration);
+            runAnimation();
+          }, displayDuration);
+        }, exponentialDuration);
       }
       
       runAnimation();

@@ -114,6 +114,9 @@ export default function SubscriptionForm() {
                 required
                 className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
                 placeholder="First Name *"
+                autoComplete="given-name"
+                aria-label="First Name"
+                inputMode="text"
               />
             </div>
             
@@ -126,6 +129,9 @@ export default function SubscriptionForm() {
                 required
                 className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
                 placeholder="Last Name *"
+                autoComplete="family-name"
+                aria-label="Last Name"
+                inputMode="text"
               />
             </div>
           </div>
@@ -139,6 +145,9 @@ export default function SubscriptionForm() {
               required
               className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
               placeholder="Email Address *"
+              autoComplete="email"
+              aria-label="Email Address"
+              inputMode="email"
             />
           </div>
           
@@ -150,6 +159,9 @@ export default function SubscriptionForm() {
               onChange={handleChange}
               className="w-full px-4 py-3 bg-gray-800 border border-purple-700/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
               placeholder="Company Name (Optional)"
+              autoComplete="organization"
+              aria-label="Company Name"
+              inputMode="text"
             />
           </div>
           

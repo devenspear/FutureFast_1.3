@@ -111,12 +111,18 @@ export default function ExponentialGrowthChart() {
         
         setTimeout(() => {
           setTimeout(() => {
-            runAnimation();
+            // Check if the component is still mounted before continuing the loop
+            if (document.getElementById('chart-area')) {
+              runAnimation();
+            }
           }, displayDuration);
         }, exponentialDuration);
       }
       
-      runAnimation();
+      // Add a small initial delay to ensure proper initialization on Android
+      setTimeout(() => {
+        runAnimation();
+      }, 100);
     };
     
     // Initialize the chart

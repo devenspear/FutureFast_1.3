@@ -69,7 +69,7 @@ export const defaultThoughtLeadersContent: ThoughtLeadersContent = {
 export const defaultAboutFutureFastContent: AboutFutureFastContent = {
   title: 'About FutureFast',
   headline: 'About FutureFast',
-  image: '/DKS_Future_head.JPG',
+  image: '/DKS_Future_Head2.JPG',
   bio_paragraphs: [
     "Deven Spear is a serial entrepreneur with three decades of experience transforming disruption into opportunity. With deep expertise across real estate development, emerging tech (AI, Blockchain, Web3), and wellness innovation, Deven builds ideas into ventures that bridge physical and digital worlds. From smart homes to sacred geometry, from online platforms to metaphysical systems, he sees patterns where others see noise — engineering the future with a blend of precision, intuition, and imagination.",
     "FutureFast is the next evolution of that personal journey: A platform designed to empower leaders, creators, and changemakers to navigate—and master—the exponential speed of innovation ahead."

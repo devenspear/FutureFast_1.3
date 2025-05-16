@@ -5,7 +5,7 @@ import { saveSubscriber, checkEmailExists } from '../../../../lib/blob';
 async function verifyTurnstileToken(token: string, remoteip?: string) {
   try {
     const formData = new URLSearchParams();
-    formData.append('secret', 'YOUR_SECRET_KEY'); // Replace with your actual secret key
+    formData.append('secret', process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA'); // Cloudflare Turnstile secret key
     formData.append('response', token);
     
     if (remoteip) {

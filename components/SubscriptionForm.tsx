@@ -58,7 +58,7 @@ export default function SubscriptionForm() {
     const interval = setInterval(() => {
       if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
         widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-          sitekey: 'YOUR_SITE_KEY', // Replace with your actual site key
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA', // Cloudflare Turnstile site key
           theme: 'dark',
           callback: function(token: string) {
             setTurnstileToken(token);

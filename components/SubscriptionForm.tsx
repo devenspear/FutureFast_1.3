@@ -2,19 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
-// Define Turnstile interfaces
-interface TurnstileOptions {
-  sitekey: string;
-  theme?: 'light' | 'dark';
-  callback?: (token: string) => void;
-  'expired-callback'?: () => void;
-  'error-callback'?: (error: string) => void;
-}
-
 declare global {
   interface Window {
     turnstile: {
-      render: (container: string | HTMLElement, options: TurnstileOptions) => string;
+      render: (container: string | HTMLElement, options: any) => string;
       reset: (widgetId: string) => void;
     };
   }
@@ -35,50 +26,38 @@ export default function SubscriptionForm() {
   const turnstileRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   
-  // Load Turnstile script
+  // Initialize Turnstile when component mounts
   useEffect(() => {
-    // Only load the script once
-    if (!document.querySelector('script#cf-turnstile-script')) {
-      const script = document.createElement('script');
-      script.id = 'cf-turnstile-script';
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-
-      return () => {
-        // Cleanup script on component unmount
-        document.head.removeChild(script);
-      };
-    }
-  }, []);
-
-  // Initialize Turnstile when the script is loaded
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
+    // Wait for turnstile to be available
+    const renderTurnstile = () => {
+      if (window.turnstile && turnstileRef.current) {
+        console.log('Rendering Turnstile widget...');
         widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-          sitekey: '0x4AAAAAAABY-_49YR2qTeibm', // Hardcoded Cloudflare Turnstile site key
+          sitekey: '0x4AAAAAAABY-_49YR2qTeibm',
           theme: 'dark',
-          callback: function(token: string) {
+          callback: (token: string) => {
             console.log('Turnstile token received:', token.substring(0, 10) + '...');
             setTurnstileToken(token);
           },
-          'expired-callback': function() {
+          'expired-callback': () => {
             console.log('Turnstile token expired');
             setTurnstileToken(null);
           },
-          'error-callback': function(error: string) {
+          'error-callback': (error: string) => {
             console.error('Turnstile error:', error);
           },
         });
-        clearInterval(interval);
+      } else {
+        // If turnstile isn't available yet, try again in 500ms
+        setTimeout(renderTurnstile, 500);
       }
-    }, 100);
-
+    };
+    
+    // Start the process
+    renderTurnstile();
+    
+    // Cleanup function
     return () => {
-      clearInterval(interval);
-      // Reset the widget when component unmounts
       if (window.turnstile && widgetIdRef.current) {
         window.turnstile.reset(widgetIdRef.current);
       }

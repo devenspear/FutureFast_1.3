@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -38,8 +38,14 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: { card: "summary_large_image", title: "FutureFast: Empowering Speed", description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.", images: ["https://futurefast.com/twitter-share.png?v=20250429"] },
-  verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "" },
-  viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "" }
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1.0,
+  maximumScale: 1.0,
+  userScalable: false
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -69,7 +75,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             sameAs: ["https://twitter.com/yourprofile","https://www.linkedin.com/in/yourprofile"]
           }) }}
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden max-w-[100vw]`}>{children}</body>
     </html>

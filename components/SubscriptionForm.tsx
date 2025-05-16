@@ -2,10 +2,19 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
+// Define Turnstile options interface
+interface TurnstileOptions {
+  sitekey: string;
+  theme?: 'light' | 'dark';
+  callback?: (token: string) => void;
+  'expired-callback'?: () => void;
+  'error-callback'?: (error: string) => void;
+}
+
 declare global {
   interface Window {
     turnstile: {
-      render: (container: string | HTMLElement, options: any) => string;
+      render: (container: string | HTMLElement, options: TurnstileOptions) => string;
       reset: (widgetId: string) => void;
     };
   }

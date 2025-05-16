@@ -1,6 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+
+// Define the window interface with Turnstile
+declare global {
+  interface Window {
+    turnstile: {
+      render: (container: string | HTMLElement, options: any) => string;
+      reset: (widgetId: string) => void;
+    };
+  }
+}
 
 export default function SubscriptionForm() {
   const [formData, setFormData] = useState({
@@ -13,6 +23,59 @@ export default function SubscriptionForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+  
+  // Load Turnstile script
+  useEffect(() => {
+    // Only load the script once
+    if (!document.querySelector('script#cf-turnstile-script')) {
+      const script = document.createElement('script');
+      script.id = 'cf-turnstile-script';
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+
+      return () => {
+        // Cleanup script on component unmount
+        document.head.removeChild(script);
+      };
+    }
+  }, []);
+
+  // Initialize Turnstile when the script is loaded
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
+        widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+          sitekey: 'YOUR_SITE_KEY', // Replace with your actual site key
+          theme: 'dark',
+          callback: function(token: string) {
+            setTurnstileToken(token);
+          },
+        });
+        clearInterval(interval);
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
+      // Reset the widget when component unmounts
+      if (window.turnstile && widgetIdRef.current) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
+    };
+  }, []);
+
+  // Reset Turnstile on successful form submission
+  useEffect(() => {
+    if (submitStatus === 'success' && window.turnstile && widgetIdRef.current) {
+      window.turnstile.reset(widgetIdRef.current);
+      setTurnstileToken(null);
+    }
+  }, [submitStatus]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -45,6 +108,14 @@ export default function SubscriptionForm() {
       return;
     }
 
+    // Validate Turnstile token
+    if (!turnstileToken) {
+      setErrorMessage("Please complete the security check.");
+      setIsSubmitting(false);
+      setSubmitStatus('error');
+      return;
+    }
+
     try {
       console.log('Submitting form data:', formData);
       
@@ -54,7 +125,10 @@ export default function SubscriptionForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          turnstileToken // Include the Turnstile token
+        })
       });
       
       console.log('API response status:', response.status);
@@ -165,12 +239,17 @@ export default function SubscriptionForm() {
             />
           </div>
           
+          {/* Turnstile Widget Container */}
+          <div className="flex justify-center my-4">
+            <div ref={turnstileRef} className="cf-turnstile"></div>
+          </div>
+          
           <div className="pt-2">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !turnstileToken}
               className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 
-                ${isSubmitting 
+                ${isSubmitting || !turnstileToken
                   ? 'bg-gray-700 cursor-not-allowed' 
                   : 'bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg'}`}
             >

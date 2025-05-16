@@ -8,15 +8,15 @@ import ExponentialGrowthChart from './ExponentialGrowthChart';
 export default function FastLaneSection() {
   const content = {
     headline: "Welcome to the Fast Lane",
-    intro: "I've spent years tracking the thinkers who keep shouting \"Everything is speeding up!\"—yet in boardrooms and project meetings the urgency rarely lands. That disconnect is why FutureFast exists: to translate the hum of exponential change into something you can actually act on before it blindsides your business.",
+    intro: "The pace of change is accelerating—yet despite constant headlines and bold predictions, the urgency of exponential disruption rarely registers in boardrooms or strategic plans. FutureFast was created to bridge that gap: turning the abstract hum of exponential change into actionable insight before it blindsides organizations.",
     why_it_matters_heading: "Why It Matters",
     bullet_points: [
-      "Product cycles now shrink from years → months",
-      "AI models leap a generation ahead every season",
-      "Digital + physical worlds are merging in real time",
-      "Skills you master today can be obsolete by next quarter"
+      "Product cycles are compressing from years to months",
+      "AI models are advancing by entire generations every season",
+      "The digital and physical worlds are converging in real time",
+      "Today's essential skills risk obsolescence by next quarter"
     ],
-    closing_text: "Most leaders skim headlines; few feel the velocity. Let this site be your clutch and accelerator—cutting the noise, surfacing the signals, and giving you the frameworks to build, invest, and lead ahead of the curve.",
+    closing_text: "While most leaders glance at trends, few grasp the velocity behind them. FutureFast functions as both clutch and accelerator—filtering noise, surfacing meaningful signals, and delivering practical frameworks to build, invest, and lead ahead of the curve.",
     call_to_action: "Ready to keep pace? Scroll down and let's move. ⚡️"
   };
 

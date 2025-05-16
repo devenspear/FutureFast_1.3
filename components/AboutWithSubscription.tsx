@@ -89,7 +89,7 @@ export default function AboutWithSubscription() {
             <div className="relative">
               <div className="space-y-4 text-lg text-gray-300">
                 {content.bio_paragraphs.slice(0, Math.ceil(content.bio_paragraphs.length / 2)).map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
+                  <p key={index} dangerouslySetInnerHTML={{ __html: paragraph }}></p>
                 ))}
                 
                 <div className="relative">
@@ -106,7 +106,7 @@ export default function AboutWithSubscription() {
                   
                   {/* Remaining paragraphs wrap around the image */}
                   {content.bio_paragraphs.slice(Math.ceil(content.bio_paragraphs.length / 2)).map((paragraph, index) => (
-                    <p key={index} className="mb-4">{paragraph}</p>
+                    <p key={index} className="mb-4" dangerouslySetInnerHTML={{ __html: paragraph }}></p>
                   ))}
                   
                   {/* Subscription text integrated without background */}

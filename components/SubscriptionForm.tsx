@@ -1,24 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Script from 'next/script';
+// NOTE: Previous attempts to implement Cloudflare Turnstile for form security were made but
+// encountered integration issues. This is a simplified version without Turnstile for now.
+// Future implementation may revisit this with a different approach or third-party service.
 
-// Define Turnstile interface for TypeScript
-interface TurnstileInterface {
-  render: (container: string | HTMLElement, options: {
-    sitekey: string;
-    theme?: 'light' | 'dark';
-    callback: (token: string) => void;
-  }) => string;
-  reset: (widgetId: string) => void;
-}
-
-declare global {
-  interface Window {
-    turnstile?: TurnstileInterface;
-    onloadTurnstileCallback?: () => void;
-  }
-}
+import React, { useState } from 'react';
 
 export default function SubscriptionForm() {
   const [formData, setFormData] = useState({
@@ -31,51 +17,6 @@ export default function SubscriptionForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [widgetId, setWidgetId] = useState<string | null>(null);
-  
-  // Initialize Turnstile when script loads
-  useEffect(() => {
-    // Define the callback function that will be called when Turnstile is ready
-    window.onloadTurnstileCallback = () => {
-      console.log('Turnstile script loaded');
-      if (window.turnstile) {
-        try {
-          const id = window.turnstile.render('#turnstile-container', {
-            sitekey: '0x4AAAAAAABY-_49YR2qTeibm',
-            theme: 'dark',
-            callback: (token) => {
-              console.log('Turnstile token received:', token.substring(0, 10) + '...');
-              setTurnstileToken(token);
-            },
-          });
-          console.log('Turnstile widget rendered with ID:', id);
-          setWidgetId(id);
-        } catch (error) {
-          console.error('Error rendering Turnstile widget:', error);
-        }
-      } else {
-        console.error('Turnstile not available after script load');
-      }
-    };
-
-    // Cleanup
-    return () => {
-      if (window.turnstile && widgetId) {
-        window.turnstile.reset(widgetId);
-      }
-      // Clean up the global callback
-      delete window.onloadTurnstileCallback;
-    };
-  }, []);
-
-  // Reset Turnstile on successful form submission
-  useEffect(() => {
-    if (submitStatus === 'success' && window.turnstile && widgetId) {
-      window.turnstile.reset(widgetId);
-      setTurnstileToken(null);
-    }
-  }, [submitStatus, widgetId]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -111,27 +52,15 @@ export default function SubscriptionForm() {
       return;
     }
 
-    // Validate Turnstile token
-    console.log('Checking Turnstile token:', turnstileToken ? 'Present' : 'Missing');
-    if (!turnstileToken) {
-      console.log('Form validation failed: Missing Turnstile token');
-      setErrorMessage("Please complete the security check.");
-      setIsSubmitting(false);
-      setSubmitStatus('error');
-      return;
-    }
-
     try {
       console.log('Form validation passed, preparing submission with data:', {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        company: formData.company || '(not provided)',
-        turnstileToken: turnstileToken ? `${turnstileToken.substring(0, 10)}...` : 'missing'
+        company: formData.company || '(not provided)'
       });
       
-      // For testing, let's try the API without the www subdomain
-      const apiUrl = 'https://futurefast.ai/api/subscribe';
+      const apiUrl = 'https://www.futurefast.ai/api/subscribe';
       console.log('Submitting to API URL:', apiUrl);
       
       const response = await fetch(apiUrl, {
@@ -139,10 +68,7 @@ export default function SubscriptionForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          turnstileToken // Include the Turnstile token
-        })
+        body: JSON.stringify(formData)
       });
       
       console.log('API response received, status:', response.status);
@@ -256,23 +182,14 @@ export default function SubscriptionForm() {
             />
           </div>
           
-          {/* Turnstile Widget Container */}
-          <div className="flex justify-center my-4">
-            <div id="turnstile-container" className="cf-turnstile"></div>
-          </div>
-          
-          {/* Turnstile Script */}
-          <Script
-            src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
-            strategy="afterInteractive"
-          />
+
           
           <div className="pt-2">
             <button
               type="submit"
-              disabled={isSubmitting || !turnstileToken}
+              disabled={isSubmitting}
               className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 
-                ${isSubmitting || !turnstileToken
+                ${isSubmitting
                   ? 'bg-gray-700 cursor-not-allowed' 
                   : 'bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg'}`}
             >

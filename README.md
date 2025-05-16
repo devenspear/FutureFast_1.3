@@ -80,6 +80,26 @@ FutureFast.1.1/
   - Your `src/app/page.tsx` and `src/app/layout.tsx` must exist and be correctly named (case-sensitive).
   - If you restructure the repo, remove and re-add the project in Vercel.
 
+## Form Security Notes
+
+### Cloudflare Turnstile Integration
+Multiple attempts were made to integrate Cloudflare Turnstile for form security and bot protection in the subscription form. These attempts included:
+
+1. Initial implementation with script loading in the component
+2. Moving the script to the layout.tsx file
+3. Using environment variables for the site key and secret key
+4. Hardcoding the keys for testing
+5. Using different script loading approaches (async/defer, onload callback)
+6. Trying different DOM element references (refs vs. IDs)
+
+Despite these efforts, the Turnstile widget did not reliably appear in the form, and verification consistently failed. For now, the form has been reverted to a simpler version without Turnstile integration.
+
+Future security enhancements may explore:
+- Alternative CAPTCHA solutions
+- Server-side rate limiting
+- IP-based filtering
+- Honeypot fields
+
 ## Contentful Integration (Planned)
 - Add your Contentful credentials in `.env.local` when ready.
 

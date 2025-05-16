@@ -1,34 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { saveSubscriber, checkEmailExists } from '../../../../lib/blob';
 
-// Function to verify Turnstile token
-async function verifyTurnstileToken(token: string) {
-  try {
-    console.log('Starting Turnstile verification with token:', token.substring(0, 10) + '...');
-    
-    const formData = new URLSearchParams();
-    formData.append('secret', '0x4AAAAAAABY-_-xgWeRj14W1VlG3dWLPmfY');
-    formData.append('response', token);
-    
-    const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
-
-    const outcome = await result.json();
-    console.log('Turnstile verification result:', outcome);
-    
-    // Always return success for now to debug other issues
-    return { success: true };
-  } catch (error) {
-    console.error('Error verifying Turnstile token:', error);
-    // Return success anyway for debugging
-    return { success: true };
-  }
-}
+// NOTE: Previous attempts to implement Cloudflare Turnstile for form security were made
+// but encountered integration issues. This is a simplified version without Turnstile for now.
 
 export async function POST(request: NextRequest) {
   console.log('API route called: /api/subscribe');
@@ -36,7 +10,7 @@ export async function POST(request: NextRequest) {
     // Parse the request body
     const body = await request.json();
     console.log('Request body received:', body);
-    const { firstName, lastName, email, company, turnstileToken } = body;
+    const { firstName, lastName, email, company } = body;
 
     // Validate required fields
     if (!firstName || !lastName || !email) {
@@ -57,25 +31,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate Turnstile token
-    if (!turnstileToken) {
-      console.log('Validation failed: Missing Turnstile token');
-      return NextResponse.json(
-        { success: false, message: 'Security verification failed. Please try again.' },
-        { status: 400 }
-      );
-    }
-
-    // Verify Turnstile token
-    const turnstileVerification = await verifyTurnstileToken(turnstileToken);
-    
-    if (!turnstileVerification.success) {
-      console.log('Turnstile verification failed');
-      return NextResponse.json(
-        { success: false, message: 'Security verification failed. Please try again.' },
-        { status: 400 }
-      );
-    }
+    // NOTE: Turnstile verification was removed in this version
 
     // Check if email already exists
     console.log('Checking if email exists:', email);

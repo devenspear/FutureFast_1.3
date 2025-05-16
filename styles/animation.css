@@ -3,6 +3,24 @@
   50% { background-color: rgba(10, 10, 20, 1); } /* Very subtle shift */
 }
 
+@keyframes textPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.pulsing-text {
+  animation: textPulse 2s ease-in-out infinite;
+  font-weight: bold;
+  color: #D4AF37; /* Gold color */
+}
+
+/* Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .pulsing-text {
+    animation: none;
+  }
+}
+
 .animated-background {
   animation: subtlePulse 20s ease-in-out infinite;
   will-change: background-color;

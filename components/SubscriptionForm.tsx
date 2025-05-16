@@ -61,7 +61,15 @@ export default function SubscriptionForm() {
           sitekey: '0x4AAAAAAABY-_49YR2qTeibm', // Hardcoded Cloudflare Turnstile site key
           theme: 'dark',
           callback: function(token: string) {
+            console.log('Turnstile token received:', token.substring(0, 10) + '...');
             setTurnstileToken(token);
+          },
+          'expired-callback': function() {
+            console.log('Turnstile token expired');
+            setTurnstileToken(null);
+          },
+          'error-callback': function(error: string) {
+            console.error('Turnstile error:', error);
           },
         });
         clearInterval(interval);
@@ -95,12 +103,14 @@ export default function SubscriptionForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submission started');
     setIsSubmitting(true);
     setSubmitStatus('idle');
     setErrorMessage('');
 
     // Validate form
     if (!formData.firstName || !formData.lastName || !formData.email) {
+      console.log('Form validation failed: Missing required fields');
       setErrorMessage("Please fill in all required fields.");
       setIsSubmitting(false);
       setSubmitStatus('error');
@@ -110,6 +120,7 @@ export default function SubscriptionForm() {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
+      console.log('Form validation failed: Invalid email format');
       setErrorMessage("Please enter a valid email address.");
       setIsSubmitting(false);
       setSubmitStatus('error');
@@ -117,7 +128,9 @@ export default function SubscriptionForm() {
     }
 
     // Validate Turnstile token
+    console.log('Checking Turnstile token:', turnstileToken ? 'Present' : 'Missing');
     if (!turnstileToken) {
+      console.log('Form validation failed: Missing Turnstile token');
       setErrorMessage("Please complete the security check.");
       setIsSubmitting(false);
       setSubmitStatus('error');
@@ -125,10 +138,19 @@ export default function SubscriptionForm() {
     }
 
     try {
-      console.log('Submitting form data:', formData);
+      console.log('Form validation passed, preparing submission with data:', {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        company: formData.company || '(not provided)',
+        turnstileToken: turnstileToken ? `${turnstileToken.substring(0, 10)}...` : 'missing'
+      });
       
-      // Send data to our API endpoint with explicit www subdomain
-      const response = await fetch('https://www.futurefast.ai/api/subscribe', {
+      // For testing, let's try the API without the www subdomain
+      const apiUrl = 'https://futurefast.ai/api/subscribe';
+      console.log('Submitting to API URL:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,15 +161,17 @@ export default function SubscriptionForm() {
         })
       });
       
-      console.log('API response status:', response.status);
+      console.log('API response received, status:', response.status);
       
       const result = await response.json();
       console.log('API response data:', result);
       
       if (!response.ok) {
+        console.error('API returned error status:', response.status);
         throw new Error(result.message || 'Something went wrong');
       }
       
+      console.log('Form submission successful, resetting form');
       // Reset form and show success message
       setFormData({
         firstName: '',
@@ -162,6 +186,7 @@ export default function SubscriptionForm() {
       setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again later.");
     } finally {
       setIsSubmitting(false);
+      console.log('Form submission process completed');
     }
   };
 

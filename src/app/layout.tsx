@@ -64,7 +64,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Script id="gtag-init" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-F4CGW7GF6P', { page_path: window.location.pathname });`}
         </Script>
-        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({

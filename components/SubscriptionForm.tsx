@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Script from 'next/script';
 
-// Define Turnstile options interface
-interface TurnstileOptions {
-  sitekey: string;
-  theme?: 'light' | 'dark';
-  callback?: (token: string) => void;
-  'expired-callback'?: () => void;
-  'error-callback'?: (error: string) => void;
+// Define Turnstile interface for TypeScript
+interface TurnstileInterface {
+  render: (container: string | HTMLElement, options: {
+    sitekey: string;
+    theme?: 'light' | 'dark';
+    callback: (token: string) => void;
+  }) => string;
+  reset: (widgetId: string) => void;
 }
 
 declare global {
   interface Window {
-    turnstile: {
-      render: (container: string | HTMLElement, options: TurnstileOptions) => string;
-      reset: (widgetId: string) => void;
-    };
+    turnstile?: TurnstileInterface;
+    onloadTurnstileCallback?: () => void;
   }
 }
 
@@ -32,54 +32,50 @@ export default function SubscriptionForm() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const turnstileRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | null>(null);
+  const [widgetId, setWidgetId] = useState<string | null>(null);
   
-  // Initialize Turnstile when component mounts
+  // Initialize Turnstile when script loads
   useEffect(() => {
-    // Wait for turnstile to be available
-    const renderTurnstile = () => {
-      if (window.turnstile && turnstileRef.current) {
-        console.log('Rendering Turnstile widget...');
-        widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-          sitekey: '0x4AAAAAAABY-_49YR2qTeibm',
-          theme: 'dark',
-          callback: (token: string) => {
-            console.log('Turnstile token received:', token.substring(0, 10) + '...');
-            setTurnstileToken(token);
-          },
-          'expired-callback': () => {
-            console.log('Turnstile token expired');
-            setTurnstileToken(null);
-          },
-          'error-callback': (error: string) => {
-            console.error('Turnstile error:', error);
-          },
-        });
+    // Define the callback function that will be called when Turnstile is ready
+    window.onloadTurnstileCallback = () => {
+      console.log('Turnstile script loaded');
+      if (window.turnstile) {
+        try {
+          const id = window.turnstile.render('#turnstile-container', {
+            sitekey: '0x4AAAAAAABY-_49YR2qTeibm',
+            theme: 'dark',
+            callback: (token) => {
+              console.log('Turnstile token received:', token.substring(0, 10) + '...');
+              setTurnstileToken(token);
+            },
+          });
+          console.log('Turnstile widget rendered with ID:', id);
+          setWidgetId(id);
+        } catch (error) {
+          console.error('Error rendering Turnstile widget:', error);
+        }
       } else {
-        // If turnstile isn't available yet, try again in 500ms
-        setTimeout(renderTurnstile, 500);
+        console.error('Turnstile not available after script load');
       }
     };
-    
-    // Start the process
-    renderTurnstile();
-    
-    // Cleanup function
+
+    // Cleanup
     return () => {
-      if (window.turnstile && widgetIdRef.current) {
-        window.turnstile.reset(widgetIdRef.current);
+      if (window.turnstile && widgetId) {
+        window.turnstile.reset(widgetId);
       }
+      // Clean up the global callback
+      delete window.onloadTurnstileCallback;
     };
   }, []);
 
   // Reset Turnstile on successful form submission
   useEffect(() => {
-    if (submitStatus === 'success' && window.turnstile && widgetIdRef.current) {
-      window.turnstile.reset(widgetIdRef.current);
+    if (submitStatus === 'success' && window.turnstile && widgetId) {
+      window.turnstile.reset(widgetId);
       setTurnstileToken(null);
     }
-  }, [submitStatus]);
+  }, [submitStatus, widgetId]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -262,8 +258,14 @@ export default function SubscriptionForm() {
           
           {/* Turnstile Widget Container */}
           <div className="flex justify-center my-4">
-            <div ref={turnstileRef} className="cf-turnstile"></div>
+            <div id="turnstile-container" className="cf-turnstile"></div>
           </div>
+          
+          {/* Turnstile Script */}
+          <Script
+            src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
+            strategy="afterInteractive"
+          />
           
           <div className="pt-2">
             <button

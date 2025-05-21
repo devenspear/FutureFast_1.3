@@ -60,7 +60,7 @@ export default function SubscriptionForm() {
         company: formData.company || '(not provided)'
       });
       
-      const apiUrl = 'https://www.futurefast.ai/api/subscribe';
+      const apiUrl = '/api/subscribe';
       console.log('Submitting to API URL:', apiUrl);
       
       const response = await fetch(apiUrl, {

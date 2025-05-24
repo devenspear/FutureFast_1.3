@@ -1,6 +1,25 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+
+interface Bubble {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  vx: number;
+  vy: number;
+  hue: number;
+  saturation: number;
+  lightness: number;
+  rotationSpeed: number;
+  rotation: number;
+  scaleDirection: number;
+  scale: number;
+  lastDirectionChange: number;
+  pathMemory: Array<{x: number, y: number}>;
+}
 
 // Sampled hero image colors (example):
 // Blue: #1d5cff
@@ -8,6 +27,195 @@ import React, { useEffect, useState } from 'react';
 
 export default function HeroSection() {
   const [content, setContent] = useState({ headline: '', subheadline: '' });
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
+  const textAreasRef = useRef<Array<{x: number, y: number, width: number, height: number}>>([]);
+
+  // Initialize random bubbles with unique characteristics
+  const initializeBubbles = () => {
+    const newBubbles: Bubble[] = [];
+    const bubbleCount = 18;
+    
+    for (let i = 0; i < bubbleCount; i++) {
+      // Create unique random characteristics for each bubble
+      const size = Math.random() * 60 + 20; // 20-80px diameter (never larger than background circles)
+      const bubble: Bubble = {
+        id: i,
+        x: Math.random() * (window.innerWidth - size),
+        y: Math.random() * (window.innerHeight - size),
+        size,
+        opacity: Math.random() * 0.4 + 0.1, // 0.1 to 0.5 opacity
+        vx: (Math.random() - 0.5) * 3, // Random velocity between -1.5 and 1.5
+        vy: (Math.random() - 0.5) * 3,
+        hue: Math.random() * 120 + 180, // Blue to cyan range
+        saturation: Math.random() * 40 + 60, // 60-100% saturation
+        lightness: Math.random() * 30 + 45, // 45-75% lightness
+        rotationSpeed: (Math.random() - 0.5) * 4, // -2 to 2 degrees per frame
+        rotation: Math.random() * 360,
+        scaleDirection: Math.random() > 0.5 ? 1 : -1,
+        scale: 1,
+        lastDirectionChange: Date.now() + Math.random() * 5000, // Random delay before first direction change
+        pathMemory: []
+      };
+      newBubbles.push(bubble);
+    }
+    
+    setBubbles(newBubbles);
+  };
+
+  // Get text areas to avoid
+  const updateTextAreas = () => {
+    if (!containerRef.current) return;
+    
+    const textElements = containerRef.current.querySelectorAll('h1, div[class*="subheadline"]');
+    const areas: Array<{x: number, y: number, width: number, height: number}> = [];
+    
+    textElements.forEach(element => {
+      const rect = element.getBoundingClientRect();
+      const containerRect = containerRef.current!.getBoundingClientRect();
+      
+      areas.push({
+        x: rect.left - containerRect.left - 50, // Add padding
+        y: rect.top - containerRect.top - 50,
+        width: rect.width + 100,
+        height: rect.height + 100
+      });
+    });
+    
+    textAreasRef.current = areas;
+  };
+
+  // Check if position overlaps with text areas
+  const isOverlappingText = (x: number, y: number, size: number) => {
+    return textAreasRef.current.some(area => 
+      x < area.x + area.width &&
+      x + size > area.x &&
+      y < area.y + area.height &&
+      y + size > area.y
+    );
+  };
+
+  // Generate truly random movement that avoids repeated patterns
+  const updateBubble = (bubble: Bubble, containerWidth: number, containerHeight: number): Bubble => {
+    const now = Date.now();
+    let newX = bubble.x + bubble.vx;
+    let newY = bubble.y + bubble.vy;
+    let newVx = bubble.vx;
+    let newVy = bubble.vy;
+
+    // Add random direction changes to prevent repetitive patterns
+    if (now > bubble.lastDirectionChange) {
+      const randomFactor = 0.3;
+      newVx += (Math.random() - 0.5) * randomFactor;
+      newVy += (Math.random() - 0.5) * randomFactor;
+      
+      // Clamp velocity to prevent bubbles from moving too fast
+      const maxSpeed = 2;
+      const speed = Math.sqrt(newVx * newVx + newVy * newVy);
+      if (speed > maxSpeed) {
+        newVx = (newVx / speed) * maxSpeed;
+        newVy = (newVy / speed) * maxSpeed;
+      }
+      
+      bubble.lastDirectionChange = now + Math.random() * 3000 + 1000; // 1-4 seconds
+    }
+
+    // Bounce off walls with random angle variation
+    if (newX <= 0 || newX >= containerWidth - bubble.size) {
+      newVx = -newVx + (Math.random() - 0.5) * 0.5;
+      newX = Math.max(0, Math.min(containerWidth - bubble.size, newX));
+    }
+    if (newY <= 0 || newY >= containerHeight - bubble.size) {
+      newVy = -newVy + (Math.random() - 0.5) * 0.5;
+      newY = Math.max(0, Math.min(containerHeight - bubble.size, newY));
+    }
+
+    // Avoid text areas by adding repulsion force
+    if (isOverlappingText(newX, newY, bubble.size)) {
+      // Find nearest text area center
+      let nearestArea = textAreasRef.current[0];
+      let minDistance = Infinity;
+      
+      textAreasRef.current.forEach(area => {
+        const areaCenterX = area.x + area.width / 2;
+        const areaCenterY = area.y + area.height / 2;
+        const distance = Math.sqrt(
+          Math.pow(newX + bubble.size / 2 - areaCenterX, 2) + 
+          Math.pow(newY + bubble.size / 2 - areaCenterY, 2)
+        );
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestArea = area;
+        }
+      });
+
+      // Add repulsion force away from text area
+      const areaCenterX = nearestArea.x + nearestArea.width / 2;
+      const areaCenterY = nearestArea.y + nearestArea.height / 2;
+      const bubbleCenterX = newX + bubble.size / 2;
+      const bubbleCenterY = newY + bubble.size / 2;
+      
+      const repulsionX = bubbleCenterX - areaCenterX;
+      const repulsionY = bubbleCenterY - areaCenterY;
+      const repulsionDistance = Math.sqrt(repulsionX * repulsionX + repulsionY * repulsionY);
+      
+      if (repulsionDistance > 0) {
+        const repulsionForce = 2;
+        newVx += (repulsionX / repulsionDistance) * repulsionForce;
+        newVy += (repulsionY / repulsionDistance) * repulsionForce;
+      }
+    }
+
+    // Update rotation and scale for visual variety
+    const newRotation = bubble.rotation + bubble.rotationSpeed;
+    const scaleSpeed = 0.02;
+    let newScale = bubble.scale + (bubble.scaleDirection * scaleSpeed);
+    let newScaleDirection = bubble.scaleDirection;
+    
+    if (newScale > 1.3 || newScale < 0.7) {
+      newScaleDirection = -newScaleDirection;
+      newScale = Math.max(0.7, Math.min(1.3, newScale));
+    }
+
+    // Update path memory to ensure uniqueness (keep last 20 positions)
+    const newPathMemory = [...bubble.pathMemory, {x: newX, y: newY}];
+    if (newPathMemory.length > 20) {
+      newPathMemory.shift();
+    }
+
+    // Add slight random drift to prevent identical paths
+    const driftX = (Math.random() - 0.5) * 0.1;
+    const driftY = (Math.random() - 0.5) * 0.1;
+
+    return {
+      ...bubble,
+      x: newX,
+      y: newY,
+      vx: newVx + driftX,
+      vy: newVy + driftY,
+      rotation: newRotation,
+      scale: newScale,
+      scaleDirection: newScaleDirection,
+      pathMemory: newPathMemory
+    };
+  };
+
+  // Animation loop
+  const animate = () => {
+    if (!containerRef.current) return;
+    
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+    
+    setBubbles(prevBubbles => 
+      prevBubbles.map(bubble => updateBubble(bubble, containerWidth, containerHeight))
+    );
+    
+    animationRef.current = requestAnimationFrame(animate);
+  };
 
   useEffect(() => {
     // Load content from the server
@@ -23,78 +231,50 @@ export default function HeroSection() {
         });
       });
 
-    // Add animation styles to document head if not already added
-    if (typeof document !== 'undefined' && !document.getElementById('hero-animations')) {
-      const style = document.createElement('style');
-      style.id = 'hero-animations';
-      style.textContent = `
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-          25% { transform: translateY(-45px) translateX(24px) scale(1.09); }
-          50% { transform: translateY(-24px) translateX(-30px) scale(0.91); }
-          75% { transform: translateY(-60px) translateX(12px) scale(1.03); }
-        }
-        
-        @keyframes float-medium {
-          0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-          33% { transform: translateY(-36px) translateX(-18px) scale(1.15); }
-          66% { transform: translateY(-54px) translateX(24px) scale(0.85); }
-        }
-        
-        @keyframes float-fast {
-          0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-          20% { transform: translateY(-18px) translateX(-12px) scale(1.24); }
-          40% { transform: translateY(-30px) translateX(18px) scale(0.76); }
-          60% { transform: translateY(-12px) translateX(-6px) scale(1.12); }
-          80% { transform: translateY(-42px) translateX(12px) scale(0.88); }
-        }
-        
-        @keyframes float-ambient {
-          0% { transform: translateY(0px) translateX(0px) scale(1) rotate(0deg); }
-          25% { transform: translateY(-24px) translateX(-9px) scale(1.18) rotate(90deg); }
-          50% { transform: translateY(-12px) translateX(18px) scale(0.82) rotate(180deg); }
-          75% { transform: translateY(-36px) translateX(6px) scale(1.06) rotate(270deg); }
-          100% { transform: translateY(0px) translateX(0px) scale(1) rotate(360deg); }
-        }
-        
-        @keyframes float-ultra {
-          0%, 100% { transform: translateY(0px) translateX(0px) scale(1) rotate(0deg); }
-          16% { transform: translateY(-20px) translateX(15px) scale(1.2) rotate(60deg); }
-          33% { transform: translateY(-35px) translateX(-10px) scale(0.8) rotate(120deg); }
-          50% { transform: translateY(-15px) translateX(20px) scale(1.1) rotate(180deg); }
-          66% { transform: translateY(-45px) translateX(-5px) scale(0.9) rotate(240deg); }
-          83% { transform: translateY(-25px) translateX(12px) scale(1.15) rotate(300deg); }
-        }
-        
-        @keyframes float-mega {
-          0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-          20% { transform: translateY(-50px) translateX(-25px) scale(1.25); }
-          40% { transform: translateY(-30px) translateX(35px) scale(0.75); }
-          60% { transform: translateY(-65px) translateX(-15px) scale(1.05); }
-          80% { transform: translateY(-40px) translateX(20px) scale(0.95); }
-        }
-        
-        @keyframes float-spiral {
-          0% { transform: translateY(0px) translateX(0px) scale(1) rotate(0deg); }
-          25% { transform: translateY(-30px) translateX(30px) scale(1.3) rotate(90deg); }
-          50% { transform: translateY(-60px) translateX(0px) scale(0.7) rotate(180deg); }
-          75% { transform: translateY(-30px) translateX(-30px) scale(1.1) rotate(270deg); }
-          100% { transform: translateY(0px) translateX(0px) scale(1) rotate(360deg); }
-        }
-        
-        @keyframes float-pulse {
-          0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.3; }
-          25% { transform: translateY(-35px) translateX(20px) scale(1.4); opacity: 0.8; }
-          50% { transform: translateY(-20px) translateX(-25px) scale(0.6); opacity: 0.2; }
-          75% { transform: translateY(-50px) translateX(10px) scale(1.2); opacity: 0.6; }
-        }
-      `;
-      document.head.appendChild(style);
+    // Initialize bubbles and start animation
+    initializeBubbles();
+    
+    // Update text areas after content loads
+    const timer = setTimeout(() => {
+      updateTextAreas();
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Start animation when bubbles are initialized
+    if (bubbles.length > 0) {
+      updateTextAreas();
+      animate();
     }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [bubbles.length]);
+
+  // Update text areas when window resizes
+  useEffect(() => {
+    const handleResize = () => {
+      updateTextAreas();
+      initializeBubbles(); // Reinitialize bubbles for new screen size
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   
   return (
     <section
+      ref={containerRef}
       className="relative flex flex-col items-center justify-center min-h-[65vh] md:min-h-[85vh] w-full overflow-hidden bg-black"
     >
       {/* Background image without darkening overlay */}
@@ -103,223 +283,29 @@ export default function HeroSection() {
         style={{ backgroundImage: 'url(/FutureFastBack1.jpg)' }}
       />
       
-      {/* Animated floating bubbles - enhanced with 200% more movement and variety */}
+      {/* Dynamic animated floating bubbles - random movement avoiding text */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Large slow bubble - enhanced movement */}
-        <div 
-          className="absolute w-20 h-20 rounded-full opacity-8 bg-gradient-to-br from-cyan-400 to-blue-500"
-          style={{
-            animation: 'float-slow 20s ease-in-out infinite',
-            top: '12%',
-            left: '18%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Medium bubble - enhanced movement */}
-        <div 
-          className="absolute w-14 h-14 rounded-full opacity-6 bg-gradient-to-br from-blue-400 to-indigo-500"
-          style={{
-            animation: 'float-medium 15s ease-in-out infinite reverse',
-            top: '65%',
-            right: '25%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Small fast bubble - enhanced movement */}
-        <div 
-          className="absolute w-10 h-10 rounded-full opacity-10 bg-gradient-to-br from-cyan-300 to-blue-400"
-          style={{
-            animation: 'float-fast 10s ease-in-out infinite',
-            top: '35%',
-            right: '15%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Tiny ambient bubble */}
-        <div 
-          className="absolute w-6 h-6 rounded-full opacity-5 bg-gradient-to-br from-blue-300 to-cyan-400"
-          style={{
-            animation: 'float-ambient 25s linear infinite',
-            top: '75%',
-            left: '75%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Another medium bubble for balance */}
-        <div 
-          className="absolute w-12 h-12 rounded-full opacity-7 bg-gradient-to-br from-indigo-400 to-blue-500"
-          style={{
-            animation: 'float-slow 18s ease-in-out infinite reverse',
-            top: '45%',
-            left: '8%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* NEW BUBBLES - 200% more with varied characteristics */}
-        
-        {/* Ultra dynamic small bubble */}
-        <div 
-          className="absolute w-8 h-8 rounded-full opacity-4 bg-gradient-to-br from-purple-400 to-blue-600"
-          style={{
-            animation: 'float-ultra 12s ease-in-out infinite',
-            top: '25%',
-            left: '45%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Mega movement large bubble */}
-        <div 
-          className="absolute w-18 h-18 rounded-full opacity-6 bg-gradient-to-br from-cyan-500 to-teal-400"
-          style={{
-            animation: 'float-mega 22s ease-in-out infinite',
-            top: '55%',
-            left: '70%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Spiral moving bubble */}
-        <div 
-          className="absolute w-16 h-16 rounded-full opacity-5 bg-gradient-to-br from-indigo-300 to-purple-500"
-          style={{
-            animation: 'float-spiral 28s ease-in-out infinite',
-            top: '20%',
-            right: '35%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Pulsing transparent bubble */}
-        <div 
-          className="absolute w-12 h-12 rounded-full bg-gradient-to-br from-blue-200 to-cyan-300"
-          style={{
-            animation: 'float-pulse 16s ease-in-out infinite',
-            top: '80%',
-            left: '30%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Fast small bubble - top right */}
-        <div 
-          className="absolute w-7 h-7 rounded-full opacity-8 bg-gradient-to-br from-teal-300 to-blue-400"
-          style={{
-            animation: 'float-fast 8s ease-in-out infinite reverse',
-            top: '15%',
-            right: '10%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Medium ultra bubble - center left */}
-        <div 
-          className="absolute w-11 h-11 rounded-full opacity-3 bg-gradient-to-br from-cyan-400 to-indigo-600"
-          style={{
-            animation: 'float-ultra 14s ease-in-out infinite reverse',
-            top: '40%',
-            left: '5%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Large spiral bubble - bottom center */}
-        <div 
-          className="absolute w-15 h-15 rounded-full opacity-4 bg-gradient-to-br from-blue-500 to-purple-400"
-          style={{
-            animation: 'float-spiral 26s ease-in-out infinite reverse',
-            bottom: '20%',
-            left: '50%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Tiny fast bubbles cluster */}
-        <div 
-          className="absolute w-5 h-5 rounded-full opacity-6 bg-gradient-to-br from-cyan-200 to-blue-300"
-          style={{
-            animation: 'float-fast 6s ease-in-out infinite',
-            top: '30%',
-            left: '25%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        <div 
-          className="absolute w-4 h-4 rounded-full opacity-7 bg-gradient-to-br from-blue-300 to-indigo-400"
-          style={{
-            animation: 'float-medium 9s ease-in-out infinite',
-            top: '70%',
-            right: '45%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Large slow-moving bubble - top center */}
-        <div 
-          className="absolute w-19 h-19 rounded-full opacity-5 bg-gradient-to-br from-indigo-400 to-cyan-500"
-          style={{
-            animation: 'float-slow 24s ease-in-out infinite',
-            top: '8%',
-            left: '55%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Pulse bubble - right side */}
-        <div 
-          className="absolute w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-blue-500"
-          style={{
-            animation: 'float-pulse 18s ease-in-out infinite reverse',
-            top: '50%',
-            right: '8%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        {/* Ambient tiny bubbles */}
-        <div 
-          className="absolute w-3 h-3 rounded-full opacity-9 bg-gradient-to-br from-cyan-300 to-blue-200"
-          style={{
-            animation: 'float-ambient 20s linear infinite',
-            top: '60%',
-            left: '15%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
-        
-        <div 
-          className="absolute w-6 h-6 rounded-full opacity-4 bg-gradient-to-br from-blue-400 to-purple-300"
-          style={{
-            animation: 'float-ambient 30s linear infinite reverse',
-            bottom: '25%',
-            right: '20%',
-            transform: 'translateZ(0)',
-            willChange: 'transform'
-          }}
-        />
+        {bubbles.map(bubble => (
+          <div
+            key={bubble.id}
+            className="absolute rounded-full"
+            style={{
+              left: `${bubble.x}px`,
+              top: `${bubble.y}px`,
+              width: `${bubble.size}px`,
+              height: `${bubble.size}px`,
+              opacity: bubble.opacity,
+              background: `linear-gradient(135deg, 
+                hsl(${bubble.hue}, ${bubble.saturation}%, ${bubble.lightness}%), 
+                hsl(${bubble.hue + 20}, ${bubble.saturation - 10}%, ${bubble.lightness + 10}%))`,
+              transform: `rotate(${bubble.rotation}deg) scale(${bubble.scale})`,
+              transition: 'none',
+              willChange: 'transform, left, top',
+              filter: 'blur(0.5px)',
+              boxShadow: `0 0 ${bubble.size * 0.3}px hsla(${bubble.hue}, ${bubble.saturation}%, ${bubble.lightness}%, 0.3)`
+            }}
+          />
+        ))}
       </div>
 
       {/* Subtle bottom gradient for text readability */}

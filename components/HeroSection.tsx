@@ -29,7 +29,7 @@ export default function HeroSection() {
   const [content, setContent] = useState({ headline: '', subheadline: '' });
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
   const textAreasRef = useRef<Array<{x: number, y: number, width: number, height: number}>>([]);
 
   // Initialize random bubbles with unique characteristics
@@ -202,21 +202,6 @@ export default function HeroSection() {
     };
   };
 
-  // Animation loop
-  const animate = () => {
-    if (!containerRef.current) return;
-    
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
-    
-    setBubbles(prevBubbles => 
-      prevBubbles.map(bubble => updateBubble(bubble, containerWidth, containerHeight))
-    );
-    
-    animationRef.current = requestAnimationFrame(animate);
-  };
-
   useEffect(() => {
     // Load content from the server
     fetch('/api/hero')
@@ -251,6 +236,22 @@ export default function HeroSection() {
     // Start animation when bubbles are initialized
     if (bubbles.length > 0) {
       updateTextAreas();
+      
+      // Animation loop - defined inside useEffect to avoid dependency issues
+      const animate = () => {
+        if (!containerRef.current) return;
+        
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const containerWidth = containerRect.width;
+        const containerHeight = containerRect.height;
+        
+        setBubbles(prevBubbles => 
+          prevBubbles.map(bubble => updateBubble(bubble, containerWidth, containerHeight))
+        );
+        
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      
       animate();
     }
 

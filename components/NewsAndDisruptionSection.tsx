@@ -48,14 +48,17 @@ const defaultNewsItems: NewsItem[] = [
 ];
 
 export default function NewsAndDisruptionSection() {
-  const [newsItems, setNewsItems] = useState<NewsItem[]>(defaultNewsItems);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     // Fetch news items from the API endpoint
     fetch('/api/news')
       .then(response => {
-        console.log('API response status:', response.status);
+        console.log('News API response status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         return response.json();
       })
       .then(data => {
@@ -64,11 +67,16 @@ export default function NewsAndDisruptionSection() {
           // Limit to 4 items for display
           const limitedItems = data.slice(0, 4);
           setNewsItems(limitedItems);
+        } else {
+          // Use default items if no data
+          setNewsItems(defaultNewsItems);
         }
         setIsLoading(false);
       })
       .catch(error => {
         console.error('Error fetching news items:', error);
+        // Use default items on error
+        setNewsItems(defaultNewsItems);
         setIsLoading(false);
       });
   }, []);
@@ -81,7 +89,16 @@ export default function NewsAndDisruptionSection() {
         {/* News Articles - Left Side */}
         <div className="lg:w-1/2">
           {isLoading ? (
-            <div className="text-center py-8">Loading news...</div>
+            <div className="text-center py-8">
+              <div className="animate-pulse space-y-4">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="py-4 px-3">
+                    <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : (
             <ul>
               {newsItems.map((item, idx) => (

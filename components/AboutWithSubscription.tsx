@@ -95,13 +95,31 @@ export default function AboutWithSubscription() {
                 <div className="relative">
                   {/* Float image to the right in the text */}
                   <div className="float-right ml-6 mb-4 w-40 h-40 rounded-2xl shadow-lg bg-gradient-to-br from-purple-700 to-indigo-900 overflow-hidden flex items-center justify-center">
-                    <Image
-                      src={content.image}
-                      alt="FutureFast"
-                      width={160}
-                      height={160}
-                      className="object-cover"
-                    />
+                    <button
+                      onClick={() => window.open('http://deven.cloud', '_blank', 'noopener,noreferrer')}
+                      className="w-full h-full cursor-pointer hover:scale-105 transition-transform duration-300"
+                      style={{
+                        WebkitTapHighlightColor: 'transparent',
+                        WebkitTouchCallout: 'none',
+                        WebkitUserSelect: 'none',
+                        userSelect: 'none',
+                        willChange: 'transform',
+                        WebkitTransform: 'translate3d(0, 0, 0)',
+                        transform: 'translate3d(0, 0, 0)',
+                        WebkitBackfaceVisibility: 'hidden',
+                        backfaceVisibility: 'hidden'
+                      }}
+                      aria-label="Visit Deven Spear's website"
+                      type="button"
+                    >
+                      <Image
+                        src={content.image}
+                        alt="Deven Spear - Click to visit deven.cloud"
+                        width={160}
+                        height={160}
+                        className="object-cover pointer-events-none"
+                      />
+                    </button>
                   </div>
                   
                   {/* Remaining paragraphs wrap around the image */}

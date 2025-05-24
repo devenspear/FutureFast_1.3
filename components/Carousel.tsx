@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import ResourceCard, { ResourceCardProps } from './ResourceCard';
 
@@ -6,22 +6,18 @@ interface CarouselProps {
   cards: Array<ResourceCardProps>;
 }
 
-const scrollAmount = 300;
+const scrollAmount = 320; // Match YouTube section scroll amount
 
-// Define keyframes for the pulse animation
-const pulseAnimation = `
-@keyframes pulse-animation {
-  0% {
-    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
-    transform: translateY(-50%) scale(1.3);
+// Glow animation styles
+const glowAnimation = `
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3), 0 0 15px rgba(59, 130, 246, 0.2);
+    transform: scale(1);
   }
-  70% {
-    box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
-    transform: translateY(-50%) scale(1.4);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
-    transform: translateY(-50%) scale(1.3);
+  50% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4);
+    transform: scale(1.05);
   }
 }
 `;
@@ -29,62 +25,101 @@ const pulseAnimation = `
 const Carousel: React.FC<CarouselProps> = ({ cards }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: 'left' | 'right') => {
+  useEffect(() => {
+    // Add the keyframes to the document
+    if (typeof document !== 'undefined' && !document.getElementById('carousel-glow-animation')) {
+      const style = document.createElement('style');
+      style.id = 'carousel-glow-animation';
+      style.textContent = glowAnimation;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  const scrollLeft = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
+      scrollRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="relative w-full min-h-[440px] md:min-h-[470px] lg:min-h-[500px] xl:min-h-[520px]">
-      {/* Add the keyframes animation to the head */}
-      <style>{pulseAnimation}</style>
-      
+    <div className="relative">
+      {/* Navigation Buttons - matching YouTube section style exactly */}
       <button
-        aria-label="Scroll left"
-        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
-        style={{ 
-          opacity: 0.85, 
-          animation: 'pulse-animation 2s infinite',
-          transform: 'translateY(-50%) scale(1.3)',
-          left: '-30px' // Position mostly outside with ~20% overlap
+        onClick={scrollLeft}
+        className="absolute left-2 md:left-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-800 hover:bg-gray-700 text-white p-2 md:p-3 rounded-full shadow-lg transition-all duration-200 touch-manipulation"
+        style={{
+          animation: 'glow-pulse 3s ease-in-out infinite',
+          // iOS/Android touch optimizations
+          WebkitTapHighlightColor: 'transparent',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          // Ensure minimum touch target size (44px iOS, 48px Android)
+          minWidth: '44px',
+          minHeight: '44px',
+          // Hardware acceleration
+          willChange: 'transform, box-shadow',
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          transform: 'translate3d(0, 0, 0)'
         }}
-        onClick={() => scroll('left')}
+        aria-label="Scroll left"
+        type="button"
       >
-        <FaChevronLeft size={24} />
+        <FaChevronLeft className="text-sm md:text-base" />
       </button>
       
+      <button
+        onClick={scrollRight}
+        className="absolute right-2 md:right-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-800 hover:bg-gray-700 text-white p-2 md:p-3 rounded-full shadow-lg transition-all duration-200 touch-manipulation"
+        style={{
+          animation: 'glow-pulse 3s ease-in-out infinite 1.5s',
+          // iOS/Android touch optimizations
+          WebkitTapHighlightColor: 'transparent',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          // Ensure minimum touch target size (44px iOS, 48px Android)
+          minWidth: '44px',
+          minHeight: '44px',
+          // Hardware acceleration
+          willChange: 'transform, box-shadow',
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          transform: 'translate3d(0, 0, 0)'
+        }}
+        aria-label="Scroll right"
+        type="button"
+      >
+        <FaChevronRight className="text-sm md:text-base" />
+      </button>
+
+      {/* Cards Container - matching YouTube section layout */}
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto gap-4 py-4 px-8 scrollbar-hide scroll-smooth"
-        style={{ scrollBehavior: 'smooth' }}
+        className="flex gap-4 md:gap-6 overflow-x-auto overflow-y-hidden scrollbar-hide px-4 md:px-12 scroll-smooth"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitScrollbar: { display: 'none' },
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch',
+          // iOS specific fixes
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          transform: 'translate3d(0, 0, 0)',
+          // Android specific fixes
+          overscrollBehaviorX: 'contain',
+          // Prevent bounce on iOS
+          WebkitBackfaceVisibility: 'hidden',
+          backfaceVisibility: 'hidden'
+        }}
       >
         {cards.map((card, idx) => (
-          <div
-            key={card.title || idx}
-            className="flex-shrink-0 w-64 h-[420px] md:w-72 md:h-[450px] lg:w-80 lg:h-[480px] xl:w-80 xl:h-[500px]"
-          >
-            <ResourceCard {...card} />
-          </div>
+          <ResourceCard key={card.id || idx} {...card} />
         ))}
       </div>
-      
-      <button
-        aria-label="Scroll right"
-        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 bg-gray-900/70 text-blue-200 shadow-md rounded-full p-4 hover:bg-purple-700 hover:text-white transition border border-purple-500"
-        style={{ 
-          opacity: 0.85, 
-          animation: 'pulse-animation 2s infinite',
-          transform: 'translateY(-50%) scale(1.3)',
-          right: '-30px' // Position mostly outside with ~20% overlap
-        }}
-        onClick={() => scroll('right')}
-      >
-        <FaChevronRight size={24} />
-      </button>
     </div>
   );
 };

@@ -27,12 +27,12 @@ function mapCMSToResourceCard(card: CMSCard): ResourceCardProps {
 export default function LibraryGridClient({ cards }: { cards: CMSCard[] }) {
   const resourceCards: ResourceCardProps[] = cards.map(mapCMSToResourceCard);
   return (
-    <section className="py-16 px-4 max-w-7xl mx-auto" id="resource-library">
-      <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-10 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
+    <section className="py-12 md:py-16 px-4 max-w-7xl mx-auto" id="resource-library">
+      <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-10 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
         Resource Library
       </h1>
       {/* Only show the new carousel, no black ribbon or 2x2 grid */}
-      <div className="mb-12">
+      <div className="mb-8 md:mb-12">
         <Carousel cards={resourceCards} />
       </div>
     </section>

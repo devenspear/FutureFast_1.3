@@ -1,6 +1,7 @@
 import HeroSection from "../../components/HeroSection";
 import FastLaneSection from "../../components/FastLaneSection";
 import NewsAndDisruptionSection from "../../components/NewsAndDisruptionSection";
+import YouTubeChannelsSection from "../../components/YouTubeChannelsSection";
 import LibraryGrid from "../../components/LibraryGrid";
 import ThoughtLeadersSection from "../../components/ThoughtLeadersSection";
 import AboutWithSubscription from "../../components/AboutWithSubscription";
@@ -12,6 +13,7 @@ export default function Home() {
       <HeroSection />
       <FastLaneSection />
       <NewsAndDisruptionSection />
+      <YouTubeChannelsSection />
       <LibraryGrid />
       <ThoughtLeadersSection />
       <AboutWithSubscription />

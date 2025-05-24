@@ -13,16 +13,18 @@ interface NewsItem {
   url: string;
   icon: string;
   featured?: boolean;
+  excerpt?: string;
 }
 
 // Default news items as fallback
 const defaultNewsItems: NewsItem[] = [
   {
-    title: 'xAI\'s Grok chatbot can now \'see\' the world around it',
+    title: 'xAI&apos;s Grok chatbot can now &apos;see&apos; the world around it',
     source: 'TechCrunch',
     date: 'April 22, 2025',
     url: 'https://techcrunch.com/2025/04/22/xais-grok-chatbot-can-now-see-the-world-around-it/',
-    icon: '📸'
+    icon: '📸',
+    excerpt: 'The Grok AI chatbot from Elon Musk&apos;s startup now has vision capabilities that let it analyze and describe images...'
   },
   {
     title: 'OpenAI launches GPT-4.1 with major improvements in reasoning, memory, and tool use',
@@ -39,7 +41,7 @@ const defaultNewsItems: NewsItem[] = [
     icon: '✨'
   },
   {
-    title: 'Runway\'s Gen-3 Alpha Turbo is here and can make AI videos faster than you can type',
+    title: 'Runway&apos;s Gen-3 Alpha Turbo is here and can make AI videos faster than you can type',
     source: 'VentureBeat',
     date: 'April 8, 2025',
     url: 'https://venturebeat.com/ai/runways-gen-3-alpha-turbo-is-here-and-can-make-ai-videos-faster-than-you-can-type/',

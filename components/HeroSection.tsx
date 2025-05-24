@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
 interface Bubble {
   id: number;
@@ -95,17 +95,17 @@ export default function HeroSection() {
   };
 
   // Check if position overlaps with text areas
-  const isOverlappingText = (x: number, y: number, size: number) => {
+  const isOverlappingText = useCallback((x: number, y: number, size: number) => {
     return textAreasRef.current.some(area => 
       x < area.x + area.width &&
       x + size > area.x &&
       y < area.y + area.height &&
       y + size > area.y
     );
-  };
+  }, []);
 
   // Generate truly random movement that avoids repeated patterns
-  const updateBubble = (bubble: Bubble, containerWidth: number, containerHeight: number): Bubble => {
+  const updateBubble = useCallback((bubble: Bubble, containerWidth: number, containerHeight: number): Bubble => {
     const now = Date.now();
     let newX = bubble.x + bubble.vx;
     let newY = bubble.y + bubble.vy;
@@ -231,7 +231,7 @@ export default function HeroSection() {
       scaleDirection: newScaleDirection,
       pathMemory: newPathMemory
     };
-  };
+  }, [isOverlappingText]);
 
   useEffect(() => {
     // Load content from the server
@@ -243,7 +243,7 @@ export default function HeroSection() {
         // Fallback content
         setContent({
           headline: 'Future Fast',
-          subheadline: 'Accelerating Tomorrow\'s Innovations Today'
+          subheadline: 'Accelerating Tomorrow&apos;s Innovations Today'
         });
       });
 
@@ -291,7 +291,7 @@ export default function HeroSection() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [bubbles.length]);
+  }, [bubbles.length, updateBubble]);
 
   // Update text areas when window resizes
   useEffect(() => {

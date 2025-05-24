@@ -49,7 +49,7 @@ const learningResources: LearningResource[] = [
   {
     id: '2',
     title: 'Introduction to Generative AI Learning Path',
-    description: 'A curated learning path by Google with introductory courses. It introduces what Generative AI is, how it\'s used, and its differences from traditional ML. Includes topics like LLMs, image generation, and responsible AI.',
+    description: 'A curated learning path by Google with introductory courses. It introduces what Generative AI is, how it&apos;s used, and its differences from traditional ML. Includes topics like LLMs, image generation, and responsible AI.',
     link: 'https://www.cloudskillsboost.google/paths/118',
     provider: 'Google Cloud',
     category: 'AI',
@@ -60,7 +60,7 @@ const learningResources: LearningResource[] = [
   {
     id: '3',
     title: 'OpenAI Learning Resources & Documentation',
-    description: 'Comprehensive documentation, guides, and examples on OpenAI\'s models (like GPT), APIs, and best practices for developing with generative AI. Excellent for understanding core concepts and practical application.',
+    description: 'Comprehensive documentation, guides, and examples on OpenAI&apos;s models (like GPT), APIs, and best practices for developing with generative AI. Excellent for understanding core concepts and practical application.',
     link: 'https://platform.openai.com/docs',
     provider: 'OpenAI',
     category: 'AI',
@@ -70,7 +70,7 @@ const learningResources: LearningResource[] = [
   },
   {
     id: '4',
-    title: 'Binance Academy - Beginner\'s Guide & Tracks',
+    title: 'Binance Academy - Beginner&apos;s Guide & Tracks',
     description: 'Offers extensive free educational content, including a "Beginner Track," articles, and guides on blockchain, cryptocurrency, trading, security, and specific topics like Bitcoin, Ethereum, and NFTs.',
     link: 'https://academy.binance.com/en/articles?page=1&tags=beginner',
     provider: 'Binance Academy',
@@ -100,7 +100,7 @@ const learningResources: LearningResource[] = [
   },
   {
     id: '7',
-    title: 'Trust Wallet - Beginner\'s Guides & Wallet Setup',
+    title: 'Trust Wallet - Beginner&apos;s Guides & Wallet Setup',
     description: 'Offers guides specifically for beginners on how to get started with crypto and Web3. Includes clear explanations of cryptocurrency wallets (software, hardware) and step-by-step instructions for setting up and securing wallets.',
     link: 'https://trustwallet.com/blog/guides/how-to-get-started-in-crypto-and-web3',
     provider: 'Trust Wallet',
@@ -188,7 +188,7 @@ export default function LearningResourcesSection() {
             Learning Resources
           </h1>
           <p className="font-orbitron text-lg md:text-xl text-cyan-100 max-w-3xl mx-auto">
-            If you're feeling overwhelmed, start your journey here. Most importantly, begin using, testing, and building now!
+            If you&apos;re feeling overwhelmed, start your journey here. Most importantly, begin using, testing, and building now!
           </p>
         </div>
 

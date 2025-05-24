@@ -29,11 +29,11 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   icons: { 
     icon: [
-      { url: "/poker-chip-favicon.svg", type: "image/svg+xml" },
-      { url: "/poker-chip-favicon.png", type: "image/png" }
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", type: "image/x-icon" }
     ],
-    shortcut: "/poker-chip-favicon.png", 
-    apple: "/poker-chip-favicon.png" 
+    shortcut: "/favicon.ico", 
+    apple: "/favicon.svg" 
   },
   openGraph: {
     title: "FutureFast: Empowering Speed",
@@ -61,8 +61,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link rel="icon" href="/poker-chip-favicon.svg" type="image/svg+xml" />
-        <link rel="icon" href="/poker-chip-favicon.png" type="image/png" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="canonical" href="https://futurefast.com" />
         <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION} />
         <Script src={`https://www.googletagmanager.com/gtag/js?id=G-F4CGW7GF6P`} strategy="afterInteractive" />

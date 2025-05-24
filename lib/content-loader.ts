@@ -195,7 +195,7 @@ export async function loadYouTubeVideos(): Promise<YouTubeVideoItem[]> {
   const { data } = await loadMarkdownContent(filePath);
   
   if (Array.isArray(data.videos)) {
-    return data.videos.map((video: any) => ({
+    return data.videos.map((video: Record<string, unknown>) => ({
       url: String(video.url || ''),
       title: String(video.title || ''),
       description: String(video.description || ''),

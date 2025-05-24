@@ -13,6 +13,21 @@ export interface YouTubeVideoData {
   featured?: boolean;
 }
 
+interface YouTubeAPIVideoItem {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    publishedAt: string;
+    channelTitle: string;
+    thumbnails: {
+      maxres?: { url: string };
+      high?: { url: string };
+      medium?: { url: string };
+    };
+  };
+}
+
 // Extract video ID from various YouTube URL formats
 function extractVideoId(url: string): string | null {
   const patterns = [
@@ -43,7 +58,7 @@ async function getVideoInfoFallback(videoId: string): Promise<{ title: string; c
         channelTitle: oEmbedData.author_name || 'YouTube Channel'
       };
     }
-  } catch (error) {
+  } catch {
     console.log('oEmbed fallback failed for video:', videoId);
   }
   
@@ -76,7 +91,7 @@ export async function GET() {
               getVideoInfoFallback(videoId),
               new Promise(resolve => setTimeout(() => resolve(null), 2000)) // 2 second max per video
             ]) as { title: string; channelTitle: string } | null;
-          } catch (error) {
+          } catch {
             console.log('Fallback timeout for video:', videoId);
           }
           
@@ -147,7 +162,7 @@ export async function GET() {
     }
 
     // Transform the data to match our interface
-    const videos: YouTubeVideoData[] = data.items.map((item: any) => {
+    const videos: YouTubeVideoData[] = data.items.map((item: YouTubeAPIVideoItem) => {
       const config = videoData.find(v => v.id === item.id);
       
       return {

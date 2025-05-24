@@ -179,7 +179,6 @@ export default function YouTubeChannelsSection() {
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              WebkitScrollbar: { display: 'none' },
               scrollBehavior: 'smooth',
               WebkitOverflowScrolling: 'touch',
               // iOS specific fixes

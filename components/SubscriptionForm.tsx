@@ -64,7 +64,7 @@ export default function SubscriptionForm() {
       });
       
       // Submit to DevCo CRM API
-      const response = await fetch('https://devcocrm.vercel.app/api/submit', {
+      const response = await fetch('https://dev-co-crm.vercel.app/api/submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,9 @@ export default function SubscriptionForm() {
           email: formData.email,
           note: `FutureFast.ai newsletter signup${formData.company ? ` - Company: ${formData.company}` : ''}`,
           sourceWebsite: 'futurefast.ai',
-          sourcePage: 'Newsletter Signup'
+          sourcePage: 'Newsletter Signup',
+          // Skip Turnstile verification for now - will implement later
+          skipBotCheck: true
         })
       });
       

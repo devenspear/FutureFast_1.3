@@ -78,6 +78,12 @@ videos:
     description: "How businesses can effectively integrate new technologies into their operations."
     category: "Business Tech"
     featured: false
+
+  - url: "https://youtube.com/watch?v=dQw4w9WgXcQ"
+    title: "YouTube Video"
+    description: "Video content from YouTube"
+    category: "Tech Innovation"
+    featured: false
 ---
 
 # YouTube Videos Configuration

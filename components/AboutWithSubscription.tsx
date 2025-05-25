@@ -38,41 +38,51 @@ export default function AboutWithSubscription() {
     setSubmitResult(null);
     
     try {
-      // Submit data to the API
-      const response = await fetch('/api/subscribe', {
+      // Submit to DevCo CRM API
+      const response = await fetch('https://devcocrm.vercel.app/api/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-API-Key': 'crm_d959d98a518641ecc8555ac54e371891e0b9a48fa1ab352425d69d557a6cb2f5'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          note: `FutureFast.ai newsletter signup${formData.company ? ` - Company: ${formData.company}` : ''}`,
+          sourceWebsite: 'futurefast.ai',
+          sourcePage: 'About/Newsletter Signup'
+        })
       });
       
-      const result = await response.json();
-      
-      setIsSubmitting(false);
-      setSubmitResult({
-        success: result.success,
-        message: result.message || (result.success 
-          ? "Thank you for subscribing! We'll be in touch soon."
-          : "There was an error processing your subscription. Please try again.")
-      });
-      
-      // Clear form if successful
-      if (result.success) {
+      if (response.ok) {
+        setSubmitResult({
+          success: true,
+          message: "🎉 Welcome to the FutureFast.ai community! Check your email for confirmation."
+        });
+        
+        // Clear form if successful
         setFormData({
           firstName: '',
           lastName: '',
           email: '',
           company: ''
         });
+      } else {
+        const errorData = await response.json();
+        setSubmitResult({
+          success: false,
+          message: errorData.message || "Submission failed. Please try again."
+        });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      setIsSubmitting(false);
       setSubmitResult({
         success: false,
-        message: "There was an error connecting to our server. Please try again later."
+        message: "Network error. Please check your connection and try again."
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   

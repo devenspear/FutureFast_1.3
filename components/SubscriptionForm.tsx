@@ -4,6 +4,9 @@
 // encountered integration issues. This is a simplified version without Turnstile for now.
 // Future implementation may revisit this with a different approach or third-party service.
 
+// DevCo CRM Integration: This form now submits directly to the centralized DevCo CRM system
+// for unified lead management across all Deven Spear projects.
+
 import React, { useState } from 'react';
 
 export default function SubscriptionForm() {
@@ -53,47 +56,51 @@ export default function SubscriptionForm() {
     }
 
     try {
-      console.log('Form validation passed, preparing submission with data:', {
+      console.log('Form validation passed, submitting to DevCo CRM with data:', {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         company: formData.company || '(not provided)'
       });
       
-      const apiUrl = '/api/subscribe';
-      console.log('Submitting to API URL:', apiUrl);
-      
-      const response = await fetch(apiUrl, {
+      // Submit to DevCo CRM API
+      const response = await fetch('https://devcocrm.vercel.app/api/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-API-Key': 'crm_d959d98a518641ecc8555ac54e371891e0b9a48fa1ab352425d69d557a6cb2f5'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          note: `FutureFast.ai newsletter signup${formData.company ? ` - Company: ${formData.company}` : ''}`,
+          sourceWebsite: 'futurefast.ai',
+          sourcePage: 'Newsletter Signup'
+        })
       });
       
-      console.log('API response received, status:', response.status);
+      console.log('DevCo CRM response received, status:', response.status);
       
-      const result = await response.json();
-      console.log('API response data:', result);
-      
-      if (!response.ok) {
-        console.error('API returned error status:', response.status);
-        throw new Error(result.message || 'Something went wrong');
+      if (response.ok) {
+        console.log('Form submission successful, resetting form');
+        // Reset form and show success message
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          company: ''
+        });
+        setSubmitStatus('success');
+      } else {
+        const errorData = await response.json();
+        console.error('DevCo CRM returned error:', errorData);
+        throw new Error(errorData.message || 'Submission failed. Please try again.');
       }
-      
-      console.log('Form submission successful, resetting form');
-      // Reset form and show success message
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        company: ''
-      });
-      setSubmitStatus('success');
     } catch (error) {
       console.error('Form submission error details:', error);
       setSubmitStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again later.");
+      setErrorMessage(error instanceof Error ? error.message : "Network error. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
       console.log('Form submission process completed');

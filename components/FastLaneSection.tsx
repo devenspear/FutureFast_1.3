@@ -41,7 +41,7 @@ export default function FastLaneSection() {
   };
 
   return (
-    <section id="intro" className="pt-0 pb-16 md:pt-0 md:pb-24 bg-black text-white relative">
+    <section id="intro" className="pb-16 md:pb-24 bg-black text-white relative">
       <div className="container mx-auto px-4 relative z-10">
         <motion.div 
           className="flex flex-col lg:flex-row gap-12 items-center"

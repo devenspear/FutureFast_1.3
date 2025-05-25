@@ -13,16 +13,18 @@ interface NewsItem {
   url: string;
   icon: string;
   featured?: boolean;
+  excerpt?: string;
 }
 
 // Default news items as fallback
 const defaultNewsItems: NewsItem[] = [
   {
-    title: 'xAI\'s Grok chatbot can now \'see\' the world around it',
+    title: 'xAI&apos;s Grok chatbot can now &apos;see&apos; the world around it',
     source: 'TechCrunch',
     date: 'April 22, 2025',
     url: 'https://techcrunch.com/2025/04/22/xais-grok-chatbot-can-now-see-the-world-around-it/',
-    icon: '📸'
+    icon: '📸',
+    excerpt: 'The Grok AI chatbot from Elon Musk&apos;s startup now has vision capabilities that let it analyze and describe images...'
   },
   {
     title: 'OpenAI launches GPT-4.1 with major improvements in reasoning, memory, and tool use',
@@ -39,7 +41,7 @@ const defaultNewsItems: NewsItem[] = [
     icon: '✨'
   },
   {
-    title: 'Runway\'s Gen-3 Alpha Turbo is here and can make AI videos faster than you can type',
+    title: 'Runway&apos;s Gen-3 Alpha Turbo is here and can make AI videos faster than you can type',
     source: 'VentureBeat',
     date: 'April 8, 2025',
     url: 'https://venturebeat.com/ai/runways-gen-3-alpha-turbo-is-here-and-can-make-ai-videos-faster-than-you-can-type/',
@@ -48,14 +50,17 @@ const defaultNewsItems: NewsItem[] = [
 ];
 
 export default function NewsAndDisruptionSection() {
-  const [newsItems, setNewsItems] = useState<NewsItem[]>(defaultNewsItems);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     // Fetch news items from the API endpoint
     fetch('/api/news')
       .then(response => {
-        console.log('API response status:', response.status);
+        console.log('News API response status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         return response.json();
       })
       .then(data => {
@@ -64,11 +69,16 @@ export default function NewsAndDisruptionSection() {
           // Limit to 4 items for display
           const limitedItems = data.slice(0, 4);
           setNewsItems(limitedItems);
+        } else {
+          // Use default items if no data
+          setNewsItems(defaultNewsItems);
         }
         setIsLoading(false);
       })
       .catch(error => {
         console.error('Error fetching news items:', error);
+        // Use default items on error
+        setNewsItems(defaultNewsItems);
         setIsLoading(false);
       });
   }, []);
@@ -81,7 +91,16 @@ export default function NewsAndDisruptionSection() {
         {/* News Articles - Left Side */}
         <div className="lg:w-1/2">
           {isLoading ? (
-            <div className="text-center py-8">Loading news...</div>
+            <div className="text-center py-8">
+              <div className="animate-pulse space-y-4">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="py-4 px-3">
+                    <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : (
             <ul>
               {newsItems.map((item, idx) => (

@@ -15,6 +15,14 @@ export interface NewsItem {
   featured: boolean;
 }
 
+export interface YouTubeVideoItem {
+  url: string;
+  title: string;
+  description: string;
+  category: string;
+  featured: boolean;
+}
+
 export interface CatalogItem {
   title: string;
   description: string;
@@ -179,6 +187,24 @@ export async function loadThoughtLeaders() {
   const filePath = path.join(process.cwd(), 'content/thought-leaders/thought-leaders.md');
   const { data } = await loadMarkdownContent(filePath);
   return Array.isArray(data.leaders) ? data.leaders : [];
+}
+
+// Load YouTube videos from markdown
+export async function loadYouTubeVideos(): Promise<YouTubeVideoItem[]> {
+  const filePath = path.join(process.cwd(), 'content/youtube/videos.md');
+  const { data } = await loadMarkdownContent(filePath);
+  
+  if (Array.isArray(data.videos)) {
+    return data.videos.map((video: Record<string, unknown>) => ({
+      url: String(video.url || ''),
+      title: String(video.title || ''),
+      description: String(video.description || ''),
+      category: String(video.category || ''),
+      featured: Boolean(video.featured || false),
+    }));
+  }
+  
+  return [];
 }
 
 // Load all news items

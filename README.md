@@ -1,110 +1,154 @@
 # FutureFast Homepage
 
-This project is a professional, animated, mobile-first homepage for FutureFast.com, built with Next.js, Tailwind CSS, and (future) Contentful CMS.
+This project is a professional, animated, mobile-first homepage for FutureFast.com, built with Next.js 15.3.0, Tailwind CSS, and modern web technologies.
 
 ## Features
-- **Hero Section:** Animated headline, subheadline, and background
-- **Curated Library Cards:** Dynamic grid (Contentful integration planned)
-- **Featured Insight:** Highlight section
-- **Exponential Timeline:** Animated timeline
-- **Newsletter Subscription:** Custom form with Vercel Blob Storage integration
-- **Admin Dashboard:** Secure subscriber management with authentication
-- **About Me:** Bio, profile, quote, links
-- **Footer:** Socials, copyright, badge
-- **Mobile-first, dark mode**
+
+### ✨ **Current Features**
+- **🎯 Hero Section:** Physics-based animated bubbles with diameter-controlled movement, dynamic content loading, and text collision avoidance
+- **📚 Learning Resources:** Curated educational resources (AI, Crypto, Blockchain) with provider icons and difficulty indicators
+- **📺 YouTube Channels:** Dynamic video grid with fallback data and mobile optimization
+- **📰 News & Disruption:** Latest industry updates and insights
+- **🏎️ Fast Lane Section:** Speed-focused content and statistics
+- **💡 Thought Leaders:** Industry expert highlights
+- **✉️ Newsletter Subscription:** Secure form with Vercel Blob Storage integration
+- **👨‍💼 About Section:** Bio, profile, quote, and social links
+- **🎨 Custom Favicon:** Blue/gold gradient design with lightning bolt
+- **📱 Mobile-first responsive design with advanced animations**
+
+### 🎬 **Animation System**
+- **Diameter-Based Speed Control:** Bubbles move at maximum of their diameter per second
+- **Physics-Based Movement:** Realistic collision detection and boundary behavior
+- **Text Avoidance:** Dynamic repulsion forces prevent overlap with content
+- **Unique Path Memory:** Anti-repetition system ensures varied movement patterns
+- **60fps Performance:** Hardware-accelerated RequestAnimationFrame animations
 
 ## Tech Stack
-- Next.js (App Router, TypeScript, v15+)
-- Tailwind CSS (animations, dark mode)
-- Vercel Blob Storage (newsletter subscriptions)
-- Contentful CMS (planned)
-
-## Content Management
-The site uses a mixed approach for content management:
-
-- **Markdown Files**: Some sections (Hero, About, Footer) use markdown files in the `content/sections/` directory
-- **Component State**: Interactive sections that use client-side libraries (Fast Lane, Subscription Form) have content defined in component state
-- **See [chat-log-content-management-april-28-2025.md](./chat-log-content-management-april-28-2025.md) for detailed guidance on content updates**
+- **Frontend:** Next.js 15.3.0 (App Router, TypeScript)
+- **Styling:** Tailwind CSS with custom animations
+- **Icons:** React Icons (FontAwesome, Simple Icons)
+- **Fonts:** Google Fonts (Orbitron, Geist)
+- **Storage:** Vercel Blob Storage (newsletter subscriptions)
+- **Analytics:** Google Analytics integration
+- **Deployment:** Vercel with optimized build configuration
 
 ## Project Structure
 ```
-FutureFast.1.1/
-  components/
-  lib/
-  public/
-  src/
-    app/
-      page.tsx
-      layout.tsx
-      globals.css
-  package.json
-  next.config.ts
-  ...
+FutureFast.1.2/
+├── components/
+│   ├── HeroSection.tsx           # Physics-based animated hero
+│   ├── LearningResourcesSection.tsx # Educational resources
+│   ├── YouTubeChannelsSection.tsx
+│   ├── NewsAndDisruptionSection.tsx
+│   ├── FastLaneSection.tsx
+│   ├── ThoughtLeadersSection.tsx
+│   ├── AboutWithSubscription.tsx
+│   └── Footer.tsx
+├── lib/
+│   ├── analytics.ts              # Event tracking utilities
+│   └── content-loader.ts         # Dynamic content loading
+├── public/
+│   ├── favicon.svg               # Custom FutureFast favicon
+│   ├── favicon-16.svg            # Optimized small size
+│   └── favicon.ico               # Browser fallback
+├── src/
+│   └── app/
+│       ├── page.tsx              # Main homepage
+│       ├── layout.tsx            # Global layout & metadata
+│       ├── globals.css           # Global styles
+│       └── api/                  # API routes
+└── styles/                       # Additional CSS modules
 ```
 
 ## Local Development
-1. Clone the repo:
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Setup
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/devenspear/FutureFast.1.1.git
-   cd FutureFast.1.1
+   git clone https://github.com/devenspear/FutureFast_1.2.git
+   cd FutureFast.1.2
    ```
-2. Install dependencies:
+
+2. **Install dependencies:**
    ```bash
    npm install
    ```
-3. Set up environment variables:
+
+3. **Environment setup:**
    ```bash
    cp env.sample .env.local
-   # Edit .env.local with your Vercel Blob Storage token and admin credentials
+   # Edit .env.local with your configuration:
+   # - BLOB_READ_WRITE_TOKEN (Vercel Blob Storage)
+   # - ADMIN_USERNAME & ADMIN_PASSWORD
+   # - NEXT_PUBLIC_GOOGLE_VERIFICATION
    ```
-4. Start the dev server:
+
+4. **Start development server:**
    ```bash
    npm run dev
    ```
    Visit [http://localhost:3000](http://localhost:3000)
 
-## Vercel Deployment
-- **Root Directory:** Leave blank (use repo root)
-- **Framework Preset:** Next.js
-- **Build Command:** (default) `next build`
+## Deployment
+
+### Vercel (Recommended)
+- **Framework:** Next.js
+- **Build Command:** `next build`
 - **Output Directory:** (default)
-- **Install Command:** (default)
-- **Environment Variables:** 
-  - Set up `BLOB_READ_WRITE_TOKEN` (see docs/BLOB_STORAGE_SETUP.md)
-  - Set up `ADMIN_USERNAME` and `ADMIN_PASSWORD` (see docs/ADMIN_SECURITY.md)
+- **Node.js Version:** 18.x
 
-### Troubleshooting
-- If you see a 404 after deploy:
-  - Ensure your Vercel project is connected to the correct repo and branch.
-  - The Root Directory must be blank (unless your Next.js project is in a subfolder).
-  - Your `src/app/page.tsx` and `src/app/layout.tsx` must exist and be correctly named (case-sensitive).
-  - If you restructure the repo, remove and re-add the project in Vercel.
+### Environment Variables
+Required for production:
+- `BLOB_READ_WRITE_TOKEN` - Vercel Blob Storage access
+- `ADMIN_USERNAME` - Admin dashboard access
+- `ADMIN_PASSWORD` - Admin dashboard access  
+- `NEXT_PUBLIC_GOOGLE_VERIFICATION` - Google Search Console
 
-## Form Security Notes
+## Recent Updates (v1.2)
 
-### Cloudflare Turnstile Integration
-Multiple attempts were made to integrate Cloudflare Turnstile for form security and bot protection in the subscription form. These attempts included:
+### 🎯 **Physics-Based Animations**
+- Implemented diameter-based speed control for hero bubbles
+- Reduced bubble count by 50% for better performance
+- Enhanced collision detection and text avoidance
+- Maintained randomness while respecting physics constraints
 
-1. Initial implementation with script loading in the component
-2. Moving the script to the layout.tsx file
-3. Using environment variables for the site key and secret key
-4. Hardcoding the keys for testing
-5. Using different script loading approaches (async/defer, onload callback)
-6. Trying different DOM element references (refs vs. IDs)
+### 📚 **Learning Resources Section**
+- Added 7 curated educational resources
+- Category-based color coding (AI, Crypto, Blockchain)
+- Provider icons and difficulty indicators
+- External link tracking with analytics
 
-Despite these efforts, the Turnstile widget did not reliably appear in the form, and verification consistently failed. For now, the form has been reverted to a simpler version without Turnstile integration.
+### 🎨 **Visual Improvements**
+- Custom FutureFast favicon with brand colors
+- Multiple favicon formats for browser compatibility
+- Enhanced mobile touch optimizations
+- Improved typography and spacing consistency
 
-Future security enhancements may explore:
-- Alternative CAPTCHA solutions
-- Server-side rate limiting
-- IP-based filtering
-- Honeypot fields
+## Performance Features
+- **Static Generation:** Pre-rendered pages for optimal loading
+- **Image Optimization:** Next.js automatic image optimization
+- **Font Loading:** Optimized Google Fonts with display: swap
+- **Bundle Splitting:** Automatic code splitting for smaller bundles
+- **Hardware Acceleration:** GPU-accelerated animations where supported
 
-## Contentful Integration (Planned)
-- Add your Contentful credentials in `.env.local` when ready.
+## Content Management
+Content is managed through a hybrid approach:
+- **Static Content:** Hero, About, Footer sections use markdown files
+- **Dynamic Content:** API routes for YouTube videos and news
+- **Component State:** Interactive sections with client-side libraries
+
+## Security Features
+- **Input Validation:** Server-side form validation
+- **Rate Limiting:** Protection against spam submissions
+- **Environment Protection:** Sensitive data in environment variables
+- **Admin Authentication:** Secure admin dashboard access
 
 ---
 
-2025 Deven Spear | All Rights Reserved
+**2025 Deven Spear | All Rights Reserved**
 
-This is a fork of Exponize2.3, now rebranded as FutureFast 1.1. All previous Exponize references have been updated.
+*FutureFast 1.2 - Empowering Speed with Physics-Based Animations*

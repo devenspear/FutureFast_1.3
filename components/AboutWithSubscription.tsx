@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { defaultAboutFutureFastContent } from '../lib/content';
 
@@ -23,6 +23,47 @@ export default function AboutWithSubscription() {
     message: string;
   } | null>(null);
   
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!turnstileRef.current) return;
+    if (typeof window === 'undefined') return;
+    if ((window as any).turnstile) return; // Script already loaded
+
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window && (window as any).turnstile && turnstileRef.current) {
+        (window as any).turnstile.render(turnstileRef.current, {
+          sitekey: '0x4AAAAAABerS3z0dQ0loAUa', // Updated site key
+          callback: (token: string) => setTurnstileToken(token),
+          'expired-callback': () => setTurnstileToken(''),
+          'error-callback': () => {
+            setTurnstileToken('');
+            setSubmitResult({ success: false, message: 'Security check failed. Please try again.' });
+          },
+        });
+      }
+    };
+    script.onerror = () => {
+      // Handle script loading errors, e.g., network issues or ad-blockers
+      setSubmitResult({ success: false, message: 'Could not load security check. Please disable ad-blockers or check your connection.'});
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup widget and script if component unmounts
+      if (turnstileRef.current) {
+        turnstileRef.current.innerHTML = ''; // Clear the widget
+      }
+      // Potentially remove the script if it was appended with a unique ID
+      // For simplicity, we are not removing it here, as it loads only once.
+    };
+  }, []); // Empty dependency array ensures this runs once on mount
+  
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,55 +74,64 @@ export default function AboutWithSubscription() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Reset submission state
+    if (!turnstileToken) {
+      setSubmitResult({ success: false, message: 'Please complete the security check.' });
+      setIsSubmitting(false); // Ensure button is re-enabled
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitResult(null);
     
     try {
-      // Submit to DevCo CRM API
-      const response = await fetch('https://dev-co-crm.vercel.app/api/submissions', {
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: '', // Not collected in this form
+        note: formData.company || '', // Use company field for note
+        subject: 'Mailing List Signup - FutureFast.ai',
+        inquiryType: 'newsletter',
+        sourceWebsite: 'futurefast.ai',
+        sourcePage: typeof window !== 'undefined' ? window.location.pathname : '/about', // More dynamic sourcePage
+        sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
+        turnstileToken: turnstileToken, // Send the token
+      };
+
+      const response = await fetch('https://crm.deven.site/api/submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': 'crm_d959d98a518641ecc8555ac54e371891e0b9a48fa1ab352425d69d557a6cb2f5'
+          'X-API-Key': 'crm_d959d98a518641ecc8555ac54e371891e0b9a48fa1ab352425d69d557a6cb2f5',
         },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          note: `FutureFast.ai newsletter signup${formData.company ? ` - Company: ${formData.company}` : ''}`,
-          sourceWebsite: 'futurefast.ai',
-          sourcePage: 'About/Newsletter Signup',
-          // Skip Turnstile verification for now - will implement later
-          skipBotCheck: true
-        })
+        body: JSON.stringify(payload),
       });
       
+      // const result = await response.json(); // Only parse if not OK or expecting specific data
+
       if (response.ok) {
         setSubmitResult({
           success: true,
-          message: "🎉 Welcome to the FutureFast.ai community! Check your email for confirmation."
+          message: "🎉 Welcome! We'll be in touch soon."
         });
-        
-        // Clear form if successful
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          company: ''
-        });
+        setFormData({ firstName: '', lastName: '', email: '', company: '' });
+        // Optionally reset Turnstile if needed, though usually not required on success
+        // if (window && (window as any).turnstile && turnstileRef.current) {
+        //   (window as any).turnstile.reset(turnstileRef.current);
+        // }
+        setTurnstileToken(''); // Clear token after successful submission
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ message: 'Submission failed. Please try again.' }));
         setSubmitResult({
           success: false,
-          message: errorData.message || "Submission failed. Please try again."
+          message: errorData.message || "Submission failed due to an unknown error."
         });
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Form submission error:", error);
       setSubmitResult({
         success: false,
-        message: "Network error. Please check your connection and try again."
+        message: "There was an error connecting to our server. Please try again later."
       });
     } finally {
       setIsSubmitting(false);
@@ -221,9 +271,12 @@ export default function AboutWithSubscription() {
                       />
                     </div>
                     
+                    {/* Turnstile Widget Placeholder */}
+                    <div ref={turnstileRef} className="my-4 flex justify-center"></div>
+
                     <button
                       type="submit"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !turnstileToken}
                       className="w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? 'Subscribing...' : 'Subscribe Now'}

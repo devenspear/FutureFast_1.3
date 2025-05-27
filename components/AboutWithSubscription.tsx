@@ -158,7 +158,7 @@ export default function AboutWithSubscription() {
         try {
           errorPayload = await response.json();
           console.error("API Error Response:", errorPayload); // Log full API error payload
-        } catch (e) {
+        } catch (_e) {
           console.error("Failed to parse API error response as JSON:", await response.text());
           errorPayload = { message: 'Submission failed. The server response was not valid JSON.' };
         }

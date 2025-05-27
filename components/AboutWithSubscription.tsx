@@ -152,23 +152,41 @@ export default function AboutWithSubscription() {
           message: "🎉 Welcome! We'll be in touch soon."
         });
         setFormData({ firstName: '', lastName: '', email: '', company: '' });
-        // Optionally reset Turnstile if needed, though usually not required on success
-        // if (window && (window as any).turnstile && turnstileRef.current) {
-        //   (window as any).turnstile.reset(turnstileRef.current);
-        // }
         setTurnstileToken(''); // Clear token after successful submission
       } else {
-        const errorData = await response.json().catch(() => ({ message: 'Submission failed. Please try again.' }));
+        let errorPayload;
+        try {
+          errorPayload = await response.json();
+          console.error("API Error Response:", errorPayload); // Log full API error payload
+        } catch (e) {
+          console.error("Failed to parse API error response as JSON:", await response.text());
+          errorPayload = { message: 'Submission failed. The server response was not valid JSON.' };
+        }
+        
+        const statusCode = response.status;
+        let detailedMessage = `Submission failed (Status: ${statusCode}).`;
+        if (errorPayload && errorPayload.message) {
+          detailedMessage += ` Server says: ${errorPayload.message}`;
+        } else if (errorPayload && typeof errorPayload === 'string') {
+          detailedMessage += ` Server says: ${errorPayload}`;
+        } else {
+          detailedMessage += " No specific error message from server. Check console for details.";
+        }
+
         setSubmitResult({
           success: false,
-          message: errorData.message || "Submission failed due to an unknown error."
+          message: detailedMessage
         });
       }
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error("Form submission client-side error:", error); // Log detailed client-side error
+      let errorMessage = "An unexpected error occurred. Please try again later.";
+      if (error instanceof Error) {
+        errorMessage = `Error: ${error.message}. Check console for more details.`;
+      }
       setSubmitResult({
         success: false,
-        message: "There was an error connecting to our server. Please try again later."
+        message: errorMessage
       });
     } finally {
       setIsSubmitting(false);

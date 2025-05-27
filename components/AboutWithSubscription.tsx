@@ -158,7 +158,8 @@ export default function AboutWithSubscription() {
         try {
           errorPayload = await response.json();
           console.error("API Error Response:", errorPayload); // Log full API error payload
-        } catch (_e) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_e) { // Prefix 'e' with an underscore to indicate it's intentionally unused
           console.error("Failed to parse API error response as JSON:", await response.text());
           errorPayload = { message: 'Submission failed. The server response was not valid JSON.' };
         }

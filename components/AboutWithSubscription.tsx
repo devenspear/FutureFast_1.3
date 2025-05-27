@@ -7,6 +7,27 @@ import { defaultAboutFutureFastContent } from '../lib/content';
 // Use the default content directly
 const content = defaultAboutFutureFastContent;
 
+// Define a type for the Turnstile object on the window
+interface Turnstile {
+  render: (container: string | HTMLElement, options: TurnstileOptions) => void;
+  reset: (widgetIdOrContainer: string | HTMLElement) => void;
+}
+
+interface TurnstileOptions {
+  sitekey: string;
+  callback: (token: string) => void;
+  'expired-callback'?: () => void;
+  'error-callback'?: () => void;
+  theme?: 'light' | 'dark' | 'auto';
+  // Add other options as needed
+}
+
+declare global {
+  interface Window {
+    turnstile?: Turnstile;
+  }
+}
+
 export default function AboutWithSubscription() {
   // Form state
   const [formData, setFormData] = useState({
@@ -29,15 +50,31 @@ export default function AboutWithSubscription() {
   useEffect(() => {
     if (!turnstileRef.current) return;
     if (typeof window === 'undefined') return;
-    if ((window as any).turnstile) return; // Script already loaded
+
+    const currentTurnstileRef = turnstileRef.current; // Capture ref for cleanup
+
+    if (window.turnstile) { // Script already loaded, try to render directly
+      if (currentTurnstileRef) {
+        window.turnstile.render(currentTurnstileRef, {
+          sitekey: '0x4AAAAAABerS3z0dQ0loAUa', // Updated site key
+          callback: (token: string) => setTurnstileToken(token),
+          'expired-callback': () => setTurnstileToken(''),
+          'error-callback': () => {
+            setTurnstileToken('');
+            setSubmitResult({ success: false, message: 'Security check failed. Please try again.' });
+          },
+        });
+      }
+      return; // Exit if already loaded and rendered (or attempted)
+    }
 
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      if (window && (window as any).turnstile && turnstileRef.current) {
-        (window as any).turnstile.render(turnstileRef.current, {
+      if (window && window.turnstile && currentTurnstileRef) {
+        window.turnstile.render(currentTurnstileRef, {
           sitekey: '0x4AAAAAABerS3z0dQ0loAUa', // Updated site key
           callback: (token: string) => setTurnstileToken(token),
           'expired-callback': () => setTurnstileToken(''),
@@ -56,8 +93,8 @@ export default function AboutWithSubscription() {
 
     return () => {
       // Cleanup widget and script if component unmounts
-      if (turnstileRef.current) {
-        turnstileRef.current.innerHTML = ''; // Clear the widget
+      if (currentTurnstileRef) {
+        currentTurnstileRef.innerHTML = ''; // Clear the widget using the captured ref
       }
       // Potentially remove the script if it was appended with a unique ID
       // For simplicity, we are not removing it here, as it loads only once.

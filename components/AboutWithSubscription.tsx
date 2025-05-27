@@ -56,7 +56,7 @@ export default function AboutWithSubscription() {
     if (window.turnstile) { // Script already loaded, try to render directly
       if (currentTurnstileRef) {
         window.turnstile.render(currentTurnstileRef, {
-          sitekey: '0x4AAAAAABerS3z0dQ0loAUa', // Updated site key
+          sitekey: '0x4AAAAAAAd88q_Tw0xFedez', // New site key
           callback: (token: string) => setTurnstileToken(token),
           'expired-callback': () => setTurnstileToken(''),
           'error-callback': () => {
@@ -75,7 +75,7 @@ export default function AboutWithSubscription() {
     script.onload = () => {
       if (window && window.turnstile && currentTurnstileRef) {
         window.turnstile.render(currentTurnstileRef, {
-          sitekey: '0x4AAAAAABerS3z0dQ0loAUa', // Updated site key
+          sitekey: '0x4AAAAAAAd88q_Tw0xFedez', // New site key
           callback: (token: string) => setTurnstileToken(token),
           'expired-callback': () => setTurnstileToken(''),
           'error-callback': () => {

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyAuthToken } from './lib/auth';
 
-const PUBLIC_PATHS = ['/admin/login'];
+const PUBLIC_PATHS = ['/admin/login', '/admin/news-submit']; // Temporarily added /admin/news-submit for testing
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

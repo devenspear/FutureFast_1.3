@@ -66,13 +66,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     >
       {/* Thumbnail Section */}
       <div className="relative h-36 md:h-44 w-full overflow-hidden">
-        <Image
-          src={imgSrc}
-          alt={title}
-          fill
+          <Image
+            src={imgSrc}
+            alt={title}
+            fill
           className="object-cover group-hover:scale-110 transition-transform duration-300"
           sizes="(max-width: 768px) 288px, 320px"
-        />
+          />
         
         {/* Overlay Text */}
         {overlayText && (
@@ -80,16 +80,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             <p className="text-white text-base md:text-lg font-bold text-center px-4">
               {overlayText}
             </p>
-          </div>
-        )}
+            </div>
+          )}
 
         {/* Platform Badge */}
         {platform && (
           <div className="absolute top-2 md:top-3 left-2 md:left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded">
             {platform}
+            </div>
+            )}
           </div>
-        )}
-      </div>
 
       {/* Content Section */}
       <div className="p-3 md:p-4 space-y-2 md:space-y-3 flex flex-col h-full">

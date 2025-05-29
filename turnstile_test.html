@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnstile Local Test</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+    <h1>Cloudflare Turnstile Local Test Page</h1>
+    <p>Site Key: 0x4AAAAAAAd88q_Tw0xFedez</p>
+
+    <form id="test-form" method="POST" action="#">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br><br>
+        
+        <!-- The Turnstile widget will render here -->
+        <div class="cf-turnstile"
+             data-sitekey="0x4AAAAAAAd88q_Tw0xFedez"
+             data-callback="turnstileCallback"
+             data-expired-callback="turnstileExpiredCallback"
+             data-error-callback="turnstileErrorCallback">
+        </div>
+        <br>
+        <button type="submit">Test Submit</button>
+    </form>
+
+    <script>
+        function turnstileCallback(token) {
+            console.log('Turnstile Success! Token: ', token);
+            // You could add the token to a hidden input here if this were a real form submission
+            // e.g., document.getElementById('cf-turnstile-response').value = token;
+        }
+        function turnstileExpiredCallback() {
+            console.warn('Turnstile token expired.');
+        }
+        function turnstileErrorCallback() {
+            console.error('Turnstile error callback triggered.');
+        }
+
+        // Optional: Prevent actual form submission for this test
+        document.getElementById('test-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            console.log('Test form submission prevented.');
+        });
+    </script>
+</body>
+</html> 

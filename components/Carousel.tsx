@@ -76,7 +76,7 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
       <button
         onClick={scrollRight}
         className="absolute right-2 md:right-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-800 hover:bg-gray-700 text-white p-2 md:p-3 rounded-full shadow-lg transition-all duration-200 touch-manipulation"
-        style={{
+        style={{ 
           animation: 'glow-pulse 3s ease-in-out infinite 1.5s',
           // iOS/Android touch optimizations
           WebkitTapHighlightColor: 'transparent',
@@ -95,7 +95,7 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
       >
         <FaChevronRight className="text-sm md:text-base" />
       </button>
-
+      
       {/* Cards Container - matching YouTube section layout */}
       <div
         ref={scrollRef}

@@ -339,7 +339,7 @@ export default function HeroSection() {
           />
         ))}
       </div>
-
+      
       {/* Subtle bottom gradient for text readability */}
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black to-transparent z-10" />
       <div className="absolute inset-x-0 bottom-[-20px] h-[20px] bg-black z-10" /> {/* Solid black bottom to ensure perfect transition */}

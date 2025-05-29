@@ -108,6 +108,26 @@ Required for production:
 - `ADMIN_PASSWORD` - Admin dashboard access  
 - `NEXT_PUBLIC_GOOGLE_VERIFICATION` - Google Search Console
 
+## Contact Form CRM Integration
+
+The "Join Our Mailing List" form in the `AboutWithSubscription.tsx` component has been updated to integrate with a new CRM backend and Cloudflare Turnstile for spam protection.
+
+### Integration Details:
+- **CRM API Endpoint:** `https://crm.deven.site/api/submissions`
+- **Cloudflare Turnstile Site Key:** `0x4AAAAAABerS3z0dQ0loAUa` (used in `AboutWithSubscription.tsx`)
+- **Cloudflare Turnstile Secret Key:** Configured in the backend CRM project (`dev-co-crm`) on Vercel. This key must correspond to the Site Key above.
+
+### Implementation Overview:
+The `handleSubmit` function within `components/AboutWithSubscription.tsx` was modified to:
+1.  Collect form data (First Name, Last Name, Email, Company).
+2.  Dynamically load and render the Cloudflare Turnstile widget.
+3.  Capture the Turnstile token (`cf-turnstile-response`).
+4.  Send a POST request to the CRM API endpoint (`https://crm.deven.site/api/submissions`) with the form data and the Turnstile token.
+5.  The request includes an `X-API-Key` header for authentication with the CRM.
+6.  The form submission is blocked if the Turnstile token is not obtained.
+
+The `Turnstile` interface was added, and the global `Window` type was augmented to prevent TypeScript errors related to `window.turnstile`.
+
 ## Recent Updates (v1.2)
 
 ### 🎯 **Physics-Based Animations**

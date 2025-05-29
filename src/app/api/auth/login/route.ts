@@ -57,17 +57,13 @@ export async function POST(request: NextRequest) {
         message: 'Authentication successful',
         role: 'admin'
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Set-Cookie': `auth-token=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`
+        }
+      }
     );
-
-    // Set secure HTTP-only cookie
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 86400, // 24 hours
-      path: '/',
-    });
 
     return response;
 

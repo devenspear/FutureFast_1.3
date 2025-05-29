@@ -21,6 +21,8 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ password }),
+        credentials: 'include', // Important for sending/receiving cookies
+        redirect: 'follow'
       });
 
       const data = await response.json();
@@ -29,8 +31,8 @@ export default function LoginPage() {
         throw new Error(data.error || 'Login failed');
       }
 
-      // Redirect to admin dashboard on success
-      router.push('/admin/news-submit');
+      // Force a hard redirect to ensure the cookie is properly set
+      window.location.href = '/admin/news-submit';
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during login';
       setError(errorMessage);

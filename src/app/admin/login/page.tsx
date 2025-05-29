@@ -8,11 +8,46 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('FORM SUBMIT EVENT TRIGGERED VIA JS HANDLER'); // Test 1: Does this log appear?
-    e.preventDefault();
-    console.log('Default form submission PREVENTED by JS HANDLER'); // Test 2: Does this log appear?
-    setError('Test: handleSubmit was called. No actual login attempted by JS.');
-    setIsLoading(false);
+    console.log('handleSubmit entered'); // Log when the function is entered
+    try {
+      e.preventDefault();
+      setIsLoading(true);
+      setError('');
+
+      console.log('Attempting login...');
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+        credentials: 'include', // Ensure cookies are sent and received
+      });
+
+      const data = await response.json();
+      console.log('Login response:', { status: response.status, data });
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      console.log('Login successful, preparing to redirect...');
+      // It's often better to let Next.js router handle navigation if possible,
+      // but window.location.href is fine for a full reload to ensure middleware runs.
+      // Forcing a slight delay before redirect to ensure cookie is set and processed by browser
+      setTimeout(() => {
+        console.log('Redirecting to /admin/news-submit now...');
+        window.location.href = '/admin/news-submit';
+      }, 100); // 100ms delay, can be adjusted
+
+    } catch (err: unknown) {
+      console.error('Critical error in handleSubmit:', err);
+      const errorMessage = err instanceof Error ? err.message : 'A critical error occurred during login submission';
+      setError(errorMessage);
+      // Ensure isLoading is set to false only after all operations, especially after redirect attempt or error
+      // If redirect happens, this state update might not be visible, which is fine.
+      setIsLoading(false);
+    }
   };
 
   return (

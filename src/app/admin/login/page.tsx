@@ -31,8 +31,9 @@ export default function LoginPage() {
 
       // Redirect to admin dashboard on success
       router.push('/admin/news-submit');
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during login');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred during login';
+      setError(errorMessage);
       setIsLoading(false);
     }
   };

@@ -7,7 +7,7 @@ export async function verifyAuthToken(token: string) {
     const secret = new TextEncoder().encode(JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
     return { isValid: true, payload };
-  } catch (error) {
+  } catch {
     return { isValid: false, error: 'Invalid or expired token' };
   }
 }

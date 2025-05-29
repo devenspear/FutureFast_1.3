@@ -21,9 +21,9 @@ export async function fetchWithAuth(
   return response;
 }
 
-export async function postWithAuth(
+export async function postWithAuth<T = unknown>(
   url: string,
-  data: any,
+  data: T,
   options: RequestInit = {}
 ) {
   return fetchWithAuth(url, {

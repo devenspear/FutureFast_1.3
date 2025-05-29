@@ -27,7 +27,7 @@ export function useAuth(redirectToLogin = true) {
         if (!isValid && redirectToLogin) {
           router.push('/admin/login');
         }
-      } catch (error) {
+      } catch {
         setIsAuthenticated(false);
         if (redirectToLogin) {
           router.push('/admin/login');

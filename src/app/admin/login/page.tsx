@@ -8,38 +8,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('handleSubmit entered'); // Log when the function is entered
-    try {
-      e.preventDefault();
-      setIsLoading(true);
-      setError('');
-
-      console.log('Attempting login');
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password }),
-        credentials: 'include',
-      });
-
-      const data = await response.json();
-      console.log('Login response:', { status: response.status, data });
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      console.log('Login successful, redirecting...');
-      // Force a full page reload to ensure middleware runs
-      window.location.href = '/admin/news-submit';
-    } catch (err: unknown) {
-      console.error('Critical error in handleSubmit:', err); // More specific error logging
-      const errorMessage = err instanceof Error ? err.message : 'A critical error occurred in login submission';
-      setError(errorMessage);
-      setIsLoading(false);
-    }
+    console.log('FORM SUBMIT EVENT TRIGGERED VIA JS HANDLER'); // Test 1: Does this log appear?
+    e.preventDefault();
+    console.log('Default form submission PREVENTED by JS HANDLER'); // Test 2: Does this log appear?
+    setError('Test: handleSubmit was called. No actual login attempted by JS.');
+    setIsLoading(false);
   };
 
   return (

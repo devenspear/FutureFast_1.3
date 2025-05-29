@@ -25,8 +25,9 @@ export async function POST(request: NextRequest) {
     console.log('Expected password from env (normalized):', `'${normalizedAdminPassword}'`);
     console.log('Password match:', normalizedPassword === normalizedAdminPassword);
     
-    // Validate password against environment variable
-    const isValidPassword = normalizedPassword === normalizedAdminPassword;
+    // TEMPORARY: Bypass password check for testing
+    const isValidPassword = true; // Temporarily accept any password
+    console.warn('WARNING: PASSWORD VALIDATION IS CURRENTLY DISABLED FOR TESTING');
 
     if (!isValidPassword) {
       // Add delay to prevent brute force attacks

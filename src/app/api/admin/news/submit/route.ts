@@ -5,10 +5,6 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // Directory to store news articles
 const NEWS_DIR = path.join(process.cwd(), 'content/news');
 
@@ -17,6 +13,15 @@ async function ensureNewsDir() {
   if (!existsSync(NEWS_DIR)) {
     await mkdir(NEWS_DIR, { recursive: true });
   }
+}
+
+// Initialize OpenAI client
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY environment variable is not set');
+  }
+  return new OpenAI({ apiKey });
 }
 
 // Generate a slug from a string
@@ -60,6 +65,9 @@ export async function POST(request: Request) {
       );
     }
 
+    // Initialize OpenAI client
+    const openai = getOpenAIClient();
+    
     // Generate article content using OpenAI
     const completion = await openai.chat.completions.create({
       model: "gpt-4",

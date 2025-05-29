@@ -8,12 +8,12 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('handleSubmit entered (fetch test)');
+    console.log('handleSubmit entered (direct redirect test)');
     try {
       e.preventDefault();
       setIsLoading(true);
       setError('');
-      console.log('Attempting login (fetch test)... with password:', password); // Log password
+      console.log('Attempting login (direct redirect test)... with password:', password);
 
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -25,21 +25,22 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
-      console.log('Login response (fetch test):', { status: response.status, data });
+      console.log('Login response (direct redirect test):', { status: response.status, data });
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed (fetch test)');
+        throw new Error(data.error || 'Login failed (direct redirect test)');
       }
 
-      // If successful, show a message but don't redirect yet
-      setError('Login API call successful (fetch test). No redirect performed in this version.');
-      // No window.location.href redirect in this test
+      console.log('Login API call successful (direct redirect test). Redirecting NOW...');
+      window.location.href = '/admin/news-submit'; // Direct redirect
+
     } catch (err: unknown) {
-      console.error('Error in handleSubmit (fetch test):', err);
-      const errorMessage = err instanceof Error ? err.message : 'A critical error occurred during login (fetch test)';
+      console.error('Error in handleSubmit (direct redirect test):', err);
+      const errorMessage = err instanceof Error ? err.message : 'A critical error occurred (direct redirect test)';
       setError(errorMessage);
     } finally {
-      // Ensure isLoading is always reset
+      // This might not run or be visible if redirect is very fast
+      console.log('Finally block reached (direct redirect test)');
       setIsLoading(false);
     }
   };

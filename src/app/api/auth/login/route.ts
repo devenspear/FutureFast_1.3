@@ -16,6 +16,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Debug logging (remove after fixing)
+    console.log('Login attempt with password:', password);
+    console.log('Expected password from env:', ADMIN_PASSWORD);
+    console.log('Password match:', password === ADMIN_PASSWORD);
+
     // Validate password against environment variable
     const isValidPassword = password === ADMIN_PASSWORD;
 

@@ -16,13 +16,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Normalize password by trimming whitespace
+    const normalizedPassword = password.trim();
+    const normalizedAdminPassword = ADMIN_PASSWORD.trim();
+    
     // Debug logging (remove after fixing)
-    console.log('Login attempt with password:', password);
-    console.log('Expected password from env:', ADMIN_PASSWORD);
-    console.log('Password match:', password === ADMIN_PASSWORD);
-
+    console.log('Login attempt with password (normalized):', `'${normalizedPassword}'`);
+    console.log('Expected password from env (normalized):', `'${normalizedAdminPassword}'`);
+    console.log('Password match:', normalizedPassword === normalizedAdminPassword);
+    
     // Validate password against environment variable
-    const isValidPassword = password === ADMIN_PASSWORD;
+    const isValidPassword = normalizedPassword === normalizedAdminPassword;
 
     if (!isValidPassword) {
       // Add delay to prevent brute force attacks

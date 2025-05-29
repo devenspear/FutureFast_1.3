@@ -8,12 +8,13 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
+    console.log('handleSubmit entered'); // Log when the function is entered
     try {
-      console.log('Attempting login...');
+      e.preventDefault();
+      setIsLoading(true);
+      setError('');
+
+      console.log('Attempting login');
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -34,8 +35,8 @@ export default function LoginPage() {
       // Force a full page reload to ensure middleware runs
       window.location.href = '/admin/news-submit';
     } catch (err: unknown) {
-      console.error('Login error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred during login';
+      console.error('Critical error in handleSubmit:', err); // More specific error logging
+      const errorMessage = err instanceof Error ? err.message : 'A critical error occurred in login submission';
       setError(errorMessage);
       setIsLoading(false);
     }

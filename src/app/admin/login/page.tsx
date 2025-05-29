@@ -8,16 +8,39 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('handleSubmit entered (intermediate test)'); // Different initial log
+    console.log('handleSubmit entered (fetch test)');
     try {
       e.preventDefault();
-      console.log('Default form submission PREVENTED (intermediate test)');
-      setError('Test: Intermediate handleSubmit was called. No login attempt.');
-      setIsLoading(false);
+      setIsLoading(true);
+      setError('');
+      console.log('Attempting login (fetch test)... with password:', password); // Log password
+
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+      console.log('Login response (fetch test):', { status: response.status, data });
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed (fetch test)');
+      }
+
+      // If successful, show a message but don't redirect yet
+      setError('Login API call successful (fetch test). No redirect performed in this version.');
+      // No window.location.href redirect in this test
     } catch (err: unknown) {
-      console.error('Error in intermediate handleSubmit:', err);
-      setError('An error occurred in the intermediate test handleSubmit.');
-      setIsLoading(false); // Ensure isLoading is reset on error
+      console.error('Error in handleSubmit (fetch test):', err);
+      const errorMessage = err instanceof Error ? err.message : 'A critical error occurred during login (fetch test)';
+      setError(errorMessage);
+    } finally {
+      // Ensure isLoading is always reset
+      setIsLoading(false);
     }
   };
 

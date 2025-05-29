@@ -6,27 +6,43 @@ const PUBLIC_PATHS = ['/admin/login'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  console.log(`[Middleware] Request: ${request.method} ${pathname}`);
 
   // Skip middleware for public paths
   if (PUBLIC_PATHS.some(path => pathname.startsWith(path))) {
+    console.log('[Middleware] Allowing access to public path:', pathname);
     return NextResponse.next();
   }
 
   // Check for admin routes
   if (pathname.startsWith('/admin')) {
     const token = request.cookies.get('auth-token')?.value;
+    console.log('[Middleware] Admin route access - Token present:', !!token);
 
     if (!token) {
       // Redirect to login if no token
+      console.log('[Middleware] No token found, redirecting to login');
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('from', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // Verify the token
-    const { isValid } = await verifyAuthToken(token);
-    if (!isValid) {
-      // Clear invalid token and redirect to login
+    try {
+      // Verify the token
+      console.log('[Middleware] Verifying token...');
+      const { isValid } = await verifyAuthToken(token);
+      
+      if (!isValid) {
+        console.log('[Middleware] Invalid token, redirecting to login');
+        // Clear invalid token and redirect to login
+        const response = NextResponse.redirect(new URL('/admin/login', request.url));
+        response.cookies.delete('auth-token');
+        return response;
+      }
+      
+      console.log('[Middleware] Token valid, allowing access');
+    } catch (error) {
+      console.error('[Middleware] Error verifying token:', error);
       const response = NextResponse.redirect(new URL('/admin/login', request.url));
       response.cookies.delete('auth-token');
       return response;

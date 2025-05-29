@@ -13,25 +13,28 @@ export default function LoginPage() {
     setError('');
 
     try {
+      console.log('Attempting login...');
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ password }),
-        credentials: 'include', // Important for sending/receiving cookies
-        redirect: 'follow'
+        credentials: 'include',
       });
 
       const data = await response.json();
+      console.log('Login response:', { status: response.status, data });
 
       if (!response.ok) {
         throw new Error(data.error || 'Login failed');
       }
 
-      // Force a hard redirect to ensure the cookie is properly set
+      console.log('Login successful, redirecting...');
+      // Force a full page reload to ensure middleware runs
       window.location.href = '/admin/news-submit';
     } catch (err: unknown) {
+      console.error('Login error:', err);
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during login';
       setError(errorMessage);
       setIsLoading(false);
@@ -87,7 +90,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>

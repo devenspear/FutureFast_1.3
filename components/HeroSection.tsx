@@ -42,11 +42,13 @@ export default function HeroSection() {
       const size = Math.random() * 60 + 20; // 20-80px diameter (never larger than background circles)
       
       // Calculate maximum speed based on diameter (diameter per second = diameter/60 per frame at 60fps)
-      const maxSpeedPerFrame = size / 60;
+      // Reduced speed by 80% by increasing the denominator
+      const maxSpeedPerFrame = size / 300; // Changed from 150 to 300 (slower movement)
       
       // Generate random initial velocity within the diameter-based speed limit
       const randomDirection = Math.random() * 2 * Math.PI; // Random direction in radians
-      const randomSpeed = Math.random() * maxSpeedPerFrame * 0.8; // Use up to 80% of max speed for variety
+      // Reduced initial speed by 80% by reducing the multiplier
+      const randomSpeed = Math.random() * maxSpeedPerFrame * 0.16; // Reduced from 0.32 to 0.16 (50% slower)
       
       const bubble: Bubble = {
         id: i,
@@ -344,21 +346,42 @@ export default function HeroSection() {
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black to-transparent z-10" />
       <div className="absolute inset-x-0 bottom-[-20px] h-[20px] bg-black z-10" /> {/* Solid black bottom to ensure perfect transition */}
       
-      {/* Animated content here */}
-      <div className="relative z-20 flex flex-col items-center justify-center w-full h-full py-24">
-        <h1 className="font-orbitron text-5xl md:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-[#1d5cff] via-[#ffd700] to-[#1d5cff] bg-clip-text text-transparent animate-fade-in drop-shadow-xl">
-          {content.headline.split(' ').length > 4 ? (
-            <>
-              {content.headline.split(' ').slice(0, 4).join(' ')} <br className="hidden md:inline" />
-              {content.headline.split(' ').slice(4).join(' ')}
-            </>
-          ) : (
-            content.headline
-          )}
-        </h1>
-        <div className="mt-6 flex justify-center w-full max-w-4xl mx-auto">
-          <div className="font-orbitron text-lg md:text-xl lg:text-2xl text-center w-full max-w-3xl mx-auto p-6 rounded-2xl bg-gradient-to-r from-black/70 via-indigo-950/60 to-black/70 border-2 border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.3)] text-cyan-100 tracking-wide backdrop-blur-md flex items-center justify-center h-[110px] animate-pulse-subtle">
-            {content.subheadline}
+      {/* Hero content container - using CSS Grid for perfect centering */}
+      <div className="relative z-20 w-full h-full grid place-items-center p-4">
+        <div className="w-full max-w-6xl space-y-8 md:space-y-12">
+          {/* Headline with gradient text */}
+          <h1 className="font-orbitron text-5xl md:text-7xl font-bold text-center bg-gradient-to-r from-[#1d5cff] via-[#ffd700] to-[#1d5cff] bg-clip-text text-transparent animate-fade-in drop-shadow-xl">
+            {content.headline.split(' ').length > 4 ? (
+              <>
+                <span className="block">{content.headline.split(' ').slice(0, 4).join(' ')}</span>
+                <span className="block">{content.headline.split(' ').slice(4).join(' ')}</span>
+              </>
+            ) : (
+              content.headline
+            )}
+          </h1>
+          
+          {/* Compact subheadline box with character-height padding */}
+          <div className="relative w-full max-w-2xl mx-auto">
+            <div className="relative">
+              {/* Decorative border elements */}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400/10 to-blue-500/10 border-2 border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]" />
+              
+              {/* Main content box */}
+              <div className="relative bg-gradient-to-r from-black/70 via-indigo-950/60 to-black/70 backdrop-blur-md p-4 md:p-5 rounded-xl">
+                <div className="flex items-center justify-center">
+                  <p className="font-orbitron text-base md:text-lg lg:text-xl text-center text-cyan-100 tracking-wide leading-tight py-3 px-2">
+                    {content.subheadline}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Corner accents - smaller to match the box */}
+              <div className="absolute -top-0.5 -left-0.5 w-4 h-4 border-t-2 border-l-2 border-cyan-400 rounded-tl-md" />
+              <div className="absolute -top-0.5 -right-0.5 w-4 h-4 border-t-2 border-r-2 border-cyan-400 rounded-tr-md" />
+              <div className="absolute -bottom-0.5 -left-0.5 w-4 h-4 border-b-2 border-l-2 border-cyan-400 rounded-bl-md" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 border-b-2 border-r-2 border-cyan-400 rounded-br-md" />
+            </div>
           </div>
         </div>
       </div>

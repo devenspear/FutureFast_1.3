@@ -1,0 +1,21 @@
+{
+  "name": "futurefast-news-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for managing FutureFast.AI news content",
+  "main": "update-news.ts",
+  "scripts": {
+    "update-news": "ts-node update-news.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "gray-matter": "^4.0.3",
+    "handlebars": "^4.7.8",
+    "openai": "^4.104.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.105",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

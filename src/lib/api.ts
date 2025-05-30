@@ -1,4 +1,4 @@
-export async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<any> {
+export async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<unknown> {
   const headers = {
     ...options.headers,
     'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
         const message = errorJson.message || errorJson.error || `API request failed with status: ${response.status}`;
         console.error('API Error Message:', message);
         throw new Error(message);
-      } catch (e: any) {
+      } catch (e: unknown) {
         // If JSON.parse fails or another error occurs, throw an error with the raw text or original error
         const errorMessage = e instanceof Error && e.message.startsWith('API request failed:') ? e.message : `API request failed: ${response.status} - ${responseText}`;
         console.error('Fallback API Error:', errorMessage);

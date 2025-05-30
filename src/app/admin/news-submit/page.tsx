@@ -15,7 +15,7 @@ function NewsSubmitForm() {
   const { handleSubmit, isSubmitting, error } = useFormSubmit(
     async (formData: { url: string; notes: string }) => {
       const response = await postWithAuth('/api/admin/news/submit', formData);
-      return response.json();
+      return response;
     },
     () => {
       // Reset form on success

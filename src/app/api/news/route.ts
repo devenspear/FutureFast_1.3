@@ -13,6 +13,8 @@ interface NewsItem {
   featured: boolean;
 }
 
+// News articles are sourced from individual .md files in the 'content/news' directory.
+// Each file should contain frontmatter with fields like: title, source, date (e.g., "April 30, 2025" or ISO format), url, icon, featured (boolean).
 export async function GET() {
   try {
     const newsDir = path.join(process.cwd(), 'content/news');

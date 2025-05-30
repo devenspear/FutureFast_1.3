@@ -161,6 +161,19 @@ Content is managed through a hybrid approach:
 - **Dynamic Content:** API routes for YouTube videos and news
 - **Component State:** Interactive sections with client-side libraries
 
+### News Articles
+News articles are managed as individual Markdown (`.md`) files located in the `/content/news/` directory. Each file represents a single news item and should include the following frontmatter:
+
+-   `title`: (String, required) The headline of the news article.
+-   `source`: (String, required) The original source of the news (e.g., "TechCrunch", "Forbes").
+-   `date`: (String, required) The publication date of the article. Can be in a human-readable format (e.g., "April 22, 2025") or ISO 8601 format (e.g., "2025-04-22"). The system will parse these dates for sorting.
+-   `url`: (String, required) The direct URL to the original news article.
+-   `icon`: (String, optional) An emoji or short character to represent the article type or source (e.g., "📸", "✨"). Defaults to "🔍" if not provided by the API.
+-   `featured`: (Boolean, optional) Set to `true` if the article should be considered for featured display (specific usage depends on component implementation). Defaults to `false`.
+-   `excerpt`: (String, optional) A short summary or excerpt of the article, which might be used in some display formats.
+
+The website automatically fetches these articles from the `/content/news/` directory via the `/api/news` endpoint and sorts them by date in descending order (newest first) for display in the "In The News" section.
+
 ## Security Features
 - **Input Validation:** Server-side form validation
 - **Rate Limiting:** Protection against spam submissions

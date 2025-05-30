@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { verifyAuthToken } from '@/lib/auth';
 import { OpenAI } from 'openai';
 import { writeFile, mkdir } from 'fs/promises';
@@ -37,11 +38,13 @@ function slugify(text: string): string {
 
 export async function POST(request: Request) {
   try {
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.split(' ')[1];
-    
+    // Verify authentication by reading the auth-token cookie
+    const cookieStore = await cookies(); // Await due to persistent lint error
+    console.log('Received cookies in /api/admin/news/submit:', cookieStore.getAll()); // Diagnostic log
+    const token = cookieStore.get('auth-token')?.value;
+
     if (!token) {
+      console.log('auth-token cookie not found or has no value.'); // Diagnostic log
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

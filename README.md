@@ -167,6 +167,14 @@ Content is managed through a hybrid approach:
 - **Environment Protection:** Sensitive data in environment variables
 - **Admin Authentication:** Secure admin dashboard access
 
+
+## Development & Debugging Notes
+
+### Admin Authentication Issues (Session: 2025-05-29)
+An attempt was made to debug issues with the admin authentication flow, specifically 401 errors when accessing the `/api/admin/news/submit` endpoint after login.
+Detailed notes on the findings, changes made, and current status of this debugging effort can be found in `AUTH_DEBUG_NOTES.md`.
+This issue is currently on hold.
+
 ---
 
 **2025 Deven Spear | All Rights Reserved**

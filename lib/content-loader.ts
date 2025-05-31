@@ -21,6 +21,7 @@ export interface YouTubeVideoItem {
   description: string;
   category: string;
   featured: boolean;
+  publishedAt?: string; // Optional as it will be populated from YouTube API
 }
 
 export interface CatalogItem {
@@ -201,6 +202,7 @@ export async function loadYouTubeVideos(): Promise<YouTubeVideoItem[]> {
       description: String(video.description || ''),
       category: String(video.category || ''),
       featured: Boolean(video.featured || false),
+      publishedAt: video.publishedAt ? String(video.publishedAt) : undefined,
     }));
   }
   

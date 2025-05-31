@@ -183,17 +183,25 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(videos);
+    // Sort videos by published date (newest first)
+    const sortedVideos = [...videos].sort((a, b) => 
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+
+    return NextResponse.json(sortedVideos);
   } catch (error) {
     console.error('Error fetching YouTube videos:', error);
     
-    // Fast fallback on any error
+    // Fast fallback on any error - try to use any existing publishedAt dates from config
     try {
       const videoConfigs = await loadYouTubeVideos();
       const fallbackData: YouTubeVideoData[] = videoConfigs.map((config, index) => {
         const videoId = extractVideoId(config.url);
-        const publishDate = new Date();
-        publishDate.setDate(publishDate.getDate() - (index * 3));
+        // Use the publishedAt from config if available, otherwise generate a date
+        const publishDate = config.publishedAt ? new Date(config.publishedAt) : new Date();
+        if (!config.publishedAt) {
+          publishDate.setDate(publishDate.getDate() - (index * 3));
+        }
         
         return {
           id: videoId || `video-${index}`,
@@ -208,7 +216,12 @@ export async function GET() {
         };
       });
       
-      return NextResponse.json(fallbackData);
+      // Sort fallback data by published date (newest first)
+      const sortedFallbackData = [...fallbackData].sort((a, b) => 
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      );
+      
+      return NextResponse.json(sortedFallbackData);
     } catch (fallbackError) {
       console.error('Error loading fallback data:', fallbackError);
       return NextResponse.json([], { status: 500 });

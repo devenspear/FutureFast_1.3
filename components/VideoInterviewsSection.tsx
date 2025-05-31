@@ -52,6 +52,11 @@ export default function VideoInterviewsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  // Sort videos by published date (newest first)
+  const sortedVideos = [...videos].sort((a, b) => 
+    new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
 
   useEffect(() => {
     // Add the keyframes to the document
@@ -94,12 +99,22 @@ export default function VideoInterviewsSection() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+    try {
+      const date = new Date(dateString);
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date string:', dateString);
+        return '';
+      }
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    } catch (err) {
+      console.error('Error formatting date:', err, 'Date string:', dateString);
+      return '';
+    }
   };
 
   if (error) {
@@ -176,22 +191,22 @@ export default function VideoInterviewsSection() {
           </button>
 
           {/* Video Cards Container */}
-          <div
-            ref={scrollRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto overflow-y-hidden scrollbar-hide px-4 md:px-12 scroll-smooth"
+          <div 
+            ref={scrollRef} 
+            className="flex space-x-4 overflow-x-auto pb-6 px-2 scrollbar-hide -mx-4"
             style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              scrollBehavior: 'smooth',
-              WebkitOverflowScrolling: 'touch',
-              // iOS specific fixes
-              WebkitTransform: 'translate3d(0, 0, 0)',
               transform: 'translate3d(0, 0, 0)',
               // Android specific fixes
               overscrollBehaviorX: 'contain',
-              // Prevent bounce on iOS
+              // iOS specific fixes
+              WebkitOverflowScrolling: 'touch',
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
+              WebkitTransform: 'translate3d(0, 0, 0)',
               WebkitBackfaceVisibility: 'hidden',
-              backfaceVisibility: 'hidden'
+              backfaceVisibility: 'hidden',
+              // Smooth scrolling
+              scrollBehavior: 'smooth'
             }}
           >
             {loading ? (
@@ -215,7 +230,7 @@ export default function VideoInterviewsSection() {
                 </div>
               ))
             ) : (
-              videos.map((video) => (
+              sortedVideos.map((video) => (
                 <div
                   key={video.id}
                   className="flex-shrink-0 w-72 md:w-80 h-[380px] md:h-[440px] bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-xl overflow-hidden hover:scale-105 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/20 border border-gray-700 hover:border-cyan-400/50 cursor-pointer group"

@@ -1,8 +1,8 @@
 import HeroSection from "../../components/HeroSection";
 import FastLaneSection from "../../components/FastLaneSection";
 import NewsAndDisruptionSection from "../../components/NewsAndDisruptionSection";
-import YouTubeChannelsSection from "../../components/YouTubeChannelsSection";
-import LibraryGrid from "../../components/LibraryGrid";
+import VideoInterviewsSection from "../../components/VideoInterviewsSection";
+import ResourceLibrarySection from "../../components/ResourceLibrarySection";
 import ThoughtLeadersSection from "../../components/ThoughtLeadersSection";
 import LearningResourcesSection from "../../components/LearningResourcesSection";
 import AboutWithSubscription from "../../components/AboutWithSubscription";
@@ -14,8 +14,8 @@ export default function Home() {
       <HeroSection />
       <FastLaneSection />
       <NewsAndDisruptionSection />
-      <YouTubeChannelsSection />
-      <LibraryGrid />
+      <VideoInterviewsSection />
+      <ResourceLibrarySection />
       <ThoughtLeadersSection />
       <LearningResourcesSection />
       <AboutWithSubscription />

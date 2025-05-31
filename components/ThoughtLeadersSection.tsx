@@ -28,7 +28,7 @@ export default async function ThoughtLeadersSection() {
           Thought Leaders to Follow
         </h1>
         
-        <p className="mb-10 text-lg md:text-xl text-purple-100 font-medium text-center max-w-3xl mx-auto">
+        <p className="font-sans mb-10 text-lg md:text-xl text-cyan-100 text-center max-w-3xl mx-auto">
           Stay ahead of the curve by following these influential thinkers and innovators who are shaping the future of technology, finance, and business. Each brings unique insights into emerging trends and paradigm shifts.
         </p>
         

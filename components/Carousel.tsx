@@ -7,6 +7,7 @@ interface CarouselProps {
 }
 
 const scrollAmount = 320; // Match YouTube section scroll amount
+const SCROLL_DURATION = 1000; // 1 second for smooth scrolling
 
 // Glow animation styles
 const glowAnimation = `
@@ -37,13 +38,21 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
 
   const scrollLeft = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      scrollRef.current.scrollBy({
+        left: -scrollAmount,
+        behavior: 'smooth',
+        duration: SCROLL_DURATION
+      });
     }
   };
 
   const scrollRight = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      scrollRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth',
+        duration: SCROLL_DURATION
+      });
     }
   };
 

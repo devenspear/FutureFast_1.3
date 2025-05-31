@@ -5,7 +5,7 @@ This project is a professional, animated, mobile-first homepage for FutureFast.c
 ## Features
 
 ### ✨ **Current Features**
-- **🎯 Hero Section:** Physics-based animated bubbles with diameter-controlled movement, dynamic content loading, and text collision avoidance
+- **🎯 Hero Section:** Physics-based animated bubbles with diameter-controlled movement (3x slower than original), dynamic content loading, and text collision avoidance. All non-essential animations have been removed for optimal performance.
 - **📚 Learning Resources:** Curated educational resources (AI, Crypto, Blockchain) with provider icons and difficulty indicators
 - **📺 YouTube Channels:** Dynamic video grid with fallback data and mobile optimization
 - **📰 News & Disruption:** Latest industry updates and insights
@@ -17,11 +17,19 @@ This project is a professional, animated, mobile-first homepage for FutureFast.c
 - **📱 Mobile-first responsive design with advanced animations**
 
 ### 🎬 **Animation System**
-- **Diameter-Based Speed Control:** Bubbles move at maximum of their diameter per second
+- **Diameter-Based Speed Control:** Bubbles move at 1/3 of their diameter per second (slowed down from original)
 - **Physics-Based Movement:** Realistic collision detection and boundary behavior
 - **Text Avoidance:** Dynamic repulsion forces prevent overlap with content
 - **Unique Path Memory:** Anti-repetition system ensures varied movement patterns
-- **60fps Performance:** Hardware-accelerated RequestAnimationFrame animations
+- **Optimized Performance:** Hardware-accelerated animations with reduced motion for better accessibility
+- **Simplified Animation:** Removed non-essential animations to focus on core visual elements
+
+## Recent Updates
+- **May 31, 2025**
+  - Slowed down hero section bubble animations by 3x for better visual clarity
+  - Removed non-essential animations to improve performance
+  - Made "Learn more about Deven Spear" text fully clickable in About section
+  - Updated component structure for better maintainability
 
 ## Tech Stack
 - **Frontend:** Next.js 15.3.0 (App Router, TypeScript)

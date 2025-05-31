@@ -187,8 +187,8 @@ export default function LearningResourcesSection() {
           <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
             Learning Resources
           </h1>
-          <p className="font-orbitron text-lg md:text-xl text-cyan-100 max-w-3xl mx-auto">
-            If you&apos;re feeling overwhelmed, start your journey here. Most importantly, begin using, testing, and building now!
+          <p className="font-sans text-lg md:text-xl text-cyan-100 max-w-3xl mx-auto">
+            Explore a curated collection of essential guides, articles, and courses. Build your foundational knowledge and master new skills at your own pace.
           </p>
         </div>
 

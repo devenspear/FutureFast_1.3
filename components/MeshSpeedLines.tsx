@@ -5,7 +5,7 @@ import React, { useRef, useEffect } from "react";
  * MeshSpeedLines renders animated mesh curves ("speed lines") with parallax z-depth on scroll.
  * The effect is achieved with HTML canvas for performance and flexibility.
  */
-const NUM_LINES = 14;
+const NUM_LINES = 10; // Reduced from 14 to 10 for better performance
 const LINE_COLOR = [
   "rgba(168,85,247,0.18)", // purple
   "rgba(34,211,238,0.12)", // cyan
@@ -40,7 +40,7 @@ const MeshSpeedLines: React.FC = () => {
         ctrl1,
         ctrl2,
         baseOffset: randomBetween(-60, 60),
-        speed: randomBetween(0.07, 0.18),
+        speed: randomBetween(0.02, 0.06), // Slowed down by ~3x
         depth: randomBetween(0.5, 1.5)
       });
     }
@@ -81,17 +81,17 @@ const MeshSpeedLines: React.FC = () => {
         const parallax = scrollY * (0.12 + 0.13 * typedLine.depth);
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(-60, typedLine.yStart + typedLine.baseOffset + Math.sin(Date.now()/1100 + i) * 8 + parallax);
+        ctx.moveTo(-60, typedLine.yStart + typedLine.baseOffset + Math.sin(Date.now()/3300 + i) * 8 + parallax); // Slowed down by 3x
         ctx.bezierCurveTo(
           typedLine.ctrl1[0],
-          typedLine.ctrl1[1] + Math.cos(Date.now()/1200 + i*2) * 18 + parallax * 0.8,
+          typedLine.ctrl1[1] + Math.cos(Date.now()/3600 + i*2) * 18 + parallax * 0.8, // Slowed down by 3x
           typedLine.ctrl2[0],
-          typedLine.ctrl2[1] + Math.sin(Date.now()/1300 + i*3) * 18 + parallax * 0.5,
+typedLine.ctrl2[1] + Math.sin(Date.now()/3900 + i*3) * 18 + parallax * 0.5, // Slowed down by 3x
           width + 60,
-          typedLine.yEnd + typedLine.baseOffset + Math.cos(Date.now()/1000 + i) * 8 + parallax
+          typedLine.yEnd + typedLine.baseOffset + Math.cos(Date.now()/3000 + i) * 8 + parallax // Slowed down by 3x
         );
         ctx.strokeStyle = typedLine.color;
-        ctx.lineWidth = typedLine.width + Math.sin(Date.now()/900 + i) * 0.3;
+        ctx.lineWidth = typedLine.width + Math.sin(Date.now()/2700 + i) * 0.3; // Slowed down by 3x
         ctx.shadowBlur = 4;
         ctx.shadowColor = typedLine.color;
         ctx.globalAlpha = 0.92;

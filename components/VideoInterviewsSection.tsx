@@ -47,7 +47,7 @@ const pulseAnimation = `
 }
 `;
 
-export default function YouTubeChannelsSection() {
+export default function VideoInterviewsSection() {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +107,7 @@ export default function YouTubeChannelsSection() {
       <section className="py-12 bg-black text-white">
         <div className="container mx-auto px-4">
           <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
-            YouTube Channels
+            Video/Interviews
           </h1>
           <div className="text-center text-red-400">
             <p>Unable to load videos: {error}</p>
@@ -121,8 +121,11 @@ export default function YouTubeChannelsSection() {
     <section className="py-12 md:py-16 bg-black text-white">
       <div className="container mx-auto px-4">
         <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
-          YouTube Channels
+          Video/Interviews
         </h1>
+        <p className="font-sans text-lg md:text-xl text-cyan-100 text-center max-w-3xl mx-auto mb-8 md:mb-12">
+          Tune into insightful discussions, expert interviews, and visual explainers. Stay updated with the latest trends and deepen your understanding through engaging video content.
+        </p>
 
         <div className="relative">
           {/* Navigation Buttons */}

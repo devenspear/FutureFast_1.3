@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Resources Mockup - FutureFast.AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        body {
+            font-family: sans-serif;
+            background-color: #0D0D0D;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px; /* Reduced margin */
+        }
+
+        .section-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem; /* Slightly smaller */
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            font-size: 1rem;
+            color: #B0B0B0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .filter-btn {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #222;
+            color: #FFD700;
+            border: 1px solid #FFD700;
+            padding: 6px 15px; /* Smaller padding */
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 0.8rem; /* Smaller font */
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #FFD700;
+            color: #121212;
+        }
+
+        .resource-grid-container {
+            /* This container will have the fixed height and enable scrolling for the grid */
+            max-height: 600px; /* Adjust as needed for desired visible rows */
+            overflow-y: auto;
+            padding-right: 10px; /* Space for scrollbar, adjust if needed */
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Smaller cards */
+            gap: 20px; /* Reduced gap */
+        }
+        
+        .resource-grid-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .resource-grid-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+        .resource-grid-container::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+        .resource-grid-container::-webkit-scrollbar-thumb:hover {
+            background: #FFD700;
+        }
+
+        .resource-card {
+            background-color: #222222; /* Uniform dark background for the card */
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-height: 220px; /* Reduced min-height for smaller cards */
+            position: relative; /* For absolute positioning of tags */
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .resource-card.hide {
+            display: none;
+        }
+
+        .card-top-row {
+            display: flex;
+            align-items: flex-start; /* Align items to the top */
+            margin-bottom: 10px;
+        }
+
+        .card-main-icon-wrapper {
+            margin-right: 10px;
+        }
+
+        .card-main-icon {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem; /* Smaller icon placeholder */
+            color: #FFD700; /* Gold icon color for visibility */
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* background-color: #333; Optional: if icon needs a bg */
+            /* border-radius: 4px; */
+        }
+        .card-main-icon img, .card-main-icon svg {
+            max-height: 24px; /* Smaller SVG/img icon */
+            max-width: 24px;
+        }
+
+        .card-title-source-wrapper {
+            flex-grow: 1;
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 8px; /* Adjusted for smaller card */
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .tag-free {
+            right: 8px; /* Positioned to the right */
+            /* left: auto; */
+            background-color: #28a745; /* Green */
+        }
+
+        .tag-ai {
+            top: 30px; /* Below the FREE tag */
+            right: 8px;
+            background-color: #007bff; /* Blue */
+        }
+
+        .card-source-difficulty {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.75rem; /* Smaller */
+        }
+
+        .card-source {
+            font-weight: bold;
+            color: #cccccc; /* Lighter source color */
+        }
+        /* Specific source colors can be added if desired, e.g. */
+        .card-google .card-source { color: #4285F4; }
+        .card-openai .card-source { color: #4A90E2; }
+        .card-binance .card-source { color: #F0B90B; }
+        .card-generic-ai .card-source { color: #3498db; }
+
+        .card-difficulty {
+            font-weight: bold;
+            color: #999; /* Default difficulty color */
+        }
+        .card-difficulty.beginner { color: #34A853; }
+        .card-difficulty.intermediate { color: #FFA500; }
+        .card-difficulty.advanced { color: #dc3545; }
+
+
+        .card-title {
+            font-family: sans-serif;
+            font-size: 1.1rem; /* Smaller title */
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .card-description {
+            font-size: 0.8rem; /* Smaller description */
+            color: #A0A0A0;
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .section-header h1 {
+                font-size: 2rem;
+            }
+            .section-header p {
+                font-size: 0.9rem;
+            }
+            .resource-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+            .resource-grid-container {
+                max-height: 500px; /* Adjust for mobile if needed */
+            }
+        }
+        @media (max-width: 480px) {
+            .resource-grid {
+                grid-template-columns: 1fr; /* Single column */
+            }
+             .card-title {
+                font-size: 1rem;
+            }
+            .card-description {
+                font-size: 0.75rem;
+            }
+            .resource-grid-container {
+                max-height: 400px; /* Or remove max-height for very small screens */
+                padding-right: 5px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-header">
+            <h1>Learning Resources</h1>
+            <p>If you're feeling overwhelmed, start your journey here. Most importantly, begin using, testing, and building now!</p>
+        </div>
+
+        <div class="filter-container">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="google-cloud">Google Cloud</button>
+            <button class="filter-btn" data-filter="openai">OpenAI</button>
+            <button class="filter-btn" data-filter="binance-academy">Binance Academy</button>
+            <button class="filter-btn" data-filter="general-ai">General AI</button>
+        </div>
+
+        <div class="resource-grid-container">
+            <div class="resource-grid">
+                <!-- Card 1: Generic AI -->
+                <div class="resource-card card-generic-ai" data-category="general-ai">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon">AI</div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">AI Insights</span>
+                                <span class="card-difficulty beginner">Beginner</span>
+                            </div>
+                            <h3 class="card-title">Beginners - A Swift Introduction</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">A live course on the fundamentals of Generative Models (LLMs), prompt engineering, GenAI apps, and video intros. Includes code samples.</p>
+                </div>
+
+                <!-- Card 2: Google Cloud -->
+                <div class="resource-card card-google" data-category="google-cloud">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon">G</div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">Google Cloud</span>
+                                <span class="card-difficulty beginner">Beginner</span>
+                            </div>
+                            <h3 class="card-title">Introduction to Generative AI Learning Path</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">A curated learning path by Google with introductory courses. It introduces what Generative AI is, how it's used, and its differences from traditional ML. Includes topics like LLMs, image generation, and responsible AI.</p>
+                </div>
+
+                <!-- Card 3: OpenAI -->
+                <div class="resource-card card-openai" data-category="openai">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon">OAI</div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">OpenAI</span>
+                                <span class="card-difficulty intermediate">Intermediate</span>
+                            </div>
+                            <h3 class="card-title">OpenAI Learning Resources & Documentation</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">Comprehensive documentation, guides, and examples on OpenAI's models (like GPT), APIs, and best practices for developing with generative AI. Excellent for understanding core concepts and practical application.</p>
+                </div>
+
+                <!-- Card 4: Binance Academy -->
+                <div class="resource-card card-binance" data-category="binance-academy">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon"><svg viewBox="0 0 24 24" fill="#FFD700" width="24px" height="24px"><path d="M4 2h16c1.1 0 2 .9 2 2v16c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2zm0 2v3h16V4H4zm0 5v11h16V9H4zm2 2h4v2H6v-2zm0 4h4v2H6v-2zm6-4h6v2h-6v-2zm0 4h6v2h-6v-2z"/></svg></div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">Binance Academy</span>
+                                <span class="card-difficulty beginner">Beginner</span>
+                            </div>
+                            <h3 class="card-title">Binance Academy - Beginner's Guide</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">Offers extensive free education including a "Beginner Track," guides on blockchain, crypto trading, security, and specific guides on Bitcoin, Ethereum, and NFTs.</p>
+                </div>
+                
+                <!-- Card 5: More Generic AI -->
+                <div class="resource-card card-generic-ai" data-category="general-ai">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon">AI</div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">AI Campus</span>
+                                <span class="card-difficulty intermediate">Intermediate</span>
+                            </div>
+                            <h3 class="card-title">Advanced AI Concepts</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">Delve into more complex topics such as reinforcement learning, GANs, and transformers. For those with existing AI knowledge.</p>
+                </div>
+
+                <!-- Card 6: More Google -->
+                <div class="resource-card card-google" data-category="google-cloud">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon">G</div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">Google AI</span>
+                                <span class="card-difficulty advanced">Advanced</span>
+                            </div>
+                            <h3 class="card-title">TensorFlow Extended (TFX)</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">An end-to-end platform for deploying production ML pipelines. For experienced ML practitioners.</p>
+                </div>
+                
+                <!-- Card 7: More OpenAI -->
+                <div class="resource-card card-openai" data-category="openai">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon">OAI</div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">OpenAI Cookbook</span>
+                                <span class="card-difficulty intermediate">Intermediate</span>
+                            </div>
+                            <h3 class="card-title">Practical Guides & Examples</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">The OpenAI Cookbook shares example code for accomplishing common tasks with the OpenAI API.</p>
+                </div>
+
+                 <!-- Card 8: Another Generic to ensure scrolling -->
+                <div class="resource-card card-generic-ai" data-category="general-ai">
+                    <span class="card-tag tag-free">FREE</span>
+                    <span class="card-tag tag-ai">AI</span>
+                    <div class="card-top-row">
+                        <div class="card-main-icon-wrapper"><div class="card-main-icon">AI</div></div>
+                        <div class="card-title-source-wrapper">
+                            <div class="card-source-difficulty">
+                                <span class="card-source">AI Hub</span>
+                                <span class="card-difficulty beginner">Beginner</span>
+                            </div>
+                            <h3 class="card-title">Exploring AI Chatbots</h3>
+                        </div>
+                    </div>
+                    <p class="card-description">Learn how AI chatbots are built, their common applications, and the future of conversational AI.</p>
+                </div>
+
+            </div> <!-- End resource-grid -->
+        </div> <!-- End resource-grid-container -->
+    </div> <!-- End container -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const resourceCards = document.querySelectorAll('.resource-card');
+
+            // Filter functionality
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const filterValue = button.getAttribute('data-filter');
+                    
+                    resourceCards.forEach(card => {
+                        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                            card.classList.remove('hide');
+                        } else {
+                            card.classList.add('hide');
+                        }
+                    });
+                });
+            });
+            
+            // JS for dynamic scrolling height is removed as CSS handles it with max-height on resource-grid-container
+        });
+    </script>
+
+</body>
+</html>

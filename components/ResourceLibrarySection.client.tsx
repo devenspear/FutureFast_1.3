@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Carousel from './Carousel';
-import type { Card as CMSCard } from './LibraryGrid.server';
+import type { Card as CMSCard } from './ResourceLibrarySection.server';
 import type { ResourceCardProps } from './ResourceCard';
 
 // Map CMSCard to ResourceCardProps
@@ -24,7 +24,7 @@ function mapCMSToResourceCard(card: CMSCard): ResourceCardProps {
   };
 }
 
-export default function LibraryGridClient({ cards }: { cards: CMSCard[] }) {
+export default function ResourceLibrarySectionClient({ cards }: { cards: CMSCard[] }) {
   const resourceCards: ResourceCardProps[] = cards.map(mapCMSToResourceCard);
   return (
     <section className="py-12 md:py-16 bg-black text-white" id="resource-library">

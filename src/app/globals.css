@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -45,11 +44,6 @@ body {
   .animate-gradient-x {
     background-size: 200% 200%;
     animation: gradientX 6s ease-in-out infinite;
-  }
-  .font-futureTech {
-    font-family: 'Share Tech Mono', 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
-    letter-spacing: 0.03em;
-    text-transform: none;
   }
   .font-orbitron {
     font-family: 'Orbitron', Arial, Helvetica, sans-serif !important;

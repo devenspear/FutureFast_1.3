@@ -73,6 +73,9 @@ export async function GET() {
 
     const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
     
+    // Debug: Log whether we have an API key (without exposing the actual key)
+    console.log('YouTube API key present:', !!YOUTUBE_API_KEY);
+    
     if (!YOUTUBE_API_KEY) {
       console.log('YouTube API key not found, using simple fallback');
       
@@ -146,13 +149,18 @@ export async function GET() {
     const videoIds = videoData.map(item => item.id).join(',');
 
     // Fetch video details from YouTube API
-    const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoIds}&key=${YOUTUBE_API_KEY}`,
-      { signal: AbortSignal.timeout(5000) } // 5 second timeout for API
-    );
+    console.log('Fetching video details from YouTube API...');
+    const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoIds}&key=${YOUTUBE_API_KEY}`;
+    console.log('YouTube API URL:', apiUrl.split('key=')[0] + 'key=***'); // Don't log the full key
+    
+    const response = await fetch(apiUrl, {
+      signal: AbortSignal.timeout(5000) // 5 second timeout for API
+    });
 
     if (!response.ok) {
-      throw new Error(`YouTube API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('YouTube API error:', response.status, errorText);
+      throw new Error(`YouTube API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();

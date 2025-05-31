@@ -36,23 +36,39 @@ const Carousel: React.FC<CarouselProps> = ({ cards }) => {
     }
   }, []);
 
+  const smoothScroll = (element: HTMLElement, target: number, duration: number) => {
+    const start = element.scrollLeft;
+    const distance = target - start;
+    const startTime = performance.now();
+
+    const animateScroll = (currentTime: number) => {
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+      
+      // Ease in/out function
+      const easeInOutQuad = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      
+      element.scrollLeft = start + distance * easeInOutQuad(progress);
+      
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animateScroll);
+      }
+    };
+
+    requestAnimationFrame(animateScroll);
+  };
+
   const scrollLeft = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: -scrollAmount,
-        behavior: 'smooth',
-        duration: SCROLL_DURATION
-      });
+      const target = scrollRef.current.scrollLeft - scrollAmount;
+      smoothScroll(scrollRef.current, target, SCROLL_DURATION);
     }
   };
 
   const scrollRight = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth',
-        duration: SCROLL_DURATION
-      });
+      const target = scrollRef.current.scrollLeft + scrollAmount;
+      smoothScroll(scrollRef.current, target, SCROLL_DURATION);
     }
   };
 

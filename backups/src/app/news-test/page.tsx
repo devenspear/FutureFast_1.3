@@ -1,4 +1,4 @@
-import NewsListSection from "../../../components/NewsListSection";
+import NewsListSection from "../../../../components/NewsListSection";
 
 export default function NewsTestPage() {
   return (

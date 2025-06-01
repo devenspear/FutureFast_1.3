@@ -1,10 +1,10 @@
 'use server';
 
 import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import 'server-only';
-import { existsSync } from 'fs';
 
 // Define types for the content
 export interface NewsItem {
@@ -22,6 +22,8 @@ export interface YouTubeVideoItem {
   category: string;
   featured: boolean;
   publishedAt?: string; // Optional as it will be populated from YouTube API
+  channelName?: string; // Optional as it will be populated from YouTube API
+  slug?: string; // Optional for backward compatibility with old format
 }
 
 export interface CatalogItem {
@@ -190,9 +192,72 @@ export async function loadThoughtLeaders() {
   return Array.isArray(data.leaders) ? data.leaders : [];
 }
 
-// Load YouTube videos from markdown
+// Load YouTube videos from individual markdown files
 export async function loadYouTubeVideos(): Promise<YouTubeVideoItem[]> {
-  const filePath = path.join(process.cwd(), 'content/youtube/videos.md');
+  // First check if we're using the new structure or the old one
+  const indexPath = path.join(process.cwd(), 'content/youtube/index.md');
+  const oldFilePath = path.join(process.cwd(), 'content/youtube/videos.md');
+  const videosDir = path.join(process.cwd(), 'content/youtube/videos');
+  
+  // Check if we're using the new structure (individual files)
+  if (existsSync(indexPath) && existsSync(videosDir)) {
+    return await loadVideosFromIndividualFiles(indexPath, videosDir);
+  } 
+  // Fall back to the old structure (single file)
+  else if (existsSync(oldFilePath)) {
+    return await loadVideosFromSingleFile(oldFilePath);
+  }
+  
+  console.warn('No YouTube videos configuration found');
+  return [];
+}
+
+// Helper function to load videos from individual files
+async function loadVideosFromIndividualFiles(indexPath: string, videosDir: string): Promise<YouTubeVideoItem[]> {
+  // Load the index file to get the order and featured status
+  const { data: indexData } = await loadMarkdownContent(indexPath);
+  
+  if (!Array.isArray(indexData.videos)) {
+    console.warn('Invalid YouTube videos index format');
+    return [];
+  }
+  
+  // Create a map to store video data
+  const videoPromises = indexData.videos.map(async (indexEntry: any) => {
+    const slug = indexEntry.slug;
+    if (!slug) return null;
+    
+    const videoPath = path.join(videosDir, `${slug}.md`);
+    if (!existsSync(videoPath)) {
+      console.warn(`Video file not found: ${videoPath}`);
+      return null;
+    }
+    
+    try {
+      const { data: videoData } = await loadMarkdownContent(videoPath);
+      return {
+        url: String(videoData.url || ''),
+        title: String(videoData.title || ''),
+        description: String(videoData.description || ''),
+        category: String(videoData.category || indexEntry.category || ''),
+        featured: Boolean(videoData.featured !== undefined ? videoData.featured : indexEntry.featured || false),
+        publishedAt: videoData.publishedAt ? String(videoData.publishedAt) : undefined,
+        channelName: videoData.channelName ? String(videoData.channelName) : undefined,
+        slug: String(slug),
+      };
+    } catch (error) {
+      console.error(`Error loading video data from ${videoPath}:`, error);
+      return null;
+    }
+  });
+  
+  const videos = await Promise.all(videoPromises);
+  // Filter out null values and cast to YouTubeVideoItem[]
+  return videos.filter((video): video is NonNullable<typeof video> => video !== null) as YouTubeVideoItem[];
+}
+
+// Helper function to load videos from a single file (legacy support)
+async function loadVideosFromSingleFile(filePath: string): Promise<YouTubeVideoItem[]> {
   const { data } = await loadMarkdownContent(filePath);
   
   if (Array.isArray(data.videos)) {
@@ -203,6 +268,7 @@ export async function loadYouTubeVideos(): Promise<YouTubeVideoItem[]> {
       category: String(video.category || ''),
       featured: Boolean(video.featured || false),
       publishedAt: video.publishedAt ? String(video.publishedAt) : undefined,
+      channelName: video.channelName ? String(video.channelName) : undefined,
     }));
   }
   

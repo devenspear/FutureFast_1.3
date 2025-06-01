@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureFast Admin Direct Login</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fbbf24;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .container {
+            background-color: #1e293b;
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        button {
+            background-color: #0891b2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0e7490;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        .error {
+            background-color: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
+        }
+        .note {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 30px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FutureFast Admin</h1>
+        
+        <p>Click the button below to log in directly to the admin dashboard.</p>
+        
+        <button id="loginBtn">
+            <span>Sign in to Admin Dashboard</span>
+        </button>
+        
+        <div id="statusMessage" class="status hidden"></div>
+        
+        <p class="note">
+            This is a development environment with simplified authentication.<br>
+            In production, proper security measures would be implemented.
+        </p>
+    </div>
+
+    <script>
+        const loginBtn = document.getElementById('loginBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        loginBtn.addEventListener('click', async () => {
+            try {
+                // Show loading state
+                loginBtn.innerHTML = '<div class="loading"></div> Signing in...';
+                loginBtn.disabled = true;
+                
+                // Hide any previous status message
+                statusMessage.classList.add('hidden');
+                
+                // Get the base URL
+                const baseUrl = window.location.origin;
+                
+                // Call the login API
+                const response = await fetch(`${baseUrl}/api/admin/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Login failed with status: ${response.status}`);
+                }
+                
+                // Show success message
+                statusMessage.textContent = 'Login successful! Redirecting to admin dashboard...';
+                statusMessage.classList.remove('hidden', 'error');
+                statusMessage.classList.add('success');
+                
+                // Redirect to admin dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = `${baseUrl}/admin`;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Reset button
+                loginBtn.innerHTML = 'Sign in to Admin Dashboard';
+                loginBtn.disabled = false;
+                
+                // Show error message
+                statusMessage.textContent = `Error: ${error.message}`;
+                statusMessage.classList.remove('hidden', 'success');
+                statusMessage.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>

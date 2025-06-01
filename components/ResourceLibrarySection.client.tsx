@@ -25,7 +25,28 @@ function mapCMSToResourceCard(card: CMSCard): ResourceCardProps {
 }
 
 export default function ResourceLibrarySectionClient({ cards }: { cards: CMSCard[] }) {
-  const resourceCards: ResourceCardProps[] = cards.map(mapCMSToResourceCard);
+  // Sort cards by date (newest first)
+  const sortedCards = [...cards].sort((a, b) => {
+    // Parse the year (and month if available) to get a comparable date
+    const yearA = parseInt(a.year);
+    const yearB = parseInt(b.year);
+    
+    if (yearA !== yearB) {
+      return yearB - yearA; // Sort by year (descending)
+    }
+    
+    // If years are equal, sort by month if available
+    if (a.month && b.month) {
+      const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+      const monthIndexA = months.indexOf(a.month.toLowerCase());
+      const monthIndexB = months.indexOf(b.month.toLowerCase());
+      return monthIndexB - monthIndexA; // Sort by month (descending)
+    }
+    
+    return 0;
+  });
+  
+  const resourceCards: ResourceCardProps[] = sortedCards.map(mapCMSToResourceCard);
   return (
     <section className="py-12 md:py-16 bg-black text-white" id="resource-library">
       <div className="container mx-auto px-4">

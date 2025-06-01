@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       
       // Check if the video already exists in the index
       // Use a synchronous check first with the available data
-      videoExists = indexData.videos.some((video: any) => {
+      videoExists = indexData.videos.some((video: { slug?: string }) => {
         if (!video.slug) return false;
         return false; // We'll do a more thorough check below
       });
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
                 videoExists = true;
                 break;
               }
-            } catch (err) {
+            } catch (_) {
               // Continue checking other videos
             }
           }
@@ -149,7 +149,7 @@ export async function POST(request: Request) {
       
       // Check if the video already exists
       const videos = data.videos || [];
-      videoExists = videos.some((video: any) => {
+      videoExists = videos.some((video: { url: string }) => {
         const existingVideoId = extractVideoId(video.url);
         return existingVideoId === videoId;
       });

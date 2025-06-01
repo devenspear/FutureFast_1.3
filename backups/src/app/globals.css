@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  /* font-family: Arial, Helvetica, sans-serif; */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 1.2s ease-out both;
+  }
+  .animate-slide-up {
+    animation: slideUp 1s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+  .animate-typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typewriter 2.5s steps(40, end) 1s 1 normal both;
+  }
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradientX 6s ease-in-out infinite;
+  }
+  .font-orbitron {
+    font-family: 'Orbitron', Arial, Helvetica, sans-serif !important;
+    line-height: 1.3;
+    padding-bottom: 0.1em;
+  }
+  /* Animated orb keyframes */
+  .animate-orb1 {
+    animation: orb1move 18s linear infinite alternate;
+  }
+  .animate-orb2 {
+    animation: orb2move 22s linear infinite alternate;
+  }
+  .animate-orb3 {
+    animation: orb3move 25s linear infinite alternate;
+  }
+  .animate-orb4 {
+    animation: orb4move 20s linear infinite alternate;
+  }
+  /* Fix for Tailwind gradient text */
+  .bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .text-transparent {
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+@keyframes gradientX {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes orb1move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(60vw, 10vh) scale(1.1); }
+}
+@keyframes orb2move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-30vw, -10vh) scale(1.2); }
+}
+@keyframes orb3move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-10vw, 20vh) scale(0.9); }
+}
+@keyframes orb4move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(20vw, -20vh) scale(1.05); }
+}

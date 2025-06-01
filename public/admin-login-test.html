@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureFast Admin Login Test</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fbbf24;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #334155;
+            border-radius: 6px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #38bdf8;
+        }
+        button {
+            background-color: #0891b2;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0e7490;
+        }
+        pre {
+            background-color: #1e293b;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .success {
+            color: #4ade80;
+        }
+        .error {
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+    <h1>FutureFast Admin Login Test</h1>
+    
+    <div class="container">
+        <div class="section">
+            <h2>1. Login to Admin</h2>
+            <button id="loginBtn">Login as Admin</button>
+            <div id="loginStatus" class="status"></div>
+            <pre id="loginResponse"></pre>
+        </div>
+        
+        <div class="section">
+            <h2>2. Check Auth Status</h2>
+            <button id="checkAuthBtn">Check Auth Status</button>
+            <div id="authStatus" class="status"></div>
+            <pre id="authResponse"></pre>
+        </div>
+        
+        <div class="section">
+            <h2>3. Access Admin Dashboard</h2>
+            <button id="accessAdminBtn">Go to Admin Dashboard</button>
+            <div id="accessStatus" class="status"></div>
+        </div>
+        
+        <div class="section">
+            <h2>4. Logout</h2>
+            <button id="logoutBtn">Logout</button>
+            <div id="logoutStatus" class="status"></div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API calls
+        const baseUrl = window.location.origin;
+        
+        // Login to Admin
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            try {
+                const loginStatus = document.getElementById('loginStatus');
+                const loginResponse = document.getElementById('loginResponse');
+                
+                loginStatus.textContent = 'Logging in...';
+                loginStatus.className = 'status';
+                
+                const response = await fetch(`${baseUrl}/api/admin/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+                
+                const data = await response.json();
+                loginResponse.textContent = JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    loginStatus.textContent = 'Login successful!';
+                    loginStatus.className = 'status success';
+                } else {
+                    loginStatus.textContent = 'Login failed!';
+                    loginStatus.className = 'status error';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginStatus').textContent = `Error: ${error.message}`;
+                document.getElementById('loginStatus').className = 'status error';
+            }
+        });
+        
+        // Check Auth Status
+        document.getElementById('checkAuthBtn').addEventListener('click', async () => {
+            try {
+                const authStatus = document.getElementById('authStatus');
+                const authResponse = document.getElementById('authResponse');
+                
+                authStatus.textContent = 'Checking auth status...';
+                authStatus.className = 'status';
+                
+                const response = await fetch(`${baseUrl}/api/admin/auth/status`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                
+                const data = await response.json();
+                authResponse.textContent = JSON.stringify(data, null, 2);
+                
+                if (data.authenticated) {
+                    authStatus.textContent = 'Authenticated!';
+                    authStatus.className = 'status success';
+                } else {
+                    authStatus.textContent = 'Not authenticated!';
+                    authStatus.className = 'status error';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                document.getElementById('authStatus').textContent = `Error: ${error.message}`;
+                document.getElementById('authStatus').className = 'status error';
+            }
+        });
+        
+        // Access Admin Dashboard
+        document.getElementById('accessAdminBtn').addEventListener('click', () => {
+            window.location.href = `${baseUrl}/admin`;
+        });
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                // Clear the auth cookie by setting it to expire
+                document.cookie = "auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                
+                document.getElementById('logoutStatus').textContent = 'Logged out successfully!';
+                document.getElementById('logoutStatus').className = 'status success';
+                
+                // Refresh auth status
+                document.getElementById('authStatus').textContent = 'Not authenticated (logged out)';
+                document.getElementById('authStatus').className = 'status error';
+            } catch (error) {
+                console.error('Logout error:', error);
+                document.getElementById('logoutStatus').textContent = `Error: ${error.message}`;
+                document.getElementById('logoutStatus').className = 'status error';
+            }
+        });
+    </script>
+</body>
+</html>

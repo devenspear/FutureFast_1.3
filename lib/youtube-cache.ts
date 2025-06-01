@@ -1,8 +1,9 @@
 'use server';
 
 import fs from 'fs/promises';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import path from 'path';
+import matter from 'gray-matter';
 import { loadYouTubeVideos } from './content-loader';
 
 // Define the YouTube video data interface
@@ -68,6 +69,98 @@ async function writeCacheFile(videos: YouTubeVideoData[]): Promise<void> {
     
     await fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheData, null, 2), 'utf8');
     console.log('YouTube cache file updated');
+    
+    // Update the video markdown files with the latest metadata
+    try {
+      // Check if we're using the new structure (individual files) or the old structure
+      const indexPath = path.join(process.cwd(), 'content/youtube/index.md');
+      const videosDir = path.join(process.cwd(), 'content/youtube/videos');
+      const oldMarkdownPath = path.join(process.cwd(), 'content/youtube/videos.md');
+      
+      // If using the new structure with individual files
+      if (existsSync(indexPath) && existsSync(videosDir)) {
+        // Read the index file to get the mapping of video slugs
+        const indexContent = await fs.readFile(indexPath, 'utf8');
+        const { data: indexData } = matter(indexContent);
+        
+        if (Array.isArray(indexData.videos)) {
+          // For each video in the cache, update the corresponding markdown file
+          for (const cacheVideo of videos) {
+            // Find the corresponding video in the index
+            const indexEntry = indexData.videos.find((v: any) => {
+              // Try to find by loading the individual file and checking the URL
+              const videoPath = path.join(videosDir, `${v.slug}.md`);
+              if (existsSync(videoPath)) {
+                try {
+                  const videoContent = readFileSync(videoPath, 'utf8');
+                  const { data: videoData } = matter(videoContent);
+                  const videoId = extractVideoId(videoData.url);
+                  return videoId === cacheVideo.id;
+                } catch (err) {
+                  return false;
+                }
+              }
+              return false;
+            });
+            
+            if (indexEntry && indexEntry.slug) {
+              const videoPath = path.join(videosDir, `${indexEntry.slug}.md`);
+              if (existsSync(videoPath)) {
+                // Update the individual video file with metadata
+                const videoContent = await fs.readFile(videoPath, 'utf8');
+                const { data: videoData, content: videoContentText } = matter(videoContent);
+                
+                // Update with the latest metadata from the API
+                const updatedVideoData = {
+                  ...videoData,
+                  publishedAt: cacheVideo.publishedAt,
+                  channelName: cacheVideo.channelTitle
+                };
+                
+                // Write the updated data back to the video file
+                const updatedFileContent = matter.stringify(videoContentText, updatedVideoData);
+                await fs.writeFile(videoPath, updatedFileContent, 'utf8');
+                console.log(`Updated metadata for video: ${indexEntry.slug}`);
+              }
+            }
+          }
+          console.log('Individual YouTube video files updated with latest metadata');
+        }
+      }
+      // If using the old structure with a single file
+      else if (existsSync(oldMarkdownPath)) {
+        const fileContent = await fs.readFile(oldMarkdownPath, 'utf8');
+        const { data, content } = matter(fileContent);
+        
+        // Update videos in the markdown file with the latest metadata
+        if (Array.isArray(data.videos)) {
+          // For each video in the cache, update the corresponding markdown entry
+          videos.forEach(cacheVideo => {
+            const markdownVideoIndex = data.videos.findIndex((v: any) => {
+              const videoId = extractVideoId(v.url);
+              return videoId === cacheVideo.id;
+            });
+            
+            if (markdownVideoIndex >= 0) {
+              // Update with the latest metadata from the API
+              data.videos[markdownVideoIndex] = {
+                ...data.videos[markdownVideoIndex],
+                publishedAt: cacheVideo.publishedAt,
+                channelName: cacheVideo.channelTitle
+              };
+            }
+          });
+          
+          // Write the updated data back to the markdown file
+          const updatedFileContent = matter.stringify(content, data);
+          await fs.writeFile(oldMarkdownPath, updatedFileContent, 'utf8');
+          console.log('YouTube markdown file updated with latest metadata');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating YouTube markdown files:', error);
+      // Continue anyway as this is not critical
+    }
   } catch (error) {
     console.error('Error writing YouTube cache file:', error);
   }
@@ -81,12 +174,19 @@ function isCacheValid(timestamp: number): boolean {
 // Generate fallback data
 import type { YouTubeVideoItem } from './content-loader';
 
+// Extend the YouTubeVideoItem interface to include channelName
+interface ExtendedYouTubeVideoItem extends YouTubeVideoItem {
+  channelName?: string;
+}
+
 async function generateFallbackData(videoConfigs: YouTubeVideoItem[]): Promise<YouTubeVideoData[]> {
+  // Cast to extended interface to access channelName property
+  const extendedConfigs = videoConfigs as ExtendedYouTubeVideoItem[];
   console.log('Using fallback data generation');
   const fallbackData: YouTubeVideoData[] = [];
   
-  for (let i = 0; i < videoConfigs.length; i++) {
-    const config = videoConfigs[i];
+  for (let i = 0; i < extendedConfigs.length; i++) {
+    const config = extendedConfigs[i];
     const videoId = extractVideoId(config.url);
     
     if (!videoId) {
@@ -107,7 +207,7 @@ async function generateFallbackData(videoConfigs: YouTubeVideoItem[]): Promise<Y
       description: config.description || 'Video content from YouTube',
       thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
       publishedAt: publishDate.toISOString(),
-      channelTitle: config.category || 'Tech Innovation',
+      channelTitle: config.channelName || 'FutureFast Channel',
       url: config.url || `https://youtube.com/watch?v=${videoId}`,
       category: config.category,
       featured: config.featured || false
@@ -186,6 +286,23 @@ async function fetchFromYouTubeAPI(videoConfigs: YouTubeVideoItem[]): Promise<Yo
     // Transform the data to match our interface
     const videos: YouTubeVideoData[] = data.items.map((item: { id: string; snippet: { title: string; description: string; publishedAt: string; channelTitle: string; thumbnails: { maxres?: { url: string }; high?: { url: string }; medium?: { url: string } } } }) => {
       const config = videoData.find(v => v.id === item.id);
+      
+      // Also update the original video config with channel name and published date
+      // This will ensure it gets saved back to the markdown file
+      if (config) {
+        try {
+          // Find the original video in the markdown file by URL
+          const originalVideoIndex = videoConfigs.findIndex(v => extractVideoId(v.url) === item.id);
+          if (originalVideoIndex >= 0) {
+            // Update the video in the markdown file
+            const videoToUpdate = videoConfigs[originalVideoIndex] as any;
+            videoToUpdate.publishedAt = item.snippet.publishedAt;
+            videoToUpdate.channelName = item.snippet.channelTitle;
+          }
+        } catch (error) {
+          console.error('Error updating video config with API data:', error);
+        }
+      }
       
       return {
         id: item.id,

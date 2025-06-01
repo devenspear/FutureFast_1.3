@@ -101,7 +101,7 @@ export async function POST(request: Request) {
                 videoSlug = video.slug;
                 break;
               }
-            } catch (err) {
+            } catch (_) {
               // Continue checking other videos
             }
           }
@@ -155,8 +155,19 @@ export async function POST(request: Request) {
           const videoContent = await fs.readFile(videoPath, 'utf8');
           const { data: videoData, content: videoContentText } = matter(videoContent);
           
+          // Define the type for the video data with optional properties
+          interface VideoData {
+            url: string;
+            category: string;
+            featured: boolean;
+            title: string;
+            description: string;
+            publishedAt?: string;
+            channelName?: string;
+          }
+          
           // Update the video data
-          const updatedVideoData = {
+          const updatedVideoData: VideoData = {
             ...videoData,
             url,
             category: category || videoData.category || 'Interview',
@@ -194,7 +205,7 @@ export async function POST(request: Request) {
       const videos = data.videos || [];
       
       // Find the video to update
-      const videoIndex = videos.findIndex((video: any, index: number) => {
+      const videoIndex = videos.findIndex((video: { url: string }, index: number) => {
         // If we're replacing a pending video, we might not have a real ID
         if (id && id.startsWith('pending-')) {
           const pendingIndex = parseInt(id.split('-')[1]);

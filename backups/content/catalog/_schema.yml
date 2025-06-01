@@ -1,0 +1,65 @@
+_inputs:
+  title:
+    type: text
+    label: Resource Title
+    comment: The title of the resource
+  description:
+    type: textarea
+    label: Description
+    comment: A detailed description of the resource that will be displayed on the card
+  year:
+    type: text
+    label: Year
+    comment: The year the resource was published
+  month:
+    type: select
+    label: Month
+    comment: The month the resource was published
+    options:
+      values:
+        - January
+        - February
+        - March
+        - April
+        - May
+        - June
+        - July
+        - August
+        - September
+        - October
+        - November
+        - December
+  type:
+    type: select
+    label: Resource Type
+    comment: The type of resource
+    options:
+      values:
+        - Report
+        - Guide
+        - Article
+        - Video
+        - Podcast
+        - Tool
+  tag:
+    type: select
+    label: Primary Tag
+    comment: The primary category for this resource
+    options:
+      values:
+        - AI
+        - Web3
+        - Robotics
+        - Future of Work
+        - Metaverse
+  image:
+    type: image
+    label: Cover Image
+    comment: The cover image for the resource card
+  url:
+    type: url
+    label: Resource URL
+    comment: The link to the full resource
+    
+_structures: {}
+_editables: {}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureFast Admin Login Test</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffd700;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0051a8;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>FutureFast Admin Login Test</h1>
+    
+    <div>
+        <button id="loginBtn">Login to Admin</button>
+        <button id="checkStatusBtn">Check Auth Status</button>
+        <button id="goToAdminBtn">Go to Admin Dashboard</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+    
+    <div id="statusContainer"></div>
+    
+    <script>
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/admin/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                displayStatus('Login Response', data, response.ok ? 'success' : 'error');
+            } catch (error) {
+                displayStatus('Login Error', error.message, 'error');
+            }
+        });
+        
+        document.getElementById('checkStatusBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/admin/auth/status', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                displayStatus('Auth Status', data, response.ok ? 'success' : 'error');
+            } catch (error) {
+                displayStatus('Status Check Error', error.message, 'error');
+            }
+        });
+        
+        document.getElementById('goToAdminBtn').addEventListener('click', () => {
+            window.location.href = '/admin';
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                // Clear the auth cookie by setting it to expire
+                document.cookie = 'auth-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                displayStatus('Logout', { success: true, message: 'Logged out successfully' }, 'success');
+            } catch (error) {
+                displayStatus('Logout Error', error.message, 'error');
+            }
+        });
+        
+        function displayStatus(title, data, type) {
+            const statusContainer = document.getElementById('statusContainer');
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            
+            const titleElement = document.createElement('h3');
+            titleElement.textContent = title;
+            
+            const pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(data, null, 2);
+            
+            statusDiv.appendChild(titleElement);
+            statusDiv.appendChild(pre);
+            
+            statusContainer.prepend(statusDiv);
+        }
+    </script>
+</body>
+</html>

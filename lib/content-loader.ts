@@ -222,8 +222,15 @@ async function loadVideosFromIndividualFiles(indexPath: string, videosDir: strin
     return [];
   }
   
+  // Define interface for video index entries
+  interface VideoIndexEntry {
+    slug?: string;
+    category?: string;
+    featured?: boolean;
+  }
+  
   // Create a map to store video data
-  const videoPromises = indexData.videos.map(async (indexEntry: any) => {
+  const videoPromises = indexData.videos.map(async (indexEntry: VideoIndexEntry) => {
     const slug = indexEntry.slug;
     if (!slug) return null;
     

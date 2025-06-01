@@ -99,7 +99,7 @@ export async function POST(request: Request) {
                 videoExists = true;
                 break;
               }
-            } catch (_) {
+            } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */ _) {
               // Continue checking other videos
             }
           }

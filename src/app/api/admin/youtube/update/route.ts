@@ -101,7 +101,7 @@ export async function POST(request: Request) {
                 videoSlug = video.slug;
                 break;
               }
-            } catch (_) {
+            } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */ _) {
               // Continue checking other videos
             }
           }

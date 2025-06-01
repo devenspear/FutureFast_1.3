@@ -116,7 +116,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       url, 
       category, 
       featured, 
-      ...(editingVideo ? { id: (editingVideo as any).id } : {})
+      ...(editingVideo && editingVideo.id ? { id: editingVideo.id } : {})
     });
   };
   
@@ -316,14 +316,14 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                           // Use a dummy ID for pending videos since they don't have real IDs
                           const videoId = video.title.includes('[Pending') 
                             ? `pending-${index}` 
-                            : (video as any).id || `video-${index}`;
+                            : video.id || `video-${index}`;
                           handleDelete(videoId);
                         }
                       }}
-                      disabled={isDeleting && deleteId === (video as any).id}
+                      disabled={isDeleting && deleteId === video.id}
                       className="text-xs px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors disabled:opacity-50"
                     >
-                      {isDeleting && deleteId === (video as any).id ? 'Deleting...' : 'Delete'}
+                      {isDeleting && deleteId === video.id ? 'Deleting...' : 'Delete'}
                     </button>
                   </div>
                 </div>

@@ -16,10 +16,7 @@ function generateSecureToken(): string {
   return randomBytes(64).toString('hex');
 }
 
-// Hash a password for comparison
-function hashPassword(password: string, salt: string): string {
-  return pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-}
+// Note: Password hashing is handled elsewhere in the authentication flow
 
 export async function POST(request: Request) {
   try {

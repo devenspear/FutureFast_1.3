@@ -87,7 +87,7 @@ async function writeCacheFile(videos: YouTubeVideoData[]): Promise<void> {
           // For each video in the cache, update the corresponding markdown file
           for (const cacheVideo of videos) {
             // Find the corresponding video in the index
-            const indexEntry = indexData.videos.find((v: any) => {
+            const indexEntry = indexData.videos.find((v: { slug?: string }) => {
               // Try to find by loading the individual file and checking the URL
               const videoPath = path.join(videosDir, `${v.slug}.md`);
               if (existsSync(videoPath)) {
@@ -96,7 +96,7 @@ async function writeCacheFile(videos: YouTubeVideoData[]): Promise<void> {
                   const { data: videoData } = matter(videoContent);
                   const videoId = extractVideoId(videoData.url);
                   return videoId === cacheVideo.id;
-                } catch (err) {
+                } catch (_) {
                   return false;
                 }
               }
@@ -136,7 +136,7 @@ async function writeCacheFile(videos: YouTubeVideoData[]): Promise<void> {
         if (Array.isArray(data.videos)) {
           // For each video in the cache, update the corresponding markdown entry
           videos.forEach(cacheVideo => {
-            const markdownVideoIndex = data.videos.findIndex((v: any) => {
+            const markdownVideoIndex = data.videos.findIndex((v: { url: string }) => {
               const videoId = extractVideoId(v.url);
               return videoId === cacheVideo.id;
             });
@@ -295,7 +295,7 @@ async function fetchFromYouTubeAPI(videoConfigs: YouTubeVideoItem[]): Promise<Yo
           const originalVideoIndex = videoConfigs.findIndex(v => extractVideoId(v.url) === item.id);
           if (originalVideoIndex >= 0) {
             // Update the video in the markdown file
-            const videoToUpdate = videoConfigs[originalVideoIndex] as any;
+            const videoToUpdate: { publishedAt?: string; channelName?: string; url: string } = videoConfigs[originalVideoIndex];
             videoToUpdate.publishedAt = item.snippet.publishedAt;
             videoToUpdate.channelName = item.snippet.channelTitle;
           }

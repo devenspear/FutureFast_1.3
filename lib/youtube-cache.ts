@@ -96,8 +96,7 @@ async function writeCacheFile(videos: YouTubeVideoData[]): Promise<void> {
                   const { data: videoData } = matter(videoContent);
                   const videoId = extractVideoId(videoData.url);
                   return videoId === cacheVideo.id;
-                } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-                       _) {
+                } catch {
                   return false;
                 }
               }

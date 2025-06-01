@@ -5,9 +5,10 @@ import { cookies } from 'next/headers';
 // Simple authentication utility for development purposes
 // In production, this would be replaced with a proper authentication system
 
-export function setAuthCookie() {
+export async function setAuthCookie() {
   // Set a development auth token cookie that lasts for 7 days
-  cookies().set({
+  const cookieStore = await cookies();
+  cookieStore.set({
     name: 'auth-token',
     value: 'dev-admin-token',
     httpOnly: true,
@@ -17,16 +18,19 @@ export function setAuthCookie() {
   });
 }
 
-export function getAuthCookie(): string | undefined {
-  return cookies().get('auth-token')?.value;
+export async function getAuthCookie(): Promise<string | undefined> {
+  const cookieStore = await cookies();
+  return cookieStore.get('auth-token')?.value;
 }
 
-export function clearAuthCookie() {
-  cookies().delete('auth-token');
+export async function clearAuthCookie() {
+  const cookieStore = await cookies();
+  cookieStore.delete('auth-token');
 }
 
-export function isAuthenticated(): boolean {
-  return cookies().has('auth-token');
+export async function isAuthenticated(): Promise<boolean> {
+  const cookieStore = await cookies();
+  return cookieStore.has('auth-token');
 }
 
 // For client components that need to check auth status

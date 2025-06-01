@@ -48,7 +48,7 @@ export default async function AdminYouTubePage() {
                 After adding a video, the system will:
               </p>
               <ul className="list-disc list-inside space-y-2 pl-2">
-                <li>Add the video to the content/youtube/videos.md file</li>
+                <li>Add the video to the individual markdown files in content/youtube/videos/</li>
                 <li>Fetch metadata from the YouTube API (title, description, etc.)</li>
                 <li>Update the website to display the new video</li>
               </ul>

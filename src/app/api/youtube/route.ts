@@ -66,20 +66,31 @@ async function getVideoInfoFallback(videoId: string): Promise<{ title: string; c
 }
 
 export async function GET() {
+  console.log('YouTube API endpoint called');
+  
   try {
     // Load video configuration from markdown file
     const videoConfigs = await loadYouTubeVideos();
     console.log('Loaded video configs from markdown:', videoConfigs.length);
 
-    const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+    // Try different ways to access the API key
+    const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || 
+                           process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
     
     // Debug: Log whether we have an API key (without exposing the actual key)
     console.log('YouTube API key present:', !!YOUTUBE_API_KEY);
-    console.log('Environment variables:', Object.keys(process.env).filter(k => k.includes('YOUTUBE') || k.includes('VERCEL')));
+    console.log('Environment variables available:', 
+      Object.keys(process.env).filter(k => 
+        k.includes('YOUTUBE') || 
+        k.includes('VERCEL') || 
+        k.includes('NEXT_PUBLIC')
+      )
+    );
     
     if (!YOUTUBE_API_KEY) {
-      console.log('YouTube API key not found in process.env.YOUTUBE_API_KEY, using simple fallback');
-      console.log('Make sure the environment variable is set in Vercel and the project has been redeployed');
+      console.error('YouTube API key not found in environment variables');
+      console.log('Environment keys available:', Object.keys(process.env).join(', '));
+      console.log('Using fallback data generation');
       
       // Simple, fast fallback that won't cause timeouts
       const fallbackData: YouTubeVideoData[] = [];
@@ -153,29 +164,32 @@ export async function GET() {
     // Fetch video details from YouTube API
     console.log('Fetching video details from YouTube API...');
     const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoIds}&key=${YOUTUBE_API_KEY}`;
-    console.log('YouTube API URL:', apiUrl.split('key=')[0] + 'key=***'); // Don't log the full key
-    
-    // Log the first video ID being requested for verification
+    console.log('YouTube API URL:', apiUrl.split('key=')[0] + 'key=***');
     console.log('First video ID being requested:', videoIds.split(',')[0]);
     
-    const response = await fetch(apiUrl, {
-      signal: AbortSignal.timeout(5000) // 5 second timeout for API
-    });
+    try {
+      const startTime = Date.now();
+      const response = await fetch(apiUrl, {
+        signal: AbortSignal.timeout(10000) // Increased timeout to 10 seconds
+      });
+      console.log(`YouTube API response received in ${Date.now() - startTime}ms`);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('YouTube API error:', response.status, errorText);
-      throw new Error(`YouTube API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.items) {
-      throw new Error('No video data returned from YouTube API');
-    }
-
-    // Transform the data to match our interface
-    const videos: YouTubeVideoData[] = data.items.map((item: YouTubeAPIVideoItem) => {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('YouTube API error status:', response.status);
+        console.error('YouTube API error response:', errorText);
+        throw new Error(`YouTube API error: ${response.status} - ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('YouTube API response items:', data.items?.length || 0);
+      if (!data.items) {
+        console.error('No video data in YouTube API response');
+        throw new Error('No video data returned from YouTube API');
+      }
+      
+      // Transform the data to match our interface
+      const videos: YouTubeVideoData[] = data.items.map((item: YouTubeAPIVideoItem) => {
       const config = videoData.find(v => v.id === item.id);
       
       return {
@@ -201,7 +215,21 @@ export async function GET() {
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
 
-    return NextResponse.json(sortedVideos);
+      // Return the transformed videos
+      return NextResponse.json(videos);
+    } catch (fetchError) {
+      console.error('Error fetching from YouTube API:', fetchError);
+      if (fetchError instanceof Error) {
+        console.error('Error details:', {
+          name: fetchError.name,
+          message: fetchError.message,
+          stack: fetchError.stack
+        });
+      } else {
+        console.error('Error details:', JSON.stringify(fetchError, null, 2));
+      }
+      throw fetchError; // Re-throw to be caught by outer try-catch
+    }
   } catch (error) {
     console.error('Error fetching YouTube videos:', error);
     

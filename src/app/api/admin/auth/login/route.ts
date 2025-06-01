@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { randomBytes, pbkdf2Sync } from 'crypto';
+import { randomBytes } from 'crypto';
 
 // In a production environment, these would be stored in a secure database
 // and the password would be properly hashed

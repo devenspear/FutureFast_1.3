@@ -38,7 +38,8 @@ export async function POST(request: Request) {
     // Validate URL format
     try {
       new URL(url);
-    } catch (_) {
+    } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+            _) {
       return NextResponse.json(
         { error: 'Invalid URL format' },
         { status: 400 }

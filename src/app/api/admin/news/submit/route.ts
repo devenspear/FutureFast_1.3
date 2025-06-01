@@ -20,8 +20,10 @@ async function ensureNewsDir() {
 function getOpenAIClient() {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
+    console.error('OPENAI_API_KEY environment variable is not set');
     throw new Error('OPENAI_API_KEY environment variable is not set');
   }
+  console.log('Initializing OpenAI client with API key:', apiKey.substring(0, 10) + '...');
   return new OpenAI({ apiKey });
 }
 
@@ -145,8 +147,31 @@ ${content}`;
       filePath,
     });
 
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Error processing news submission:', error);
+    
+    // More detailed error logging
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
+    // Check if it's an OpenAI API error
+    if (error instanceof OpenAI.APIError) {
+      console.error('OpenAI API Error:', {
+        status: error.status,
+        message: error.message,
+        type: error.type,
+        code: error.code
+      });
+      
+      return NextResponse.json(
+        { error: `OpenAI API Error: ${error.message}` },
+        { status: error.status || 500 }
+      );
+    }
+    
     const errorMessage = error instanceof Error ? error.message : 'Failed to process article';
     return NextResponse.json(
       { error: errorMessage },

@@ -1,7 +1,5 @@
-import { Inter } from 'next/font/google';
 import './admin.css';
-
-const inter = Inter({ subsets: ['latin'] });
+import AdminNavbar from '../../components/admin/AdminNavbar';
 
 export default function AdminLayout({
   children,
@@ -9,10 +7,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <div className="min-h-screen bg-gray-950">
+      <AdminNavbar />
+      <main className="py-6">
         {children}
-      </body>
-    </html>
+      </main>
+    </div>
   );
 }

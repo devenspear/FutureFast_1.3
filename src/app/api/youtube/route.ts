@@ -4,16 +4,22 @@ import { getYouTubeVideos, refreshYouTubeCacheInBackground } from '../../../../l
 // This route handler will use the cached YouTube video data
 // and trigger a background refresh of the cache if needed
 
-export async function GET() {
+export async function GET(request: Request) {
   console.log('YouTube API endpoint called');
   
   try {
-    // Get videos from cache or API with fallback mechanism
-    const videos = await getYouTubeVideos();
+    // Check if we should force a refresh
+    const { searchParams } = new URL(request.url);
+    const forceRefresh = searchParams.get('refresh') === 'true';
     
-    // Trigger a background refresh of the cache if it's older than 1 hour
+    // Get videos from cache or API with fallback mechanism
+    const videos = await getYouTubeVideos(forceRefresh);
+    
+    // If not already forcing a refresh, trigger a background refresh of the cache if it's older than 1 hour
     // This won't block the response and will update the cache for future requests
-    refreshYouTubeCacheInBackground().catch(console.error);
+    if (!forceRefresh) {
+      refreshYouTubeCacheInBackground().catch(console.error);
+    }
     
     return NextResponse.json(videos);
   } catch (error) {

@@ -75,9 +75,11 @@ export async function GET() {
     
     // Debug: Log whether we have an API key (without exposing the actual key)
     console.log('YouTube API key present:', !!YOUTUBE_API_KEY);
+    console.log('Environment variables:', Object.keys(process.env).filter(k => k.includes('YOUTUBE') || k.includes('VERCEL')));
     
     if (!YOUTUBE_API_KEY) {
-      console.log('YouTube API key not found, using simple fallback');
+      console.log('YouTube API key not found in process.env.YOUTUBE_API_KEY, using simple fallback');
+      console.log('Make sure the environment variable is set in Vercel and the project has been redeployed');
       
       // Simple, fast fallback that won't cause timeouts
       const fallbackData: YouTubeVideoData[] = [];
@@ -152,6 +154,9 @@ export async function GET() {
     console.log('Fetching video details from YouTube API...');
     const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoIds}&key=${YOUTUBE_API_KEY}`;
     console.log('YouTube API URL:', apiUrl.split('key=')[0] + 'key=***'); // Don't log the full key
+    
+    // Log the first video ID being requested for verification
+    console.log('First video ID being requested:', videoIds.split(',')[0]);
     
     const response = await fetch(apiUrl, {
       signal: AbortSignal.timeout(5000) // 5 second timeout for API

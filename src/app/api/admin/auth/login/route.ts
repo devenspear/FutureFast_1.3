@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { randomBytes } from 'crypto';
+import { SignJWT } from 'jose';
 
 // In a production environment, these would be stored in a secure database
 // and the password would be properly hashed
@@ -11,9 +11,18 @@ const MAX_ATTEMPTS = 5;
 const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
 const attemptsByIp: Record<string, { count: number; lastAttempt: number; lockedUntil: number }> = {};
 
-// Generate a secure token
-function generateSecureToken(): string {
-  return randomBytes(64).toString('hex');
+// Generate a secure JWT token
+async function generateJWT(): Promise<string> {
+  const JWT_SECRET = process.env.JWT_SECRET || 'futurefast-jwt-secret-key-super-secure-2025';
+  const secret = new TextEncoder().encode(JWT_SECRET);
+  
+  const token = await new SignJWT({ role: 'admin' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('2h') // 2 hours expiration
+    .sign(secret);
+    
+  return token;
 }
 
 // Note: Password hashing is handled elsewhere in the authentication flow
@@ -91,8 +100,8 @@ export async function POST(request: Request) {
     // Reset attempts on successful login
     attemptsByIp[clientIp] = { count: 0, lastAttempt: now, lockedUntil: 0 };
     
-    // Generate a secure token
-    const token = generateSecureToken();
+    // Generate a secure JWT token
+    const token = await generateJWT();
     
     const response = NextResponse.json({
       success: true,

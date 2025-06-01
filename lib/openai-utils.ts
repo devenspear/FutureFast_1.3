@@ -1,9 +1,19 @@
 import OpenAI from 'openai';
 
-// Initialize OpenAI client with API key from environment variables
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client with API key from environment variables if available
+let openai: OpenAI | null = null;
+
+try {
+  if (process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  } else {
+    console.warn('OPENAI_API_KEY is not set. OpenAI features will be disabled.');
+  }
+} catch (error) {
+  console.error('Failed to initialize OpenAI client:', error);
+}
 
 interface NewsMetadata {
   title: string;
@@ -26,6 +36,18 @@ interface ResourceMetadata {
  */
 export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
   try {
+    // If OpenAI client is not available, return fallback metadata
+    if (!openai) {
+      console.warn('OpenAI client not available. Using fallback metadata for:', url);
+      return {
+        title: 'Article from ' + new URL(url).hostname,
+        source: new URL(url).hostname,
+        publishedDate: new Date().toISOString(),
+        summary: `This is a placeholder summary for the article at ${url}. OpenAI integration is currently disabled.`,
+        tags: ['ai', 'technology', 'news']
+      };
+    }
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -69,6 +91,23 @@ export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
  */
 export async function generateResourceMetadata(url: string, type: string): Promise<ResourceMetadata> {
   try {
+    // Get current month and year for fallbacks
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+    const currentYear = currentDate.getFullYear().toString();
+
+    // If OpenAI client is not available, return fallback metadata
+    if (!openai) {
+      console.warn('OpenAI client not available. Using fallback metadata for resource:', url);
+      return {
+        title: `${type} Resource from ${new URL(url).hostname}`,
+        description: `This is a placeholder description for the ${type.toLowerCase()} resource at ${url}. OpenAI integration is currently disabled.`,
+        tags: [type.toLowerCase(), 'resource', 'document'],
+        month: currentMonth,
+        year: currentYear
+      };
+    }
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -85,11 +124,6 @@ export async function generateResourceMetadata(url: string, type: string): Promi
     });
 
     const result = JSON.parse(response.choices[0].message.content || '{}');
-    
-    // Get current month and year for fallbacks
-    const currentDate = new Date();
-    const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
-    const currentYear = currentDate.getFullYear().toString();
     
     // Ensure we have all required fields with fallbacks
     return {

@@ -37,8 +37,8 @@ export default async function AdminYouTubePage() {
               <ol className="list-decimal list-inside space-y-2 pl-2">
                 <li>Paste the full YouTube URL in the form</li>
                 <li>Select an appropriate category</li>
-                <li>Check the "Featured" box if this is a highlight video</li>
-                <li>Click "Add YouTube Video" to submit</li>
+                <li>Check the &quot;Featured&quot; box if this is a highlight video</li>
+                <li>Click &quot;Add YouTube Video&quot; to submit</li>
               </ol>
             </div>
             

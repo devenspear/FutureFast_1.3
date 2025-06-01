@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useFormSubmit } from '../../hooks/useFormSubmit';
 
 interface YouTubeSubmitFormProps {
@@ -9,7 +8,6 @@ interface YouTubeSubmitFormProps {
 }
 
 export default function YouTubeSubmitForm({ categories = [] }: YouTubeSubmitFormProps) {
-  const router = useRouter();
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Interview');
   const [featured, setFeatured] = useState(false);

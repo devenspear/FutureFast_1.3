@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
@@ -69,7 +68,7 @@ export async function POST(request: Request) {
     
     // Check if the video already exists
     const videos = data.videos || [];
-    const videoExists = videos.some((video: any) => {
+    const videoExists = videos.some((video: { url: string }) => {
       const existingVideoId = extractVideoId(video.url);
       return existingVideoId === videoId;
     });
@@ -113,7 +112,7 @@ export async function POST(request: Request) {
       message: 'YouTube video added successfully',
       videoId
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error adding YouTube video:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(

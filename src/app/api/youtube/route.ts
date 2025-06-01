@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getYouTubeVideos, refreshYouTubeCacheInBackground, YouTubeVideoData } from '../../../../lib/youtube-cache';
+import { getYouTubeVideos, refreshYouTubeCacheInBackground } from '../../../../lib/youtube-cache';
 
 // This route handler will use the cached YouTube video data
 // and trigger a background refresh of the cache if needed

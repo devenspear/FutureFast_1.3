@@ -42,28 +42,6 @@ function extractVideoId(url: string): string | null {
   return null;
 }
 
-// Simple fallback method using only oEmbed (fast, no scraping)
-async function getVideoInfoFallback(videoId: string): Promise<{ title: string; channelTitle: string } | null> {
-  try {
-    // Use YouTube oEmbed API which doesn't require authentication and is fast
-    const oEmbedResponse = await fetch(
-      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
-      { signal: AbortSignal.timeout(3000) } // 3 second timeout
-    );
-    
-    if (oEmbedResponse.ok) {
-      const oEmbedData = await oEmbedResponse.json();
-      return {
-        title: oEmbedData.title || 'Video Title',
-        channelTitle: oEmbedData.author_name || 'YouTube Channel'
-      };
-    }
-  } catch {
-    console.log('oEmbed fallback failed for video:', videoId);
-  }
-  
-  return null;
-}
 
 // Read cache from file
 async function readCacheFile(): Promise<{ videos: YouTubeVideoData[]; timestamp: number } | null> {
@@ -101,7 +79,9 @@ function isCacheValid(timestamp: number): boolean {
 }
 
 // Generate fallback data
-async function generateFallbackData(videoConfigs: any[]): Promise<YouTubeVideoData[]> {
+import type { YouTubeVideoItem } from './content-loader';
+
+async function generateFallbackData(videoConfigs: YouTubeVideoItem[]): Promise<YouTubeVideoData[]> {
   console.log('Using fallback data generation');
   const fallbackData: YouTubeVideoData[] = [];
   
@@ -141,7 +121,7 @@ async function generateFallbackData(videoConfigs: any[]): Promise<YouTubeVideoDa
 }
 
 // Fetch videos from YouTube API
-async function fetchFromYouTubeAPI(videoConfigs: any[]): Promise<YouTubeVideoData[] | null> {
+async function fetchFromYouTubeAPI(videoConfigs: YouTubeVideoItem[]): Promise<YouTubeVideoData[] | null> {
   console.log('Fetching video details from YouTube API...');
   
   try {
@@ -204,7 +184,7 @@ async function fetchFromYouTubeAPI(videoConfigs: any[]): Promise<YouTubeVideoDat
     }
     
     // Transform the data to match our interface
-    const videos: YouTubeVideoData[] = data.items.map((item: any) => {
+    const videos: YouTubeVideoData[] = data.items.map((item: { id: string; snippet: { title: string; description: string; publishedAt: string; channelTitle: string; thumbnails: { maxres?: { url: string }; high?: { url: string }; medium?: { url: string } } } }) => {
       const config = videoData.find(v => v.id === item.id);
       
       return {

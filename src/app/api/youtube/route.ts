@@ -215,8 +215,8 @@ export async function GET() {
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
 
-      // Return the transformed videos
-      return NextResponse.json(videos);
+      // Return the sorted videos
+      return NextResponse.json(sortedVideos);
     } catch (fetchError) {
       console.error('Error fetching from YouTube API:', fetchError);
       if (fetchError instanceof Error) {

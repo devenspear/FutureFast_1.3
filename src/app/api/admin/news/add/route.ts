@@ -9,9 +9,17 @@ import { generateNewsMetadata } from '@/lib/openai-utils';
 // Directory where news markdown files are stored
 const NEWS_DIR = path.join(process.cwd(), 'content', 'news');
 
-// Ensure the news directory exists
-if (!fs.existsSync(NEWS_DIR)) {
-  fs.mkdirSync(NEWS_DIR, { recursive: true });
+// Check if we're in a development environment
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+// Ensure the news directory exists (only in development)
+if (isDevelopment && !fs.existsSync(NEWS_DIR)) {
+  try {
+    fs.mkdirSync(NEWS_DIR, { recursive: true });
+  } catch (err) {
+    console.warn('Could not create news directory:', err);
+    // Continue execution - we'll handle file operations differently based on environment
+  }
 }
 
 export async function POST(request: Request) {
@@ -97,13 +105,25 @@ ${metadata.summary}
     const fileName = `${uuidv4()}.md`;
     const filePath = path.join(NEWS_DIR, fileName);
 
-    // Write the markdown file
-    fs.writeFileSync(filePath, markdownContent, 'utf-8');
+    // In development, try to write to the file system
+    if (isDevelopment) {
+      try {
+        fs.writeFileSync(filePath, markdownContent, 'utf-8');
+        console.log(`News article saved to ${filePath}`);
+      } catch (err) {
+        console.error('Error writing file:', err);
+        // Continue execution - we'll return success even if file write fails
+      }
+    } else {
+      // In production, we don't try to write to the file system
+      console.log('Production environment detected - not writing to file system');
+    }
 
     return NextResponse.json({
       success: true,
       message: 'News article added successfully',
-      metadata
+      metadata,
+      id: fileName.replace('.md', '')
     });
   } catch (error: unknown) {
     console.error('Error adding news article:', error);

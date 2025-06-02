@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useFormSubmit } from '../../../hooks/useFormSubmit';
 import { NewsItem } from '../../../../lib/content-loader';
+import { useEffect } from 'react';
 
 interface NewsSectionProps {
   newsItems: NewsItem[];
@@ -12,6 +13,16 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
   const [url, setUrl] = useState('');
   const [featured, setFeatured] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [isProduction, setIsProduction] = useState(false);
+  const [generatedMarkdown, setGeneratedMarkdown] = useState<string>('');
+  
+  // Check if we're in production environment
+  useEffect(() => {
+    // In Next.js, process.env.NODE_ENV is replaced at build time
+    // We can't access it directly in client components, so we'll check the hostname
+    const hostname = window.location.hostname;
+    setIsProduction(hostname !== 'localhost' && hostname !== '127.0.0.1');
+  }, []);
   
   const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
     async (formData: { url: string; featured: boolean }) => {
@@ -28,7 +39,30 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
         throw new Error(errorData.error || 'Failed to add news article');
       }
       
-      return response.json();
+      const data = await response.json();
+      
+      // If we're in production, store the generated markdown
+      if (isProduction && data.metadata) {
+        // Create markdown content with YAML frontmatter
+        const markdownContent = `---
+title: "${data.metadata.title.replace(/"/g, '\"')}"
+url: "${formData.url}"
+source: "${data.metadata.source.replace(/"/g, '\"')}"
+publishedDate: "${data.metadata.publishedDate}"
+featured: ${formData.featured}
+summary: "${data.metadata.summary.replace(/"/g, '\"')}"
+tags: [${data.metadata.tags.map((tag: string) => `"${tag.replace(/"/g, '\"')}"`).join(', ')}]
+---
+
+${data.metadata.summary}
+
+[Read the full article](${formData.url})
+`;
+        
+        setGeneratedMarkdown(markdownContent);
+      }
+      
+      return data;
     },
     () => {
       // Reset form on success
@@ -38,7 +72,9 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
     (error) => {
       console.error('Error adding news article:', error);
     },
-    'News article added successfully! Metadata has been generated using AI.'
+    isProduction ? 
+      'News article metadata generated! Copy the markdown below to add it to your repository.' : 
+      'News article added successfully! Metadata has been generated using AI.'
   );
   
   const onSubmit = (e: React.FormEvent) => {
@@ -64,14 +100,35 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
           
           <form onSubmit={onSubmit} className="space-y-4">
             {error && (
-              <div className="bg-red-900/50 border border-red-500 text-red-100 px-4 py-3 rounded">
-                {error}
+              <div className="bg-red-900 text-white p-4 rounded-md mb-4">
+                <p>{error.toString()}</p>
               </div>
             )}
             
             {successMessage && (
-              <div className="bg-green-900/50 border border-green-500 text-green-100 px-4 py-3 rounded">
-                {successMessage}
+              <div className="bg-green-800 text-white p-4 rounded-md mb-4">
+                <p>{successMessage}</p>
+                
+                {isProduction && generatedMarkdown && (
+                  <div className="mt-4">
+                    <p className="text-sm mb-2">Copy this markdown and save it as a .md file in your repository's content/news directory:</p>
+                    <div className="relative">
+                      <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-60">
+                        {generatedMarkdown}
+                      </pre>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(generatedMarkdown);
+                          alert('Markdown copied to clipboard!');
+                        }}
+                        className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="text-xs mt-2">Suggested filename: {new Date().toISOString().split('T')[0]}-{url.split('/').pop() || 'article'}.md</p>
+                  </div>
+                )}
               </div>
             )}
             

@@ -1,20 +1,10 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyAuthToken } from '@/lib/auth';
-import { OpenAI } from 'openai';
 import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
 import { existsSync } from 'fs';
-import path from 'path';
-
-// Directory to store news articles
-const NEWS_DIR = path.join(process.cwd(), 'content/news');
-
-// Ensure news directory exists
-async function ensureNewsDir() {
-  if (!existsSync(NEWS_DIR)) {
-    await mkdir(NEWS_DIR, { recursive: true });
-  }
-}
+import OpenAI from 'openai';
 
 // Initialize OpenAI client
 function getOpenAIClient() {
@@ -26,6 +16,19 @@ function getOpenAIClient() {
   console.log('Initializing OpenAI client with API key:', apiKey.substring(0, 10) + '...');
   return new OpenAI({ apiKey });
 }
+
+
+// Directory to store news articles
+const NEWS_DIR = join(process.cwd(), 'content/news');
+
+// Ensure news directory exists
+async function ensureNewsDir() {
+  if (!existsSync(NEWS_DIR)) {
+    await mkdir(NEWS_DIR, { recursive: true });
+  }
+}
+
+
 
 // Generate a slug from a string
 function slugify(text: string): string {
@@ -75,7 +78,7 @@ export async function POST(request: Request) {
     
     // Generate article content using OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -94,7 +97,7 @@ export async function POST(request: Request) {
     
     // Generate a shorter summary
     const summaryResponse = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -137,7 +140,7 @@ ${content}`;
     // Save to file
     const slug = slugify(title);
     const fileName = `${new Date().toISOString().split('T')[0]}-${slug}.md`;
-    const filePath = path.join(NEWS_DIR, fileName);
+    const filePath = join(NEWS_DIR, fileName);
     
     await writeFile(filePath, markdownContent, 'utf-8');
 
@@ -147,7 +150,7 @@ ${content}`;
       filePath,
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing news submission:', error);
     
     // More detailed error logging

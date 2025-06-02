@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 
-// In a production environment, these would be stored in a secure database
-// and the password would be properly hashed
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'futurefast2025';
+// Credentials should be stored in environment variables
+// In production, these would be stored in a secure database with proper hashing
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+// Check if credentials are set
+if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  console.warn('WARNING: ADMIN_USERNAME and/or ADMIN_PASSWORD environment variables are not set.');
+  console.warn('Please set these in your .env.local file for secure authentication.');
+}
 
 // Rate limiting (simple in-memory implementation)
 const MAX_ATTEMPTS = 5;

@@ -3,16 +3,27 @@ import OpenAI from 'openai';
 // Initialize OpenAI client with API key from environment variables if available
 let openai: OpenAI | null = null;
 
-try {
-  if (process.env.OPENAI_API_KEY) {
-    openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  } else {
-    console.warn('OPENAI_API_KEY is not set. OpenAI features will be disabled.');
+/**
+ * Get OpenAI client instance, creating it if necessary
+ */
+export function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      console.error('OPENAI_API_KEY environment variable is not set');
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
+    
+    try {
+      console.log('Initializing OpenAI client with API key:', apiKey.substring(0, 10) + '...');
+      openai = new OpenAI({ apiKey });
+    } catch (error) {
+      console.error('Failed to initialize OpenAI client:', error);
+      throw new Error('Failed to initialize OpenAI client: ' + (error instanceof Error ? error.message : String(error)));
+    }
   }
-} catch (error) {
-  console.error('Failed to initialize OpenAI client:', error);
+  
+  return openai;
 }
 
 interface NewsMetadata {
@@ -36,19 +47,10 @@ interface ResourceMetadata {
  */
 export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
   try {
-    // If OpenAI client is not available, return fallback metadata
-    if (!openai) {
-      console.warn('OpenAI client not available. Using fallback metadata for:', url);
-      return {
-        title: 'Article from ' + new URL(url).hostname,
-        source: new URL(url).hostname,
-        publishedDate: new Date().toISOString(),
-        summary: `This is a placeholder summary for the article at ${url}. OpenAI integration is currently disabled.`,
-        tags: ['ai', 'technology', 'news']
-      };
-    }
-
-    const response = await openai.chat.completions.create({
+    // Get OpenAI client
+    const openaiClient = getOpenAIClient();
+    
+    const response = await openaiClient.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
@@ -96,19 +98,10 @@ export async function generateResourceMetadata(url: string, type: string): Promi
     const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
     const currentYear = currentDate.getFullYear().toString();
 
-    // If OpenAI client is not available, return fallback metadata
-    if (!openai) {
-      console.warn('OpenAI client not available. Using fallback metadata for resource:', url);
-      return {
-        title: `${type} Resource from ${new URL(url).hostname}`,
-        description: `This is a placeholder description for the ${type.toLowerCase()} resource at ${url}. OpenAI integration is currently disabled.`,
-        tags: [type.toLowerCase(), 'resource', 'document'],
-        month: currentMonth,
-        year: currentYear
-      };
-    }
+    // Get OpenAI client
+    const openaiClient = getOpenAIClient();
 
-    const response = await openai.chat.completions.create({
+    const response = await openaiClient.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {

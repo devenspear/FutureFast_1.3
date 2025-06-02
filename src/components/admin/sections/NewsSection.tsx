@@ -111,7 +111,7 @@ ${data.metadata.summary}
                 
                 {isProduction && generatedMarkdown && (
                   <div className="mt-4">
-                    <p className="text-sm mb-2">Copy this markdown and save it as a .md file in your repository's content/news directory:</p>
+                    <p className="text-sm mb-2">Copy this markdown and save it as a .md file in your repository&apos;s content/news directory:</p>
                     <div className="relative">
                       <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-60">
                         {generatedMarkdown}

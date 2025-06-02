@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { verifyAuthToken } from '@/lib/auth';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { isAuthenticated } from '@/lib/auth-utils';
 import { generateNewsMetadata } from '@/lib/openai-utils';
 
 // Directory where news markdown files are stored
@@ -15,10 +16,25 @@ if (!fs.existsSync(NEWS_DIR)) {
 
 export async function POST(request: Request) {
   try {
-    // Check if user is authenticated
-    const authenticated = await isAuthenticated();
-    if (!authenticated) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify authentication by reading the auth-token cookie
+    const cookieStore = await cookies();
+    console.log('Received cookies in /api/admin/news/add:', cookieStore.getAll()); // Diagnostic log
+    const token = cookieStore.get('auth-token')?.value;
+
+    if (!token) {
+      console.log('auth-token cookie not found or has no value.'); // Diagnostic log
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const { isValid } = await verifyAuthToken(token);
+    if (!isValid) {
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      );
     }
 
     // Parse the request body
@@ -89,10 +105,29 @@ ${metadata.summary}
       message: 'News article added successfully',
       metadata
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error adding news article:', error);
+    
+    // More detailed error logging
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
+    // Check if it's an OpenAI API error
+    if (error instanceof Error && error.name === 'APIError') {
+      console.error('OpenAI API Error:', error);
+      
+      return NextResponse.json(
+        { error: `OpenAI API Error: ${error.message}` },
+        { status: 500 }
+      );
+    }
+    
+    const errorMessage = error instanceof Error ? error.message : 'Failed to add news article';
     return NextResponse.json(
-      { error: 'Failed to add news article' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

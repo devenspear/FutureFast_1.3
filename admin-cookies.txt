@@ -1,1 +1,0 @@
-auth-token=dev-admin-token; Path=/; Expires=Sun, 08 Jun 2025 15:02:35 GMT; Max-Age=604800; HttpOnly; SameSite=lax

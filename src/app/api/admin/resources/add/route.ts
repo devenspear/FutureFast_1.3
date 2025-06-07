@@ -9,6 +9,55 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_REPO = process.env.GITHUB_REPO || 'devenspear/FutureFast_1.3';
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
 
+// Function to check if URL already exists in any resource file
+async function checkResourceUrlExists(urlToCheck: string): Promise<boolean> {
+  if (!GITHUB_TOKEN) {
+    return false;
+  }
+
+  try {
+    const dirUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/content/catalog`;
+    const response = await fetch(dirUrl, {
+      headers: {
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+
+    if (response.ok) {
+      const files = await response.json();
+      
+      for (const file of files) {
+        if (file.name.endsWith('.md') && !file.name.startsWith('_')) {
+          // Get file content
+          const fileResponse = await fetch(file.url, {
+            headers: {
+              'Authorization': `Bearer ${GITHUB_TOKEN}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'X-GitHub-Api-Version': '2022-11-28',
+            },
+          });
+          
+          if (fileResponse.ok) {
+            const fileData = await fileResponse.json();
+            const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+            
+            // Simple check for URL in content
+            if (content.includes(`url: "${urlToCheck}"`)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error checking for existing resource URL:', error);
+  }
+  
+  return false;
+}
+
 // Function to create file via GitHub API
 async function createFileOnGitHub(fileName: string, content: string, commitMessage: string) {
   if (!GITHUB_TOKEN) {
@@ -81,6 +130,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'Invalid URL format' },
         { status: 400 }
+      );
+    }
+
+    // Check if URL already exists
+    const urlExists = await checkResourceUrlExists(url);
+    if (urlExists) {
+      return NextResponse.json(
+        { error: 'This resource URL has already been added. Please check the existing resources.' },
+        { status: 409 }
       );
     }
 

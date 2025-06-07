@@ -110,7 +110,7 @@ export async function generateResourceMetadata(url: string, type: string): Promi
         },
         {
           role: "user",
-          content: `Generate metadata for this ${type} resource: ${url}\n\nPlease format your response as JSON with the following fields: title, description (1-2 sentences), tags (array of 3-5 relevant keywords), month (publication month), and year (publication year).`
+          content: `Generate metadata for this ${type} resource: ${url}\n\nPlease format your response as JSON with the following fields: title, description (1-2 sentences), tags (array of 3-5 relevant keywords), month (use current month), and year (use current year). Always use the current date to show this as recently added content.`
         }
       ],
       response_format: { type: "json_object" }

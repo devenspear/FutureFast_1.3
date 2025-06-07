@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { url, type = 'Report' } = body;
+    const { url, type = 'Report', publishDate } = body;
 
     if (!url) {
       return NextResponse.json(
@@ -148,13 +148,26 @@ export async function POST(request: Request) {
     // Create a tag from the first tag in the array
     const primaryTag = metadata.tags[0] || type.toLowerCase();
 
+    // Use manual date if provided, otherwise use AI-generated date
+    let month = metadata.month;
+    let year = metadata.year;
+    
+    if (publishDate) {
+      // Parse YYYY-MM format
+      const [yearStr, monthStr] = publishDate.split('-');
+      year = yearStr;
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                         'July', 'August', 'September', 'October', 'November', 'December'];
+      month = monthNames[parseInt(monthStr) - 1] || month;
+    }
+
     // Create markdown content with YAML frontmatter
     const markdownContent = `---
 title: "${metadata.title.replace(/"/g, '\\"')}"
 url: "${url}"
 type: "${type}"
-month: "${metadata.month}"
-year: "${metadata.year}"
+month: "${month}"
+year: "${year}"
 description: "${metadata.description.replace(/"/g, '\\"')}"
 tag: "${primaryTag}"
 ---

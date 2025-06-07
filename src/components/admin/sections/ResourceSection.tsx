@@ -12,6 +12,11 @@ interface ResourceSectionProps {
 export default function ResourceSection({ resources, types }: ResourceSectionProps) {
   const [url, setUrl] = useState('');
   const [type, setType] = useState(types[0] || 'Report');
+  const [publishDate, setPublishDate] = useState(() => {
+    // Default to current date in YYYY-MM format
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [showForm, setShowForm] = useState(false);
   
   // Default types if none provided
@@ -25,7 +30,7 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
   ];
   
   const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
-    async (formData: { url: string; type: string }) => {
+    async (formData: { url: string; type: string; publishDate: string }) => {
       const response = await fetch('/api/admin/resources/add', {
         method: 'POST',
         headers: {
@@ -45,6 +50,8 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
       // Reset form on success
       setUrl('');
       setType(availableTypes[0]);
+      const now = new Date();
+      setPublishDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
     },
     (error) => {
       console.error('Error adding resource:', error);
@@ -54,7 +61,7 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
   
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSubmit({ url, type });
+    handleSubmit({ url, type, publishDate });
   };
   
   return (
@@ -120,6 +127,22 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label htmlFor="publish-date" className="block text-sm font-medium text-cyan-100 mb-1">
+                Publication Date
+              </label>
+              <input
+                type="month"
+                id="publish-date"
+                value={publishDate}
+                onChange={(e) => setPublishDate(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+              <p className="mt-1 text-sm font-sans text-gray-400">
+                When was this resource actually published? Defaults to current month. This controls where it appears in the library.
+              </p>
             </div>
             
             <div className="pt-2">

@@ -1,30 +1,69 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { isAuthenticated } from '@/lib/auth-utils';
+import { cookies } from 'next/headers';
+import { verifyAuthToken } from '@/lib/auth';
 import { generateResourceMetadata } from '@/lib/openai-utils';
 
-// Directory where catalog/resource markdown files are stored
-const CATALOG_DIR = path.join(process.cwd(), 'content', 'catalog');
+// GitHub configuration for automated file creation
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPO = process.env.GITHUB_REPO || 'devenspear/FutureFast_1.3';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
 
-// Ensure the catalog directory exists
-if (!fs.existsSync(CATALOG_DIR)) {
-  fs.mkdirSync(CATALOG_DIR, { recursive: true });
+// Function to create file via GitHub API
+async function createFileOnGitHub(fileName: string, content: string, commitMessage: string) {
+  if (!GITHUB_TOKEN) {
+    throw new Error('GITHUB_TOKEN environment variable is required for automated file creation');
+  }
+
+  const filePath = `content/catalog/${fileName}`;
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`;
+
+  // Create the file
+  const createResponse = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${GITHUB_TOKEN}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: commitMessage,
+      content: Buffer.from(content).toString('base64'),
+      branch: GITHUB_BRANCH,
+    }),
+  });
+
+  if (!createResponse.ok) {
+    const errorData = await createResponse.json();
+    throw new Error(`GitHub API Error: ${errorData.message || 'Failed to create file'}`);
+  }
+
+  return await createResponse.json();
 }
 
 export async function POST(request: Request) {
   try {
     // Verify authentication
-    const authenticated = await isAuthenticated();
-    if (!authenticated) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth-token')?.value;
+
+    if (!token) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    // Parse the request body
+    const { isValid } = await verifyAuthToken(token);
+    if (!isValid) {
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      );
+    }
+
+    // Parse request body
     const body = await request.json();
     const { url, type = 'Report' } = body;
 
@@ -38,30 +77,14 @@ export async function POST(request: Request) {
     // Validate URL format
     try {
       new URL(url);
-    } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-            _) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid URL format' },
         { status: 400 }
       );
     }
 
-    // Check if the URL already exists in any catalog file
-    const existingFiles = fs.readdirSync(CATALOG_DIR).filter(file => file.endsWith('.md'));
-    
-    for (const file of existingFiles) {
-      const filePath = path.join(CATALOG_DIR, file);
-      const content = fs.readFileSync(filePath, 'utf-8');
-      
-      if (content.includes(url)) {
-        return NextResponse.json(
-          { error: 'This resource URL already exists' },
-          { status: 409 }
-        );
-      }
-    }
-
-    // Generate metadata using OpenAI
+    // Generate metadata using AI
     const metadata = await generateResourceMetadata(url, type);
 
     // Create a tag from the first tag in the array
@@ -80,25 +103,45 @@ tag: "${primaryTag}"
 
 ${metadata.description}
 
-[Download Resource](${url})
+[Access Resource](${url})
 `;
 
-    // Generate a unique filename using UUID
+    // Generate unique filename
     const fileName = `${uuidv4()}.md`;
-    const filePath = path.join(CATALOG_DIR, fileName);
 
-    // Write the markdown file
-    fs.writeFileSync(filePath, markdownContent, 'utf-8');
-
-    return NextResponse.json({
-      success: true,
-      message: 'Resource added successfully',
-      metadata
-    });
+    // Create file via GitHub API and trigger automatic deployment
+    try {
+      const commitMessage = `📚 Add resource: ${metadata.title}`;
+      await createFileOnGitHub(fileName, markdownContent, commitMessage);
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Resource created successfully! Your website will automatically redeploy with the new content in 1-2 minutes.',
+        metadata,
+        fileName,
+        autoDeployed: true
+      });
+    } catch (err) {
+      console.error('Error creating file on GitHub:', err);
+      
+      // If GitHub API fails, return markdown for manual creation
+      return NextResponse.json({
+        success: true,
+        message: 'GitHub API failed - copy the markdown below to manually add the resource.',
+        metadata: {
+          ...metadata,
+          markdownContent,
+          suggestedFilename: fileName
+        },
+        requiresManualCreation: true
+      });
+    }
   } catch (error) {
     console.error('Error adding resource:', error);
+    
+    const errorMessage = error instanceof Error ? error.message : 'Failed to add resource';
     return NextResponse.json(
-      { error: 'Failed to add resource' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

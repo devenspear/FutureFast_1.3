@@ -1,36 +1,74 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyAuthToken } from '@/lib/auth';
-import fs from 'fs';
-import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { generateNewsMetadata } from '@/lib/openai-utils';
 
-// Directory where news markdown files are stored
-const NEWS_DIR = path.join(process.cwd(), 'content', 'news');
+// GitHub configuration for automated file creation
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPO = process.env.GITHUB_REPO || 'devenspear/FutureFast_1.3';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
 
-// Check if we're in a development environment
-const isDevelopment = process.env.NODE_ENV !== 'production';
-
-// Ensure the news directory exists (only in development)
-if (isDevelopment && !fs.existsSync(NEWS_DIR)) {
-  try {
-    fs.mkdirSync(NEWS_DIR, { recursive: true });
-  } catch (err) {
-    console.warn('Could not create news directory:', err);
-    // Continue execution - we'll handle file operations differently based on environment
+// Function to create file via GitHub API
+async function createFileOnGitHub(fileName: string, content: string, commitMessage: string) {
+  if (!GITHUB_TOKEN) {
+    throw new Error('GITHUB_TOKEN environment variable is required for automated file creation');
   }
+
+  const filePath = `content/news/${fileName}`;
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`;
+
+  // First, check if file already exists
+  try {
+    const checkResponse = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+
+    if (checkResponse.ok) {
+      throw new Error('File already exists');
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message === 'File already exists') {
+      throw error;
+    }
+    // File doesn't exist, which is what we want
+  }
+
+  // Create the file
+  const createResponse = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${GITHUB_TOKEN}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: commitMessage,
+      content: Buffer.from(content).toString('base64'),
+      branch: GITHUB_BRANCH,
+    }),
+  });
+
+  if (!createResponse.ok) {
+    const errorData = await createResponse.json();
+    throw new Error(`GitHub API Error: ${errorData.message || 'Failed to create file'}`);
+  }
+
+  return await createResponse.json();
 }
 
 export async function POST(request: Request) {
   try {
-    // Verify authentication by reading the auth-token cookie
+    // Verify authentication
     const cookieStore = await cookies();
-    console.log('Received cookies in /api/admin/news/add:', cookieStore.getAll()); // Diagnostic log
     const token = cookieStore.get('auth-token')?.value;
 
     if (!token) {
-      console.log('auth-token cookie not found or has no value.'); // Diagnostic log
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -45,7 +83,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse the request body
+    // Parse request body
     const body = await request.json();
     const { url, featured = false } = body;
 
@@ -59,30 +97,14 @@ export async function POST(request: Request) {
     // Validate URL format
     try {
       new URL(url);
-    } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-            _) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid URL format' },
         { status: 400 }
       );
     }
 
-    // Check if the URL already exists in any news file
-    const existingFiles = fs.readdirSync(NEWS_DIR).filter(file => file.endsWith('.md'));
-    
-    for (const file of existingFiles) {
-      const filePath = path.join(NEWS_DIR, file);
-      const content = fs.readFileSync(filePath, 'utf-8');
-      
-      if (content.includes(url)) {
-        return NextResponse.json(
-          { error: 'This news article URL already exists' },
-          { status: 409 }
-        );
-      }
-    }
-
-    // Generate metadata using OpenAI
+    // Generate metadata using AI
     const metadata = await generateNewsMetadata(url);
 
     // Create markdown content with YAML frontmatter
@@ -101,46 +123,42 @@ ${metadata.summary}
 [Read the full article](${url})
 `;
 
-    // Generate a unique filename using UUID
+    // Generate unique filename
     const fileName = `${uuidv4()}.md`;
-    const filePath = path.join(NEWS_DIR, fileName);
 
-    // In development, try to write to the file system
-    if (isDevelopment) {
-      try {
-        fs.writeFileSync(filePath, markdownContent, 'utf-8');
-        console.log(`News article saved to ${filePath}`);
-      } catch (err) {
-        console.error('Error writing file:', err);
-        // Continue execution - we'll return success even if file write fails
-      }
-    } else {
-      // In production, we don't try to write to the file system
-      console.log('Production environment detected - not writing to file system');
+    // Create file via GitHub API and trigger automatic deployment
+    try {
+      const commitMessage = `📰 Add news article: ${metadata.title}`;
+      await createFileOnGitHub(fileName, markdownContent, commitMessage);
+      
+      return NextResponse.json({
+        success: true,
+        message: 'News article created successfully! Your website will automatically redeploy with the new content in 1-2 minutes.',
+        metadata,
+        fileName,
+        autoDeployed: true
+      });
+    } catch (err) {
+      console.error('Error creating file on GitHub:', err);
+      
+      // If GitHub API fails, return markdown for manual creation
+      return NextResponse.json({
+        success: true,
+        message: 'GitHub API failed - copy the markdown below to manually add the article.',
+        metadata: {
+          ...metadata,
+          markdownContent,
+          suggestedFilename: fileName
+        },
+        requiresManualCreation: true
+      });
     }
-
-    return NextResponse.json({
-      success: true,
-      message: 'News article added successfully',
-      metadata,
-      id: fileName.replace('.md', '')
-    });
   } catch (error: unknown) {
     console.error('Error adding news article:', error);
     
-    // More detailed error logging
-    if (error instanceof Error) {
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
-    
-    // Check if it's an OpenAI API error
     if (error instanceof Error && error.name === 'APIError') {
-      console.error('OpenAI API Error:', error);
-      
       return NextResponse.json(
-        { error: `OpenAI API Error: ${error.message}` },
+        { error: `AI Error: ${error.message}` },
         { status: 500 }
       );
     }

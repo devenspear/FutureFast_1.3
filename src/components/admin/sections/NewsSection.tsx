@@ -41,9 +41,12 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
       
       const data = await response.json();
       
-      // If we're in production, store the generated markdown
-      if (isProduction && data.metadata) {
-        // Create markdown content with YAML frontmatter
+      // If we're in production and got markdown content for manual creation
+      if (data.requiresManualCreation && data.metadata.markdownContent) {
+        // Create markdown content for display
+        setGeneratedMarkdown(data.metadata.markdownContent);
+      } else if (isProduction && data.metadata) {
+        // For backward compatibility, generate markdown if needed
         const markdownContent = `---
 title: "${data.metadata.title.replace(/"/g, '\"')}"
 url: "${formData.url}"
@@ -73,7 +76,7 @@ ${data.metadata.summary}
       console.error('Error adding news article:', error);
     },
     isProduction ? 
-      'News article metadata generated! Copy the markdown below to add it to your repository.' : 
+      'News article processed! Check the message below for next steps.' : 
       'News article added successfully! Metadata has been generated using AI.'
   );
   
@@ -111,7 +114,12 @@ ${data.metadata.summary}
                 
                 {isProduction && generatedMarkdown && (
                   <div className="mt-4">
-                    <p className="text-sm mb-2">Copy this markdown and save it as a .md file in your repository&apos;s content/news directory:</p>
+                    <p className="text-sm mb-2">
+                      {generatedMarkdown.includes('GitHub API failed') 
+                        ? 'GitHub API failed - copy this markdown and save it as a .md file in your repository\'s content/news directory:'
+                        : 'Article was automatically added to your repository! Here\'s the content that was created:'
+                      }
+                    </p>
                     <div className="relative">
                       <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-60">
                         {generatedMarkdown}
@@ -126,7 +134,12 @@ ${data.metadata.summary}
                         Copy
                       </button>
                     </div>
-                    <p className="text-xs mt-2">Suggested filename: {new Date().toISOString().split('T')[0]}-{url.split('/').pop() || 'article'}.md</p>
+                    <p className="text-xs mt-2">Suggested filename: {new Date().toISOString().split('T')[0]}-article.md</p>
+                    {!generatedMarkdown.includes('GitHub API failed') && (
+                      <p className="text-xs mt-2 text-green-300">
+                        ✅ File automatically created in repository. Your website will redeploy automatically with the new content!
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

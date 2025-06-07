@@ -112,8 +112,10 @@ export async function POST(request: Request) {
 title: "${metadata.title.replace(/"/g, '\\"')}"
 url: "${url}"
 source: "${metadata.source.replace(/"/g, '\\"')}"
+date: "${metadata.publishedDate}"
 publishedDate: "${metadata.publishedDate}"
 featured: ${featured}
+icon: "📰"
 summary: "${metadata.summary.replace(/"/g, '\\"')}"
 tags: [${metadata.tags.map((tag: string) => `"${tag.replace(/"/g, '\"')}"`).join(', ')}]
 ---

@@ -59,7 +59,7 @@ export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
         },
         {
           role: "user",
-          content: `Generate metadata for this news article: ${url}\n\nPlease format your response as JSON with the following fields: title, source, publishedDate (in ISO format), summary (1-2 sentences), and tags (array of 3-5 relevant keywords).`
+          content: `Generate metadata for this news article: ${url}\n\nPlease format your response as JSON with the following fields: title, source, publishedDate (use today's date in ISO format), summary (1-2 sentences), and tags (array of 3-5 relevant keywords). Always use today's date for publishedDate to show this as recently added content.`
         }
       ],
       response_format: { type: "json_object" }

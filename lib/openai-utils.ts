@@ -67,11 +67,12 @@ export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
 
     const result = JSON.parse(response.choices[0].message.content || '{}');
     
-    // Ensure we have all required fields with fallbacks
+    // Always use current date regardless of what AI extracts
+    // This ensures new content appears at top of news list
     return {
       title: result.title || 'Untitled Article',
       source: result.source || 'Unknown Source',
-      publishedDate: result.publishedDate || new Date().toISOString(),
+      publishedDate: new Date().toISOString(), // Always current date
       summary: result.summary || 'No summary available',
       tags: Array.isArray(result.tags) ? result.tags : ['news'],
     };
@@ -118,13 +119,14 @@ export async function generateResourceMetadata(url: string, type: string): Promi
 
     const result = JSON.parse(response.choices[0].message.content || '{}');
     
-    // Ensure we have all required fields with fallbacks
+    // Always use current date regardless of what AI extracts
+    // This ensures new content appears at top of resource library
     return {
       title: result.title || `${type} Resource`,
       description: result.description || 'No description available',
       tags: Array.isArray(result.tags) ? result.tags : [type.toLowerCase()],
-      month: result.month || currentMonth,
-      year: result.year || currentYear,
+      month: currentMonth, // Always current month
+      year: currentYear,   // Always current year
     };
   } catch (error) {
     console.error('Error generating resource metadata:', error);

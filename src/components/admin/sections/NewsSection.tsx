@@ -15,6 +15,7 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
   const [showForm, setShowForm] = useState(false);
   const [isProduction, setIsProduction] = useState(false);
   const [generatedMarkdown, setGeneratedMarkdown] = useState<string>('');
+  const [autoDeployed, setAutoDeployed] = useState(false);
   
   // Check if we're in production environment
   useEffect(() => {
@@ -41,12 +42,16 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
       
       const data = await response.json();
       
-      // If we're in production and got markdown content for manual creation
-      if (data.requiresManualCreation && data.metadata.markdownContent) {
-        // Create markdown content for display
+      // Handle different response types
+      if (data.autoDeployed) {
+        setAutoDeployed(true);
+        setGeneratedMarkdown('');
+      } else if (data.requiresManualCreation && data.metadata.markdownContent) {
+        setAutoDeployed(false);
         setGeneratedMarkdown(data.metadata.markdownContent);
-      } else if (isProduction && data.metadata) {
+      } else if (data.metadata) {
         // For backward compatibility, generate markdown if needed
+        setAutoDeployed(false);
         const markdownContent = `---
 title: "${data.metadata.title.replace(/"/g, '\"')}"
 url: "${formData.url}"
@@ -61,7 +66,6 @@ ${data.metadata.summary}
 
 [Read the full article](${formData.url})
 `;
-        
         setGeneratedMarkdown(markdownContent);
       }
       
@@ -74,15 +78,29 @@ ${data.metadata.summary}
     },
     (error) => {
       console.error('Error adding news article:', error);
+      setAutoDeployed(false);
+      setGeneratedMarkdown('');
     },
-    isProduction ? 
-      'News article processed! Check the message below for next steps.' : 
-      'News article added successfully! Metadata has been generated using AI.'
+    '' // We'll set the success message dynamically
   );
   
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setAutoDeployed(false);
+    setGeneratedMarkdown('');
     handleSubmit({ url, featured });
+  };
+  
+  // Dynamic success message based on deployment status
+  const getSuccessMessage = () => {
+    if (autoDeployed) {
+      return 'News article created and automatically deployed! Your website will update in 1-2 minutes.';
+    } else if (generatedMarkdown) {
+      return 'News article metadata generated! See instructions below.';
+    } else if (successMessage) {
+      return successMessage;
+    }
+    return '';
   };
   
   return (
@@ -104,42 +122,62 @@ ${data.metadata.summary}
           <form onSubmit={onSubmit} className="space-y-4">
             {error && (
               <div className="bg-red-900 text-white p-4 rounded-md mb-4">
+                <p className="font-medium">❌ Error:</p>
                 <p>{error.toString()}</p>
+                {error.toString().includes('Authentication required') && (
+                  <p className="mt-2 text-sm">
+                    💡 <strong>Action needed:</strong> Please ensure you're logged in to the admin interface.
+                  </p>
+                )}
+                {error.toString().includes('GITHUB_TOKEN') && (
+                  <p className="mt-2 text-sm">
+                    💡 <strong>Action needed:</strong> GitHub environment variables need to be configured in Vercel.
+                  </p>
+                )}
               </div>
             )}
             
-            {successMessage && (
-              <div className="bg-green-800 text-white p-4 rounded-md mb-4">
-                <p>{successMessage}</p>
+            {getSuccessMessage() && (
+              <div className={`text-white p-4 rounded-md mb-4 ${autoDeployed ? 'bg-green-800' : 'bg-blue-800'}`}>
+                <p className="font-medium">
+                  {autoDeployed ? '✅ Auto-Deployed!' : '⚠️ Manual Action Required'}
+                </p>
+                <p>{getSuccessMessage()}</p>
                 
-                {isProduction && generatedMarkdown && (
+                {autoDeployed && (
+                  <div className="mt-3 p-3 bg-green-900/50 rounded border border-green-600">
+                    <p className="text-sm font-medium text-green-300">🚀 Deployment Status:</p>
+                    <ul className="text-sm mt-1 space-y-1">
+                      <li>✅ File automatically created in GitHub repository</li>
+                      <li>✅ Vercel deployment triggered automatically</li>
+                      <li>⏳ Website will update within 1-2 minutes</li>
+                      <li>🔍 Check your live website to see the new article</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {generatedMarkdown && !autoDeployed && (
                   <div className="mt-4">
-                    <p className="text-sm mb-2">
-                      {generatedMarkdown.includes('GitHub API failed') 
-                        ? 'GitHub API failed - copy this markdown and save it as a .md file in your repository\'s content/news directory:'
-                        : 'Article was automatically added to your repository! Here\'s the content that was created:'
-                      }
+                    <p className="text-sm mb-2 font-medium">
+                      📋 Manual deployment required - copy this markdown and save it as a .md file in your repository's content/news directory:
                     </p>
                     <div className="relative">
-                      <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-60">
+                      <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-60 border border-gray-600">
                         {generatedMarkdown}
                       </pre>
                       <button 
                         onClick={() => {
                           navigator.clipboard.writeText(generatedMarkdown);
-                          alert('Markdown copied to clipboard!');
+                          alert('✅ Markdown copied to clipboard!');
                         }}
-                        className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded"
+                        className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded transition-colors"
                       >
-                        Copy
+                        📋 Copy
                       </button>
                     </div>
-                    <p className="text-xs mt-2">Suggested filename: {new Date().toISOString().split('T')[0]}-article.md</p>
-                    {!generatedMarkdown.includes('GitHub API failed') && (
-                      <p className="text-xs mt-2 text-green-300">
-                        ✅ File automatically created in repository. Your website will redeploy automatically with the new content!
-                      </p>
-                    )}
+                    <p className="text-xs mt-2 text-gray-300">
+                      💡 <strong>Filename suggestion:</strong> {new Date().toISOString().split('T')[0]}-article.md
+                    </p>
                   </div>
                 )}
               </div>
@@ -159,7 +197,7 @@ ${data.metadata.summary}
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               <p className="mt-1 text-sm font-sans text-gray-400">
-                Paste the full URL to the news article. AI will generate a title and summary.
+                Paste the full URL to the news article. AI will generate a title and summary automatically.
               </p>
             </div>
             
@@ -182,16 +220,27 @@ ${data.metadata.summary}
                 disabled={isSubmitting}
                 className="w-full font-sans px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isSubmitting ? 'Adding...' : 'Add News Article'}
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing Article...
+                  </span>
+                ) : (
+                  '🤖 Add News Article'
+                )}
               </button>
             </div>
             
-            <div className="mt-4 text-sm font-sans text-gray-400">
-              <p>When you add a news article:</p>
-              <ul className="list-disc list-inside space-y-1 pl-2 mt-2">
-                <li>AI will visit the URL and extract the article content</li>
-                <li>The system will generate a title, source, and publication date</li>
-                <li>The article will be added to the news section of the website</li>
+            <div className="mt-4 text-sm font-sans text-gray-400 bg-gray-900/50 p-3 rounded border border-gray-700">
+              <p className="font-medium text-cyan-200 mb-2">🎯 How this works:</p>
+              <ul className="list-disc list-inside space-y-1 pl-2">
+                <li>AI visits the URL and extracts the article content automatically</li>
+                <li>System generates title, source, publication date, and summary</li>
+                <li>Article is automatically deployed to your live website (if configured)</li>
+                <li>No manual file editing or git commands required!</li>
               </ul>
             </div>
           </form>
@@ -202,34 +251,35 @@ ${data.metadata.summary}
         <h3 className="text-xl font-medium text-cyan-100 mb-4">Existing News Articles ({newsItems.length})</h3>
         
         {newsItems.length === 0 ? (
-          <p className="text-gray-400">No news articles found. Add your first article above.</p>
+          <div className="text-center py-8 bg-gray-800/50 rounded-lg border border-gray-700">
+            <p className="text-gray-400 mb-2">📰 No news articles found</p>
+            <p className="text-sm text-gray-500">Add your first article using the form above!</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Sort news articles by publishedDate (newest first) */}
             {[...newsItems]
               .sort((a, b) => {
-                // Compare publication dates (newest first)
                 return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
               })
               .map((article, index) => (
-              <div key={index} className="bg-gray-800 p-4 rounded-lg">
+              <div key={index} className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
                 <h4 className="font-medium text-white mb-1 line-clamp-2">{article.title}</h4>
-                <p className="text-sm text-gray-400 mb-1">Source: {article.source}</p>
+                <p className="text-sm text-gray-400 mb-1">📰 Source: {article.source}</p>
                 <p className="text-sm text-gray-400 mb-3">
-                  Published: {new Date(article.publishedDate).toLocaleDateString()}
+                  📅 Published: {new Date(article.publishedDate).toLocaleDateString()}
                 </p>
                 <div className="flex justify-between items-center">
                   <a 
                     href={article.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-cyan-400 hover:text-cyan-300 text-sm"
+                    className="text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors"
                   >
-                    View Article
+                    🔗 View Article
                   </a>
                   {article.featured && (
-                    <span className="bg-yellow-900/30 text-yellow-300 text-xs px-2 py-1 rounded">
-                      Featured
+                    <span className="bg-yellow-900/30 text-yellow-300 text-xs px-2 py-1 rounded border border-yellow-600/50">
+                      ⭐ Featured
                     </span>
                   )}
                 </div>

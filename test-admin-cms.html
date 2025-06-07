@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureFast CMS Testing Interface</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a192f 0%, #1a365d 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #64ffda, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .test-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .module {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(100, 255, 218, 0.3);
+        }
+        .module h2 {
+            color: #64ffda;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #64ffda;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 14px;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #64ffda;
+            box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+        }
+        .btn {
+            background: linear-gradient(45deg, #64ffda, #0891b2);
+            color: #0a192f;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 14px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        .status.success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+        .status.loading {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+        .test-urls {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .test-urls h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+        .url-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .url-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #64ffda;
+        }
+        .url-item .url-type {
+            font-weight: 600;
+            color: #64ffda;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .url-item .url-link {
+            color: white;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(100, 255, 218, 0.3);
+            border-top: 2px solid #64ffda;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .environment-info {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .environment-info h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 FutureFast CMS Testing Interface</h1>
+            <p>Test all automated content management functionality before going live</p>
+        </div>
+
+        <div class="environment-info">
+            <h3>📋 Pre-Test Checklist</h3>
+            <p><strong>✅ Environment Variables Required:</strong></p>
+            <ul>
+                <li><code>GITHUB_TOKEN</code> - Your GitHub personal access token</li>
+                <li><code>GITHUB_REPO</code> - devenspear/FutureFast_1.3</li>
+                <li><code>GITHUB_BRANCH</code> - main</li>
+            </ul>
+            <p><strong>🌐 Test this on:</strong> <span id="current-url"></span></p>
+        </div>
+
+        <div class="test-urls">
+            <h3>🔗 Test URLs for Each Content Type</h3>
+            <div class="url-list">
+                <div class="url-item">
+                    <div class="url-type">News Article</div>
+                    <div class="url-link">https://techcrunch.com/2025/01/03/ai-startups-2025-predictions</div>
+                </div>
+                <div class="url-item">
+                    <div class="url-type">AI Research</div>
+                    <div class="url-link">https://arxiv.org/abs/2312.11805</div>
+                </div>
+                <div class="url-item">
+                    <div class="url-type">PDF Resource</div>
+                    <div class="url-link">https://www.mckinsey.com/~/media/mckinsey/business%20functions/mckinsey%20digital/our%20insights/the%20age%20of%20ai/mgi-the-age-of-ai-discussion-paper.pdf</div>
+                </div>
+                <div class="url-item">
+                    <div class="url-type">YouTube Video</div>
+                    <div class="url-link">https://www.youtube.com/watch?v=VMj-3S1tku0</div>
+                </div>
+                <div class="url-item">
+                    <div class="url-type">Tech Blog</div>
+                    <div class="url-link">https://openai.com/blog/gpt-4</div>
+                </div>
+                <div class="url-item">
+                    <div class="url-type">Industry Report</div>
+                    <div class="url-link">https://www.pwc.com/gx/en/issues/artificial-intelligence/artificial-intelligence-study.html</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-modules">
+            <!-- News Articles Module -->
+            <div class="module">
+                <h2>📰 News Articles Module</h2>
+                <form id="news-form">
+                    <div class="form-group">
+                        <label for="news-url">Article URL</label>
+                        <input type="url" id="news-url" placeholder="https://example.com/article" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="news-featured">
+                            <input type="checkbox" id="news-featured" style="width: auto; margin-right: 8px;">
+                            Featured Article
+                        </label>
+                    </div>
+                    <button type="submit" class="btn" id="news-btn">Test News Article Creation</button>
+                    <div class="status" id="news-status"></div>
+                </form>
+            </div>
+
+            <!-- Resource Library Module -->
+            <div class="module">
+                <h2>📚 Resource Library Module</h2>
+                <form id="resource-form">
+                    <div class="form-group">
+                        <label for="resource-url">Resource URL</label>
+                        <input type="url" id="resource-url" placeholder="https://example.com/resource.pdf" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resource-type">Resource Type</label>
+                        <select id="resource-type">
+                            <option value="Report">Report</option>
+                            <option value="Guide">Guide</option>
+                            <option value="Article">Article</option>
+                            <option value="Tool">Tool</option>
+                            <option value="Podcast">Podcast</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn" id="resource-btn">Test Resource Creation</button>
+                    <div class="status" id="resource-status"></div>
+                </form>
+            </div>
+
+            <!-- YouTube Videos Module -->
+            <div class="module">
+                <h2>🎥 YouTube Videos Module</h2>
+                <form id="youtube-form">
+                    <div class="form-group">
+                        <label for="youtube-url">YouTube URL</label>
+                        <input type="url" id="youtube-url" placeholder="https://www.youtube.com/watch?v=..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="youtube-category">Category</label>
+                        <select id="youtube-category">
+                            <option value="Interview">Interview</option>
+                            <option value="Tech Innovation">Tech Innovation</option>
+                            <option value="AI & Machine Learning">AI & Machine Learning</option>
+                            <option value="Web3 & Blockchain">Web3 & Blockchain</option>
+                            <option value="Robotics & Manufacturing">Robotics & Manufacturing</option>
+                            <option value="Future of Work">Future of Work</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="youtube-featured">
+                            <input type="checkbox" id="youtube-featured" style="width: auto; margin-right: 8px;">
+                            Featured Video
+                        </label>
+                    </div>
+                    <button type="submit" class="btn" id="youtube-btn">Test YouTube Video Creation</button>
+                    <div class="status" id="youtube-status"></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="environment-info">
+            <h3>🔍 Testing Checklist</h3>
+            <ol>
+                <li><strong>News Articles:</strong> Test with tech news URL - should auto-extract title, summary, tags</li>
+                <li><strong>Resource Library:</strong> Test with PDF URL - should generate metadata and description</li>
+                <li><strong>YouTube Videos:</strong> Test with YouTube URL - should extract video info</li>
+                <li><strong>GitHub Integration:</strong> Check if files appear in repository after successful tests</li>
+                <li><strong>Auto-deployment:</strong> Verify website updates automatically within 2 minutes</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Set current URL
+        document.getElementById('current-url').textContent = window.location.href;
+
+        // Test News Articles
+        document.getElementById('news-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await testEndpoint('news', '/api/admin/news/add', {
+                url: document.getElementById('news-url').value,
+                featured: document.getElementById('news-featured').checked
+            });
+        });
+
+        // Test Resource Library
+        document.getElementById('resource-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await testEndpoint('resource', '/api/admin/resources/add', {
+                url: document.getElementById('resource-url').value,
+                type: document.getElementById('resource-type').value
+            });
+        });
+
+        // Test YouTube Videos
+        document.getElementById('youtube-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await testEndpoint('youtube', '/api/admin/youtube/add', {
+                url: document.getElementById('youtube-url').value,
+                category: document.getElementById('youtube-category').value,
+                featured: document.getElementById('youtube-featured').checked
+            });
+        });
+
+        async function testEndpoint(module, endpoint, data) {
+            const btn = document.getElementById(`${module}-btn`);
+            const status = document.getElementById(`${module}-status`);
+            
+            // Set loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span>Testing...';
+            status.className = 'status loading';
+            status.style.display = 'block';
+            status.innerHTML = '🔄 Processing request...';
+
+            try {
+                console.log(`Testing ${module}:`, { endpoint, data });
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    credentials: 'include' // Include cookies for authentication
+                });
+
+                const result = await response.json();
+                console.log(`${module} result:`, result);
+
+                if (response.ok && result.success) {
+                    status.className = 'status success';
+                    if (result.autoDeployed) {
+                        status.innerHTML = `✅ Success! ${result.message}<br/>
+                        <strong>File created:</strong> ${result.fileName || 'Generated'}<br/>
+                        <strong>Status:</strong> Auto-deployed to website<br/>
+                        <strong>Check:</strong> Your website should update in 1-2 minutes`;
+                    } else if (result.requiresManualCreation) {
+                        status.innerHTML = `⚠️ Partial Success: ${result.message}<br/>
+                        <strong>Note:</strong> GitHub API may need environment variables set up correctly`;
+                    } else {
+                        status.innerHTML = `✅ Success! ${result.message}`;
+                    }
+                } else {
+                    throw new Error(result.error || 'Unknown error occurred');
+                }
+            } catch (error) {
+                console.error(`${module} error:`, error);
+                status.className = 'status error';
+                
+                if (error.message.includes('Authentication required')) {
+                    status.innerHTML = `❌ Authentication Error: Please log in to the admin interface first<br/>
+                    <strong>Action:</strong> Go to <a href="/admin/login" style="color: #64ffda;">/admin/login</a> first`;
+                } else if (error.message.includes('GITHUB_TOKEN')) {
+                    status.innerHTML = `❌ Configuration Error: GitHub token not configured<br/>
+                    <strong>Action:</strong> Add GITHUB_TOKEN environment variable in Vercel`;
+                } else {
+                    status.innerHTML = `❌ Error: ${error.message}`;
+                }
+            } finally {
+                // Reset button
+                btn.disabled = false;
+                btn.innerHTML = btn.innerHTML.replace(/Testing\.\.\.|<span[^>]*><\/span>/, '').replace(/^Test /, 'Test ');
+                if (!btn.innerHTML.startsWith('Test ')) {
+                    btn.innerHTML = 'Test ' + btn.innerHTML;
+                }
+            }
+        }
+
+        // Auto-populate test URLs when clicking on them
+        document.querySelectorAll('.url-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const url = item.querySelector('.url-link').textContent;
+                const type = item.querySelector('.url-type').textContent.toLowerCase();
+                
+                if (type.includes('news') || type.includes('ai') || type.includes('tech') || type.includes('blog')) {
+                    document.getElementById('news-url').value = url;
+                } else if (type.includes('pdf') || type.includes('resource') || type.includes('report')) {
+                    document.getElementById('resource-url').value = url;
+                } else if (type.includes('youtube')) {
+                    document.getElementById('youtube-url').value = url;
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

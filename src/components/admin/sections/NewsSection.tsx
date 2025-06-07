@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useFormSubmit } from '../../../hooks/useFormSubmit';
 import { NewsItem } from '../../../../lib/content-loader';
-import { useEffect } from 'react';
 
 interface NewsSectionProps {
   newsItems: NewsItem[];
@@ -13,17 +12,8 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
   const [url, setUrl] = useState('');
   const [featured, setFeatured] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [isProduction, setIsProduction] = useState(false);
   const [generatedMarkdown, setGeneratedMarkdown] = useState<string>('');
   const [autoDeployed, setAutoDeployed] = useState(false);
-  
-  // Check if we're in production environment
-  useEffect(() => {
-    // In Next.js, process.env.NODE_ENV is replaced at build time
-    // We can't access it directly in client components, so we'll check the hostname
-    const hostname = window.location.hostname;
-    setIsProduction(hostname !== 'localhost' && hostname !== '127.0.0.1');
-  }, []);
   
   const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
     async (formData: { url: string; featured: boolean }) => {
@@ -126,7 +116,7 @@ ${data.metadata.summary}
                 <p>{error.toString()}</p>
                 {error.toString().includes('Authentication required') && (
                   <p className="mt-2 text-sm">
-                    💡 <strong>Action needed:</strong> Please ensure you're logged in to the admin interface.
+                                         💡 <strong>Action needed:</strong> Please ensure you&apos;re logged in to the admin interface.
                   </p>
                 )}
                 {error.toString().includes('GITHUB_TOKEN') && (
@@ -159,7 +149,7 @@ ${data.metadata.summary}
                 {generatedMarkdown && !autoDeployed && (
                   <div className="mt-4">
                     <p className="text-sm mb-2 font-medium">
-                      📋 Manual deployment required - copy this markdown and save it as a .md file in your repository's content/news directory:
+                                             📋 Manual deployment required - copy this markdown and save it as a .md file in your repository&apos;s content/news directory:
                     </p>
                     <div className="relative">
                       <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-60 border border-gray-600">

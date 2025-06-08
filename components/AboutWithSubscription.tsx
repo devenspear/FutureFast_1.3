@@ -1,32 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { defaultAboutFutureFastContent } from '../lib/content';
 
 // Use the default content directly
 const content = defaultAboutFutureFastContent;
-
-// Define a type for the Turnstile object on the window
-interface Turnstile {
-  render: (container: string | HTMLElement, options: TurnstileOptions) => void;
-  reset: (widgetIdOrContainer: string | HTMLElement) => void;
-}
-
-interface TurnstileOptions {
-  sitekey: string;
-  callback: (token: string) => void;
-  'expired-callback'?: () => void;
-  'error-callback'?: () => void;
-  theme?: 'light' | 'dark' | 'auto';
-  // Add other options as needed
-}
-
-declare global {
-  interface Window {
-    turnstile?: Turnstile;
-  }
-}
 
 export default function AboutWithSubscription() {
   // Form state
@@ -44,63 +23,6 @@ export default function AboutWithSubscription() {
     message: string;
   } | null>(null);
   
-  const [turnstileToken, setTurnstileToken] = useState('');
-  const turnstileRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!turnstileRef.current) return;
-    if (typeof window === 'undefined') return;
-
-    const currentTurnstileRef = turnstileRef.current; // Capture ref for cleanup
-
-    if (window.turnstile) { // Script already loaded, try to render directly
-      if (currentTurnstileRef) {
-        window.turnstile.render(currentTurnstileRef, {
-          sitekey: '0x4AAAAAABerS3z0dQ0loAUa', // Reverted to previously working site key
-          callback: (token: string) => setTurnstileToken(token),
-          'expired-callback': () => setTurnstileToken(''),
-          'error-callback': () => {
-            setTurnstileToken('');
-            setSubmitResult({ success: false, message: 'Security check failed. Please try again.' });
-          },
-        });
-      }
-      return; // Exit if already loaded and rendered (or attempted)
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      if (window && window.turnstile && currentTurnstileRef) {
-        window.turnstile.render(currentTurnstileRef, {
-          sitekey: '0x4AAAAAABerS3z0dQ0loAUa', // Reverted to previously working site key
-          callback: (token: string) => setTurnstileToken(token),
-          'expired-callback': () => setTurnstileToken(''),
-          'error-callback': () => {
-            setTurnstileToken('');
-            setSubmitResult({ success: false, message: 'Security check failed. Please try again.' });
-          },
-        });
-      }
-    };
-    script.onerror = () => {
-      // Handle script loading errors, e.g., network issues or ad-blockers
-      setSubmitResult({ success: false, message: 'Could not load security check. Please disable ad-blockers or check your connection.'});
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      // Cleanup widget and script if component unmounts
-      if (currentTurnstileRef) {
-        currentTurnstileRef.innerHTML = ''; // Clear the widget using the captured ref
-      }
-      // Potentially remove the script if it was appended with a unique ID
-      // For simplicity, we are not removing it here, as it loads only once.
-    };
-  }, []); // Empty dependency array ensures this runs once on mount
-  
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -110,12 +32,6 @@ export default function AboutWithSubscription() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!turnstileToken) {
-      setSubmitResult({ success: false, message: 'Please complete the security check.' });
-      setIsSubmitting(false); // Ensure button is re-enabled
-      return;
-    }
 
     setIsSubmitting(true);
     setSubmitResult(null);
@@ -130,9 +46,8 @@ export default function AboutWithSubscription() {
         subject: 'Mailing List Signup - FutureFast.ai',
         inquiryType: 'newsletter',
         sourceWebsite: 'futurefast.ai',
-        sourcePage: typeof window !== 'undefined' ? window.location.pathname : '/about', // More dynamic sourcePage
+        sourcePage: typeof window !== 'undefined' ? window.location.pathname : '/about',
         sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
-        turnstileToken: turnstileToken, // Send the token
       };
 
       const response = await fetch('https://crm.deven.site/api/submissions', {
@@ -143,8 +58,6 @@ export default function AboutWithSubscription() {
         },
         body: JSON.stringify(payload),
       });
-      
-      // const result = await response.json(); // Only parse if not OK or expecting specific data
 
       if (response.ok) {
         setSubmitResult({
@@ -152,14 +65,13 @@ export default function AboutWithSubscription() {
           message: "🎉 Welcome! We'll be in touch soon."
         });
         setFormData({ firstName: '', lastName: '', email: '', company: '' });
-        setTurnstileToken(''); // Clear token after successful submission
       } else {
         let errorPayload;
         try {
           errorPayload = await response.json();
-          console.error("API Error Response:", errorPayload); // Log full API error payload
+          console.error("API Error Response:", errorPayload);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_e) { // Prefix 'e' with an underscore to indicate it's intentionally unused
+        } catch (_e) {
           console.error("Failed to parse API error response as JSON:", await response.text());
           errorPayload = { message: 'Submission failed. The server response was not valid JSON.' };
         }
@@ -180,7 +92,7 @@ export default function AboutWithSubscription() {
         });
       }
     } catch (error) {
-      console.error("Form submission client-side error:", error); // Log detailed client-side error
+      console.error("Form submission client-side error:", error);
       let errorMessage = "An unexpected error occurred. Please try again later.";
       if (error instanceof Error) {
         errorMessage = `Error: ${error.message}. Check console for more details.`;
@@ -326,13 +238,10 @@ export default function AboutWithSubscription() {
                         placeholder="Company"
                       />
                     </div>
-                    
-                    {/* Turnstile Widget Placeholder */}
-                    <div ref={turnstileRef} className="my-4 flex justify-center"></div>
 
                     <button
                       type="submit"
-                      disabled={isSubmitting || !turnstileToken}
+                      disabled={isSubmitting}
                       className="w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? 'Subscribing...' : 'Subscribe Now'}

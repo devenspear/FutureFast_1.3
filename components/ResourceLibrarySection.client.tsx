@@ -18,7 +18,7 @@ function mapCMSToResourceCard(card: CMSCard): ResourceCardProps {
     date,
     description: card.description,
     image: card.image || `https://placehold.co/600x400/0a192f/64ffda?text=${encodeURIComponent(card.title.substring(0, 20))}`,
-    overlayText: card.tag,
+
     platform: card.type,
     url: card.url || '',
   };

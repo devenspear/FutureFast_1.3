@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { url, type = 'Report', publishDate } = body;
+    const { url, type = 'Report', publishDate, image } = body;
 
     if (!url) {
       return NextResponse.json(
@@ -168,7 +168,7 @@ url: "${url}"
 type: "${type}"
 month: "${month}"
 year: "${year}"
-description: "${metadata.description.replace(/"/g, '\\"')}"
+description: "${metadata.description.replace(/"/g, '\\"')}"${image ? `\nimage: \"${image}\"` : ''}
 tag: "${primaryTag}"
 ---
 

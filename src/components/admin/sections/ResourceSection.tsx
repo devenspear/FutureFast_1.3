@@ -4,6 +4,14 @@ import { useState } from 'react';
 import { useFormSubmit } from '../../../hooks/useFormSubmit';
 import { CatalogItem } from '../../../../lib/content-loader';
 
+// Form data structure including optional thumbnail file
+interface AddResourceFormData {
+  url: string;
+  type: string;
+  publishDate: string;
+  thumbnailFile?: File | null;
+}
+
 interface ResourceSectionProps {
   resources: CatalogItem[];
   types: string[];
@@ -18,6 +26,8 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
   const [showForm, setShowForm] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   
   // Default types if none provided
   const availableTypes = types.length > 0 ? types : [
@@ -29,14 +39,38 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
     'Case Study'
   ];
   
-  const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
-    async (formData: { url: string; type: string; publishDate: string }) => {
+  const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit<AddResourceFormData>(
+    async (formData: AddResourceFormData) => {
+      // 1. Upload thumbnail (if provided)
+      let imageUrl = '';
+      if (formData.thumbnailFile) {
+        const uploadData = new FormData();
+        uploadData.append('file', formData.thumbnailFile);
+        const uploadRes = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: uploadData,
+        });
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json();
+          throw new Error(err.error || 'Thumbnail upload failed');
+        }
+        const uploadJson = await uploadRes.json();
+        imageUrl = uploadJson.imageUrl;
+      }
+
+      // 2. Add resource with image URL (if any)
+      const bodyToSend = {
+        url: formData.url,
+        type: formData.type,
+        publishDate: formData.publishDate,
+        image: imageUrl,
+      };
       const response = await fetch('/api/admin/resources/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(bodyToSend),
       });
       
       if (!response.ok) {
@@ -52,6 +86,8 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
       setType(availableTypes[0]);
       const now = new Date();
       setPublishDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+      setThumbnailFile(null);
+      setThumbnailPreview(null);
     },
     (error) => {
       console.error('Error adding resource:', error);
@@ -61,7 +97,7 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
   
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSubmit({ url, type, publishDate });
+    handleSubmit({ url, type, publishDate, thumbnailFile });
   };
   
   return (
@@ -144,7 +180,38 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
                 When was this resource actually published? Defaults to current month. This controls where it appears in the library.
               </p>
             </div>
-            
+
+            <div>
+              <label htmlFor="thumbnail" className="block text-sm font-medium text-cyan-100 mb-1">
+                Thumbnail Image (optional)
+              </label>
+              <input
+                type="file"
+                id="thumbnail"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setThumbnailFile(file);
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setThumbnailPreview(reader.result as string);
+                    };
+                    reader.readAsDataURL(file);
+                  } else {
+                    setThumbnailPreview(null);
+                  }
+                }}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+              {thumbnailPreview && (
+                <img src={thumbnailPreview} alt="Thumbnail preview" className="mt-2 h-24 object-cover rounded" />
+              )}
+              <p className="mt-1 text-sm font-sans text-gray-400">
+                Upload a cover image (600×400 recommended). If omitted, a placeholder will be generated.
+              </p>
+            </div>
+
             <div className="pt-2">
               <button
                 type="submit"

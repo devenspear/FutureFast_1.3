@@ -11,12 +11,13 @@ interface NewsSectionProps {
 export default function NewsSection({ newsItems }: NewsSectionProps) {
   const [url, setUrl] = useState('');
   const [featured, setFeatured] = useState(false);
+  const [manualDate, setManualDate] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [generatedMarkdown, setGeneratedMarkdown] = useState<string>('');
   const [autoDeployed, setAutoDeployed] = useState(false);
   
   const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
-    async (formData: { url: string; featured: boolean }) => {
+    async (formData: { url: string; featured: boolean; manualDate?: string }) => {
       const response = await fetch('/api/admin/news/add', {
         method: 'POST',
         headers: {
@@ -78,7 +79,7 @@ ${data.metadata.summary}
     e.preventDefault();
     setAutoDeployed(false);
     setGeneratedMarkdown('');
-    handleSubmit({ url, featured });
+    handleSubmit({ url, featured, manualDate: manualDate || undefined });
   };
   
   // Dynamic success message based on deployment status
@@ -189,6 +190,18 @@ ${data.metadata.summary}
               <p className="mt-1 text-sm font-sans text-gray-400">
                 Paste the full URL to the news article. AI will generate a title and summary automatically.
               </p>
+            </div>
+            
+            <div>
+              <label htmlFor="news-date" className="block text-sm font-medium text-cyan-100 mb-1">Publication Date (optional)</label>
+              <input
+                type="date"
+                id="news-date"
+                value={manualDate}
+                onChange={(e) => setManualDate(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+              <p className="mt-1 text-sm font-sans text-gray-400">Leave blank to auto-detect.</p>
             </div>
             
             <div className="flex items-center">

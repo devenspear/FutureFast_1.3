@@ -134,7 +134,7 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { url, featured = false } = body;
+    const { url, featured = false, manualDate } = body;
 
     if (!url) {
       return NextResponse.json(
@@ -165,17 +165,57 @@ export async function POST(request: Request) {
     // Generate metadata using AI
     const metadata = await generateNewsMetadata(url);
 
+    // Helper: scrape date from HTML
+    async function scrapePublishedDate(targetUrl: string): Promise<string | null> {
+      try {
+        const res = await fetch(targetUrl);
+        const html = await res.text();
+        const metaRegexes = [
+          /<meta[^>]*property=["']article:published_time["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+          /<meta[^>]*name=["']pubdate["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+          /<meta[^>]*name=["']date["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+          /<meta[^>]*property=["']og:published_time["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+          /<time[^>]*datetime=["']([^"']+)["'][^>]*>/i,
+        ];
+        for (const regex of metaRegexes) {
+          const match = regex.exec(html);
+          if (match && match[1]) return match[1];
+        }
+      } catch (_) {
+        // ignore errors
+      }
+      return null;
+    }
+
+    let finalDateIso: string;
+    if (manualDate) {
+      finalDateIso = new Date(manualDate).toISOString();
+    } else {
+      const scraped = await scrapePublishedDate(url);
+      let latest: Date | null = null;
+      if (scraped) {
+        const d = new Date(scraped);
+        if (!isNaN(d.getTime())) latest = d;
+      }
+      if (metadata.publishedDate) {
+        const aiD = new Date(metadata.publishedDate);
+        if (!isNaN(aiD.getTime()) && (!latest || aiD > latest)) {
+          latest = aiD;
+        }
+      }
+      finalDateIso = (latest ?? new Date()).toISOString();
+    }
+
     // Create markdown content with YAML frontmatter
     const markdownContent = `---
 title: "${metadata.title.replace(/"/g, '\\"')}"
 url: "${url}"
 source: "${metadata.source.replace(/"/g, '\\"')}"
-date: "${metadata.publishedDate}"
-publishedDate: "${metadata.publishedDate}"
+date: "${finalDateIso}"
 featured: ${featured}
 icon: "📰"
 summary: "${metadata.summary.replace(/"/g, '\\"')}"
-tags: [${metadata.tags.map((tag: string) => `"${tag.replace(/"/g, '\"')}"`).join(', ')}]
+tags: [${metadata.tags.map((tag: string) => `"${tag.replace(/"/g, '\\"')}"`).join(', ')}]
 ---
 
 ${metadata.summary}

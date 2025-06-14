@@ -36,7 +36,7 @@ export default function AboutWithSubscription() {
 
             {/* Subscription pitch text */}
             <p>
-              Welcome to the Future of Faster Thinking. If you're ready to ride the wave instead of being swept away by it — you're in the right place! 👉 <strong className="text-purple-100">Join our private list</strong> for early access to disruptive ideas, tools, and strategies to stay <em>future-ready</em>.
+              Welcome to the Future of Faster Thinking. If you&apos;re ready to ride the wave instead of being swept away by it — you&apos;re in the right place! 👉 <strong className="text-purple-100">Join our private list</strong> for early access to disruptive ideas, tools, and strategies to stay <em>future-ready</em>.
             </p>
           </div>
 

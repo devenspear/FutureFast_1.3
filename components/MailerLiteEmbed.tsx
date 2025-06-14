@@ -15,16 +15,16 @@ export default function MailerLiteEmbed() {
   // Load the MailerLite universal script once on mount
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if ((window as any).ml) return; // already loaded
-
+    const win = window as typeof window & { ml?: (event: string, account: string) => void };
+    if (win.ml) return; // already loaded
     const script = document.createElement("script");
     script.src = "https://assets.mailerlite.com/js/universal.js";
     script.async = true;
     script.onload = () => {
-      // @ts-ignore – MailerLite exposes global `ml`
-      if (window.ml) {
-        // @ts-ignore
-        window.ml("account", "1595754");
+      // MailerLite exposes global `ml`, typings not available
+      const winMl = (window as typeof window & { ml?: (event: string, account: string) => void }).ml;
+      if (winMl) {
+        winMl("account", "1595754");
       }
     };
     document.body.appendChild(script);
@@ -47,8 +47,8 @@ export default function MailerLiteEmbed() {
             <div class="ml-form-fieldRow"><div class="ml-field-group ml-field-name ml-validate-required"><label>First Name</label><input aria-label="name" aria-required="true" type="text" class="form-control" name="fields[name]" autocomplete="given-name"></div></div>
             <div class="ml-form-fieldRow"><div class="ml-field-group ml-field-last_name"><label>Last Name</label><input aria-label="last_name" type="text" class="form-control" name="fields[last_name]" autocomplete="family-name"></div></div>
             <div class="ml-form-fieldRow"><div class="ml-field-group ml-field-email ml-validate-email ml-validate-required"><label>Email</label><input aria-label="email" aria-required="true" type="email" class="form-control" name="fields[email]" autocomplete="email"></div></div>
-            <div class="ml-form-fieldRow"><div class="ml-field-group ml-field-company"><label>Company</label><input aria-label="company" type="text" class="form-control" name="fields[company]"></div></div>
-            <div class="ml-form-fieldRow ml-last-item"><div class="ml-field-group ml-field-phone"><label>Phone</label><input aria-label="phone" type="text" class="form-control" name="fields[phone]"></div></div>
+            <div class="ml-form-fieldRow"><div class="ml-field-group ml-field-phone"><label>Phone (optional)</label><input aria-label="phone" type="text" class="form-control" name="fields[phone]"></div></div>
+            <div class="ml-form-fieldRow ml-last-item"><div class="ml-field-group ml-field-note ml-validate-required"><label>Comment</label><textarea class="form-control" name="fields[note]" aria-label="note" aria-required="true" maxlength="255"></textarea></div></div>
           </div>
           <input type="hidden" name="ml-submit" value="1">
           <div class="ml-form-embedSubmit"><button type="submit" class="primary">Subscribe</button></div>

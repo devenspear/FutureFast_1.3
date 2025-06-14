@@ -53,6 +53,53 @@ export default function VideoInterviewsSection() {
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   
+  // Client-side cache key and duration (30 minutes)
+  const CACHE_KEY = 'youtube_videos_cache';
+  const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+  // Check if cached data is still valid
+  const getCachedData = (): YouTubeVideo[] | null => {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return null;
+      
+      const { data, timestamp } = JSON.parse(cached);
+      const now = Date.now();
+      
+      // Check if cache is still valid (within 30 minutes)
+      if (now - timestamp < CACHE_DURATION) {
+        console.log('Using cached YouTube data');
+        return data;
+      } else {
+        // Cache expired, remove it
+        localStorage.removeItem(CACHE_KEY);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error reading YouTube cache:', error);
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+  };
+
+  // Save data to cache
+  const setCachedData = (data: YouTubeVideo[]) => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const cacheData = {
+        data,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      console.log('YouTube data cached for 30 minutes');
+    } catch (error) {
+      console.error('Error caching YouTube data:', error);
+    }
+  };
+
   // Sort videos by published date (newest first)
   const sortedVideos = [...videos].sort((a, b) => 
     new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
@@ -66,15 +113,44 @@ export default function VideoInterviewsSection() {
       document.head.appendChild(style);
     }
 
-    // Fetch videos on component mount
+    // Add pulse animation styles
+    const style = document.createElement('style');
+    const pulseAnimation = `
+      @keyframes glow-pulse {
+        0%, 100% { box-shadow: 0 0 5px rgba(34, 211, 238, 0.3); }
+        50% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.6), 0 0 30px rgba(34, 211, 238, 0.4); }
+      }
+    `;
+    
+    if (!document.querySelector('#glow-pulse-styles')) {
+      style.id = 'glow-pulse-styles';
+      style.textContent = pulseAnimation;
+      document.head.appendChild(style);
+    }
+
+    // Fetch videos with caching
     const fetchVideos = async () => {
       try {
         setLoading(true);
+        
+        // First, try to get cached data
+        const cachedVideos = getCachedData();
+        if (cachedVideos && cachedVideos.length > 0) {
+          setVideos(cachedVideos);
+          setLoading(false);
+          return;
+        }
+
+        // If no valid cache, fetch from API
+        console.log('Fetching fresh YouTube data from API');
         const response = await fetch('/api/youtube');
         if (!response.ok) {
           throw new Error(`Failed to fetch videos: ${response.status}`);
         }
         const data = await response.json();
+        
+        // Cache the fresh data
+        setCachedData(data);
         setVideos(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');

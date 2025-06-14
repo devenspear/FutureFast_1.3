@@ -53,34 +53,98 @@ export default function NewsAndDisruptionSection() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
+  // Client-side cache key and duration (15 minutes for news)
+  const CACHE_KEY = 'news_items_cache';
+  const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+  // Check if cached data is still valid
+  const getCachedData = (): NewsItem[] | null => {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return null;
+      
+      const { data, timestamp } = JSON.parse(cached);
+      const now = Date.now();
+      
+      // Check if cache is still valid (within 15 minutes)
+      if (now - timestamp < CACHE_DURATION) {
+        console.log('Using cached news data');
+        return data;
+      } else {
+        // Cache expired, remove it
+        localStorage.removeItem(CACHE_KEY);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error reading news cache:', error);
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+  };
+
+  // Save data to cache
+  const setCachedData = (data: NewsItem[]) => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const cacheData = {
+        data,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      console.log('News data cached for 15 minutes');
+    } catch (error) {
+      console.error('Error caching news data:', error);
+    }
+  };
+  
   useEffect(() => {
-    // Fetch news items from the API endpoint
-    fetch('/api/news')
-      .then(response => {
+    // Fetch news items with caching
+    const fetchNews = async () => {
+      try {
+        setIsLoading(true);
+        
+        // First, try to get cached data
+        const cachedNews = getCachedData();
+        if (cachedNews && cachedNews.length > 0) {
+          setNewsItems(cachedNews);
+          setIsLoading(false);
+          return;
+        }
+
+        // If no valid cache, fetch from API
+        console.log('Fetching fresh news data from API');
+        const response = await fetch('/api/news');
         console.log('News API response status:', response.status);
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.json();
-      })
-      .then(data => {
+        
+        const data = await response.json();
         console.log('Fetched news items:', data);
+        
         if (Array.isArray(data) && data.length > 0) {
           // Limit to 4 items for display
           const limitedItems = data.slice(0, 4);
+          setCachedData(limitedItems);
           setNewsItems(limitedItems);
         } else {
           // Use default items if no data
           setNewsItems(defaultNewsItems);
         }
-        setIsLoading(false);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error fetching news items:', error);
         // Use default items on error
         setNewsItems(defaultNewsItems);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchNews();
   }, []);
 
   return (

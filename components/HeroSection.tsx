@@ -26,11 +26,58 @@ interface Bubble {
 // Gold: #ffd700
 
 export default function HeroSection() {
-  const [content, setContent] = useState({ headline: '', subheadline: '' });
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const [content, setContent] = useState({ headline: 'Future Fast', subheadline: 'Accelerating Tomorrow\'s Innovations Today' });
+  const [textAreas, setTextAreas] = useState<Array<{x: number, y: number, width: number, height: number}>>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number | undefined>(undefined);
-  const textAreasRef = useRef<Array<{x: number, y: number, width: number, height: number}>>([]);
+  const animationRef = useRef<number>();
+
+  // Client-side cache for hero content (1 hour)
+  const CACHE_KEY = 'hero_content_cache';
+  const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+
+  // Check if cached data is still valid
+  const getCachedContent = () => {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return null;
+      
+      const { data, timestamp } = JSON.parse(cached);
+      const now = Date.now();
+      
+      // Check if cache is still valid (within 1 hour)
+      if (now - timestamp < CACHE_DURATION) {
+        console.log('Using cached hero content');
+        return data;
+      } else {
+        // Cache expired, remove it
+        localStorage.removeItem(CACHE_KEY);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error reading hero cache:', error);
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+  };
+
+  // Save content to cache
+  const setCachedContent = (data: typeof content) => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const cacheData = {
+        data,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      console.log('Hero content cached for 1 hour');
+    } catch (error) {
+      console.error('Error caching hero content:', error);
+    }
+  };
 
   // Initialize random bubbles with unique characteristics
   const initializeBubbles = () => {
@@ -93,18 +140,18 @@ export default function HeroSection() {
       });
     });
     
-    textAreasRef.current = areas;
+    setTextAreas(areas);
   };
 
   // Check if position overlaps with text areas
   const isOverlappingText = useCallback((x: number, y: number, size: number) => {
-    return textAreasRef.current.some(area => 
+    return textAreas.some(area => 
       x < area.x + area.width &&
       x + size > area.x &&
       y < area.y + area.height &&
       y + size > area.y
     );
-  }, []);
+  }, [textAreas]);
 
   // Generate truly random movement that avoids repeated patterns
   const updateBubble = useCallback((bubble: Bubble, containerWidth: number, containerHeight: number): Bubble => {
@@ -148,10 +195,10 @@ export default function HeroSection() {
     // Avoid text areas by adding repulsion force
     if (isOverlappingText(newX, newY, bubble.size)) {
       // Find nearest text area center
-      let nearestArea = textAreasRef.current[0];
+      let nearestArea = textAreas[0];
       let minDistance = Infinity;
       
-      textAreasRef.current.forEach(area => {
+      textAreas.forEach(area => {
         const areaCenterX = area.x + area.width / 2;
         const areaCenterY = area.y + area.height / 2;
         const distance = Math.sqrt(
@@ -236,18 +283,31 @@ export default function HeroSection() {
   }, [isOverlappingText]);
 
   useEffect(() => {
-    // Load content from the server
-    fetch('/api/hero')
-      .then(response => response.json())
-      .then(data => setContent(data))
-      .catch(error => {
+    // Load content with caching
+    const loadContent = async () => {
+      try {
+        // First, try to get cached content
+        const cachedContent = getCachedContent();
+        if (cachedContent) {
+          setContent(cachedContent);
+          return;
+        }
+
+        // If no valid cache, fetch from API
+        console.log('Fetching fresh hero content from API');
+        const response = await fetch('/api/hero');
+        const data = await response.json();
+        
+        // Cache the fresh content
+        setCachedContent(data);
+        setContent(data);
+      } catch (error) {
         console.error('Error loading hero content:', error);
-        // Fallback content
-        setContent({
-          headline: 'Future Fast',
-          subheadline: 'Accelerating Tomorrow&apos;s Innovations Today'
-        });
-      });
+        // Fallback content is already set in initial state
+      }
+    };
+
+    loadContent();
 
     // Initialize bubbles and start animation
     initializeBubbles();

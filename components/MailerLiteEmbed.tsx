@@ -629,7 +629,7 @@ export default function MailerLiteEmbed() {
         }
 
         // Check reCAPTCHA
-        const recaptchaResponse = (window as any).grecaptcha?.getResponse();
+        const recaptchaResponse = (window as typeof window & { grecaptcha?: { getResponse: () => string } })?.grecaptcha?.getResponse();
         if (!recaptchaResponse) {
           // Show reCAPTCHA error
           const recaptchaDiv = document.querySelector('#mlb2-27227712 .g-recaptcha');
@@ -665,7 +665,6 @@ export default function MailerLiteEmbed() {
         try {
           // Show loading state
           const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-          const originalText = submitButton?.textContent;
           if (submitButton) {
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
@@ -675,7 +674,7 @@ export default function MailerLiteEmbed() {
           const formData = new FormData(form);
           
           // Submit to MailerLite via fetch
-          const response = await fetch(form.action, {
+          await fetch(form.action, {
             method: 'POST',
             body: formData,
             mode: 'no-cors' // This prevents CORS issues but we won't get response details
@@ -759,12 +758,12 @@ export default function MailerLiteEmbed() {
     // Force reCAPTCHA to load and be visible
     const forceRecaptchaLoad = () => {
       // Check if reCAPTCHA API is loaded
-      if (typeof window !== 'undefined' && (window as any).grecaptcha) {
+      if (typeof window !== 'undefined' && (window as typeof window & { grecaptcha?: { render: (element: Element, options: { sitekey: string }) => void } })?.grecaptcha) {
         const recaptchaDiv = document.querySelector('#mlb2-27227712 .g-recaptcha');
         if (recaptchaDiv && !recaptchaDiv.innerHTML.trim()) {
           try {
             // Force render the reCAPTCHA
-            (window as any).grecaptcha.render(recaptchaDiv, {
+            (window as typeof window & { grecaptcha?: { render: (element: Element, options: { sitekey: string }) => void } })?.grecaptcha?.render(recaptchaDiv, {
               'sitekey': '6Lf1KHQUAAAAAFNKEX1hdSWCS3mRMv4FlFaNslaD'
             });
           } catch (error) {

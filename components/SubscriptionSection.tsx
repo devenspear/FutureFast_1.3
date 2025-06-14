@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import SubscriptionForm from './SubscriptionForm';
+import MailerLiteEmbed from './MailerLiteEmbed';
 
 export default function SubscriptionSection() {
   return (
@@ -16,7 +16,7 @@ export default function SubscriptionSection() {
             Join the FutureFast community to receive exclusive insights, early access to resources, and invitations to special events.
           </p>
           
-          <SubscriptionForm />
+          <MailerLiteEmbed />
         </div>
       </div>
     </section>

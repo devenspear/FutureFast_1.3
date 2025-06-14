@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight, FaPlay, FaCalendarAlt, FaYoutube } from 'react-icons/fa';
 
@@ -16,36 +16,7 @@ export interface YouTubeVideo {
   featured?: boolean;
 }
 
-const scrollAmount = 320;
-
-// Define keyframes for the pulse animation
-const pulseAnimation = `
-@keyframes pulse-animation {
-  0% {
-    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
-    transform: translateY(-50%) scale(1.3);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
-    transform: translateY(-50%) scale(1.4);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
-    transform: translateY(-50%) scale(1.3);
-  }
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3), 0 0 15px rgba(59, 130, 246, 0.2);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4);
-    transform: scale(1.05);
-  }
-}
-`;
+const scrollAmount = 300;
 
 export default function VideoInterviewsSection() {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
@@ -58,7 +29,7 @@ export default function VideoInterviewsSection() {
   const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
 
   // Check if cached data is still valid
-  const getCachedData = (): YouTubeVideo[] | null => {
+  const getCachedData = useCallback((): YouTubeVideo[] | null => {
     if (typeof window === 'undefined') return null;
     
     try {
@@ -82,10 +53,10 @@ export default function VideoInterviewsSection() {
       localStorage.removeItem(CACHE_KEY);
       return null;
     }
-  };
+  }, [CACHE_KEY, CACHE_DURATION]);
 
   // Save data to cache
-  const setCachedData = (data: YouTubeVideo[]) => {
+  const setCachedData = useCallback((data: YouTubeVideo[]) => {
     if (typeof window === 'undefined') return;
     
     try {
@@ -98,7 +69,7 @@ export default function VideoInterviewsSection() {
     } catch (error) {
       console.error('Error caching YouTube data:', error);
     }
-  };
+  }, [CACHE_KEY]);
 
   // Sort videos by published date (newest first)
   const sortedVideos = [...videos].sort((a, b) => 
@@ -106,13 +77,6 @@ export default function VideoInterviewsSection() {
   );
 
   useEffect(() => {
-    // Add the keyframes to the document
-    if (typeof document !== 'undefined') {
-      const style = document.createElement('style');
-      style.textContent = pulseAnimation;
-      document.head.appendChild(style);
-    }
-
     // Add pulse animation styles
     const style = document.createElement('style');
     const pulseAnimation = `
@@ -160,7 +124,7 @@ export default function VideoInterviewsSection() {
     };
 
     fetchVideos();
-  }, []);
+  }, [getCachedData, setCachedData]);
 
   const scrollLeft = () => {
     if (scrollRef.current) {

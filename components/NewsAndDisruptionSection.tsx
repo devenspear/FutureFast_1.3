@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { FaExternalLinkAlt, FaCalendarAlt, FaNewspaper } from 'react-icons/fa';
 import { trackNewsClick, trackDisruptionWeeklyClick } from '../lib/analytics';
@@ -58,7 +58,7 @@ export default function NewsAndDisruptionSection() {
   const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 
   // Check if cached data is still valid
-  const getCachedData = (): NewsItem[] | null => {
+  const getCachedData = useCallback((): NewsItem[] | null => {
     if (typeof window === 'undefined') return null;
     
     try {
@@ -82,10 +82,10 @@ export default function NewsAndDisruptionSection() {
       localStorage.removeItem(CACHE_KEY);
       return null;
     }
-  };
+  }, [CACHE_KEY, CACHE_DURATION]);
 
   // Save data to cache
-  const setCachedData = (data: NewsItem[]) => {
+  const setCachedData = useCallback((data: NewsItem[]) => {
     if (typeof window === 'undefined') return;
     
     try {
@@ -98,7 +98,7 @@ export default function NewsAndDisruptionSection() {
     } catch (error) {
       console.error('Error caching news data:', error);
     }
-  };
+  }, [CACHE_KEY]);
   
   useEffect(() => {
     // Fetch news items with caching
@@ -145,7 +145,7 @@ export default function NewsAndDisruptionSection() {
     };
 
     fetchNews();
-  }, []);
+  }, [getCachedData, setCachedData]);
 
   return (
     <section className="py-16 bg-black text-white" id="news-and-disruption">

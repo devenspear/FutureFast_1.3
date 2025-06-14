@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useFormSubmit } from '../../../hooks/useFormSubmit';
 import { CatalogItem } from '../../../../lib/content-loader';
 
@@ -205,7 +206,7 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               {thumbnailPreview && (
-                <img src={thumbnailPreview} alt="Thumbnail preview" className="mt-2 h-24 object-cover rounded" />
+                <Image src={thumbnailPreview} alt="Thumbnail preview" width={200} height={200} className="mt-2 h-24 object-cover rounded" />
               )}
               <p className="mt-1 text-sm font-sans text-gray-400">
                 Upload a cover image (600×400 recommended). If omitted, a placeholder will be generated.

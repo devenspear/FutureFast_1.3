@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 interface Bubble {
   id: number;
@@ -30,14 +30,13 @@ export default function HeroSection() {
   const [content, setContent] = useState({ headline: 'Future Fast', subheadline: 'Accelerating Tomorrow\'s Innovations Today' });
   const [textAreas, setTextAreas] = useState<Array<{x: number, y: number, width: number, height: number}>>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
 
   // Client-side cache for hero content (1 hour)
   const CACHE_KEY = 'hero_content_cache';
   const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
-  // Check if cached data is still valid
-  const getCachedContent = () => {
+  const getCachedContent = useCallback(() => {
     if (typeof window === 'undefined') return null;
     
     try {
@@ -61,10 +60,9 @@ export default function HeroSection() {
       localStorage.removeItem(CACHE_KEY);
       return null;
     }
-  };
+  }, [CACHE_KEY, CACHE_DURATION]);
 
-  // Save content to cache
-  const setCachedContent = (data: typeof content) => {
+  const setCachedContent = useCallback((data: typeof content) => {
     if (typeof window === 'undefined') return;
     
     try {
@@ -77,7 +75,7 @@ export default function HeroSection() {
     } catch (error) {
       console.error('Error caching hero content:', error);
     }
-  };
+  }, [CACHE_KEY]);
 
   // Initialize random bubbles with unique characteristics
   const initializeBubbles = () => {
@@ -280,7 +278,7 @@ export default function HeroSection() {
       scaleDirection: newScaleDirection,
       pathMemory: newPathMemory
     };
-  }, [isOverlappingText]);
+  }, [isOverlappingText, textAreas]);
 
   useEffect(() => {
     // Load content with caching
@@ -323,7 +321,7 @@ export default function HeroSection() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [getCachedContent, setCachedContent]);
 
   useEffect(() => {
     // Start animation when bubbles are initialized

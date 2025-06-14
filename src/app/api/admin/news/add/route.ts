@@ -181,7 +181,7 @@ export async function POST(request: Request) {
           const match = regex.exec(html);
           if (match && match[1]) return match[1];
         }
-      } catch (_) {
+       } catch {
         // ignore errors
       }
       return null;

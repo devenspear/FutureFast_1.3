@@ -56,35 +56,32 @@ export default function SubscriptionForm() {
     }
 
     try {
-      console.log('Form validation passed, submitting to DevCo CRM with data:', {
+      console.log('Form validation passed, submitting to internal API with data:', {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         company: formData.company || '(not provided)'
       });
       
-      // Submit to DevCo CRM API
-      const response = await fetch('https://dev-co-crm.vercel.app/api/submissions', {
+      // Submit to our internal subscription API route
+      const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': 'crm_d959d98a518641ecc8555ac54e371891e0b9a48fa1ab352425d69d557a6cb2f5'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
-          note: `FutureFast.ai newsletter signup${formData.company ? ` - Company: ${formData.company}` : ''}`,
-          sourceWebsite: 'futurefast.ai',
-          sourcePage: 'Newsletter Signup',
-          // Skip Turnstile verification for now - will implement later
-          skipBotCheck: true
+          company: formData.company
         })
       });
       
-      console.log('DevCo CRM response received, status:', response.status);
+      console.log('Internal API response received, status:', response.status);
       
-      if (response.ok) {
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
         console.log('Form submission successful, resetting form');
         // Reset form and show success message
         setFormData({
@@ -95,9 +92,8 @@ export default function SubscriptionForm() {
         });
         setSubmitStatus('success');
       } else {
-        const errorData = await response.json();
-        console.error('DevCo CRM returned error:', errorData);
-        throw new Error(errorData.message || 'Submission failed. Please try again.');
+        console.error('Subscription API returned error:', result);
+        throw new Error(result.message || 'Submission failed. Please try again.');
       }
     } catch (error) {
       console.error('Form submission error details:', error);

@@ -41,20 +41,14 @@ export default function AboutWithSubscription() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phone: '', // Not collected in this form
-        note: formData.company || '', // Use company field for note
-        subject: 'Mailing List Signup - FutureFast.ai',
-        inquiryType: 'newsletter',
-        sourceWebsite: 'futurefast.ai',
-        sourcePage: typeof window !== 'undefined' ? window.location.pathname : '/about',
-        sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
+        company: formData.company
       };
 
-      const response = await fetch('https://crm.deven.site/api/submissions', {
+      const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': 'crm_d959d98a518641ecc8555ac54e371891e0b9a48fa1ab352425d69d557a6cb2f5',
+          
         },
         body: JSON.stringify(payload),
       });

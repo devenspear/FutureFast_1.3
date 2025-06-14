@@ -505,7 +505,7 @@ export default function MailerLiteEmbed() {
 
     // Add client-side validation for email and phone number
     const addFormValidation = () => {
-      const form = document.querySelector('#mlb2-27227712 form.ml-block-form');
+      const form = document.querySelector('#mlb2-27227712 form.ml-block-form') as HTMLFormElement;
       if (!form) return;
 
       // Improved email validation regex (more permissive but still valid)

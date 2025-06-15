@@ -88,12 +88,12 @@ export default function HeroSection() {
       
       // Calculate maximum speed based on diameter (diameter per second = diameter/60 per frame at 60fps)
       // Reduced speed by 90% by increasing the denominator (slower movement)
-      const maxSpeedPerFrame = size / 1800; // Changed from 600 to 1800 (3x slower)
+      const maxSpeedPerFrame = size / 3600; // Changed from 1800 to 3600 (2x slower)
       
       // Generate random initial velocity within the diameter-based speed limit
       const randomDirection = Math.random() * 2 * Math.PI; // Random direction in radians
       // Reduced initial speed by 80% by reducing the multiplier
-      const randomSpeed = Math.random() * maxSpeedPerFrame * 0.08; // Reduced from 0.32 to 0.16 (50% slower)
+      const randomSpeed = Math.random() * maxSpeedPerFrame * 0.04; // Reduced from 0.08 to 0.04 (2x slower)
       
       const bubble: Bubble = {
         id: i,
@@ -106,11 +106,11 @@ export default function HeroSection() {
         hue: Math.random() * 120 + 180, // Blue to cyan range
         saturation: Math.random() * 40 + 60, // 60-100% saturation
         lightness: Math.random() * 30 + 45, // 45-75% lightness
-        rotationSpeed: (Math.random() - 0.5) * 0.13, // Reduced from 0.4 to 0.13 (3x slower)
+        rotationSpeed: (Math.random() - 0.5) * 0.065, // Reduced from 0.13 to 0.065 (2x slower)
         rotation: Math.random() * 360,
         scaleDirection: Math.random() > 0.5 ? 1 : -1,
         scale: 1,
-        lastDirectionChange: Date.now() + Math.random() * 50000, // Increased from 5000 to 25000 (5x slower)
+        lastDirectionChange: Date.now() + Math.random() * 100000, // Increased from 50000 to 100000 (2x slower)
         pathMemory: []
       };
       newBubbles.push(bubble);
@@ -161,11 +161,11 @@ export default function HeroSection() {
 
     // Add random direction changes to prevent repetitive patterns
     if (now > bubble.lastDirectionChange) {
-      const randomFactor = 0.015; // Reduced from 0.3 to 0.06 (20% of original)
+      const randomFactor = 0.0075; // Reduced from 0.015 to 0.0075 (2x slower)
       newVx += (Math.random() - 0.5) * randomFactor;
       newVy += (Math.random() - 0.5) * randomFactor;
       
-      bubble.lastDirectionChange = now + Math.random() * 30000 + 10000; // Increased from 3000+1000 to 15000+5000 (5x slower)
+      bubble.lastDirectionChange = now + Math.random() * 60000 + 20000; // Increased from 30000+10000 to 60000+20000 (2x slower)
     }
 
     // Apply diameter-based speed limiting
@@ -253,8 +253,8 @@ export default function HeroSection() {
     }
 
     // Add slight random drift to prevent identical paths
-    const driftX = (Math.random() - 0.5) * 0.0017; // Reduced from 0.005 to 0.0017 (3x slower)
-    const driftY = (Math.random() - 0.5) * 0.0017; // Reduced from 0.005 to 0.0017 (3x slower)
+    const driftX = (Math.random() - 0.5) * 0.00085; // Reduced from 0.0017 to 0.00085 (2x slower)
+    const driftY = (Math.random() - 0.5) * 0.00085; // Reduced from 0.0017 to 0.00085 (2x slower)
 
     // Apply final velocity with drift, ensuring it still respects speed limit
     let finalVx = newVx + driftX;

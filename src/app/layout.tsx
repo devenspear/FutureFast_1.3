@@ -24,8 +24,8 @@ const orbitron = Orbitron({
 
 export const metadata: Metadata = {
   title: "FutureFast: Empowering Speed",
-  description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.",
-  metadataBase: new URL("https://futurefast.com"),
+  description: "Animated, mobile-first homepage for FutureFast.ai built with Next.js and Tailwind CSS.",
+  metadataBase: new URL("https://futurefast.ai"),
   robots: { index: true, follow: true },
   icons: { 
     icon: [
@@ -37,14 +37,24 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "FutureFast: Empowering Speed",
-    description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.",
-    url: "https://futurefast.com",
+    description: "Animated, mobile-first homepage for FutureFast.ai built with Next.js and Tailwind CSS.",
+    url: "https://futurefast.ai",
     siteName: "FutureFast",
-    images: [{ url: "https://futurefast.com/social-share.png?v=20250429", width: 1200, height: 630, alt: "FutureFast Social Share Image" }],
+    images: [{ 
+      url: "https://futurefast.ai/images/design-thinking-ai.jpg", 
+      width: 1200, 
+      height: 630, 
+      alt: "FutureFast - Design Thinking AI" 
+    }],
     locale: "en_US",
     type: "website",
   },
-  twitter: { card: "summary_large_image", title: "FutureFast: Empowering Speed", description: "Animated, mobile-first homepage for FutureFast.com built with Next.js and Tailwind CSS.", images: ["https://futurefast.com/twitter-share.png?v=20250429"] },
+  twitter: { 
+    card: "summary_large_image", 
+    title: "FutureFast: Empowering Speed", 
+    description: "Animated, mobile-first homepage for FutureFast.ai built with Next.js and Tailwind CSS.", 
+    images: ["https://futurefast.ai/images/design-thinking-ai.jpg"] 
+  },
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "" }
 };
 
@@ -63,7 +73,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="canonical" href="https://futurefast.com" />
+        <link rel="canonical" href="https://futurefast.ai" />
         <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION} />
         <Script src={`https://www.googletagmanager.com/gtag/js?id=G-F4CGW7GF6P`} strategy="afterInteractive" />
         <Script id="gtag-init" strategy="afterInteractive">
@@ -75,8 +85,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             "@context": "https://schema.org",
             "@type": "Organization",
             name: "FutureFast",
-            url: "https://futurefast.com",
-            logo: "https://futurefast.com/favicon.svg",
+            url: "https://futurefast.ai",
+            logo: "https://futurefast.ai/favicon.svg",
             sameAs: ["https://twitter.com/yourprofile","https://www.linkedin.com/in/yourprofile"]
           }) }}
         />

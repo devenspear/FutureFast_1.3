@@ -1,0 +1,234 @@
+import { Client } from '@notionhq/client';
+
+export interface NotionNewsItem {
+  id: string;
+  title: string;
+  source: string;
+  publishedDate: string;
+  sourceUrl: string;
+  status?: string;
+}
+
+class NotionClient {
+  private client: Client;
+  private databaseId: string;
+
+  constructor() {
+    this.client = new Client({
+      auth: process.env.NOTION_TOKEN,
+    });
+    this.databaseId = process.env.NOTION_DATABASE_ID || '';
+  }
+
+  async getNewsArticles(): Promise<NotionNewsItem[]> {
+    try {
+      const response = await this.client.databases.query({
+        database_id: this.databaseId,
+        filter: {
+          and: [
+            {
+              property: 'Status',
+              select: {
+                equals: 'Published'
+              }
+            }
+          ]
+        },
+        sorts: [
+          {
+            property: 'Publication Date',
+            direction: 'descending'
+          }
+        ],
+        page_size: 5 // Limit to 5 most recent articles
+      });
+
+      return response.results.map((page: any) => {
+        const properties = page.properties;
+        
+        return {
+          id: page.id,
+          title: this.extractTitle(properties.Title),
+          source: this.extractRichText(properties.Source),
+          publishedDate: this.extractDate(properties['Publication Date']),
+          sourceUrl: this.extractUrl(properties['Source URL']),
+          status: this.extractSelect(properties.Status),
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching from Notion:', error);
+      throw new Error('Failed to fetch news articles from Notion');
+    }
+  }
+
+  private extractTitle(titleProperty: any): string {
+    if (!titleProperty?.title) return '';
+    return titleProperty.title.map((t: any) => t.plain_text).join('');
+  }
+
+  private extractRichText(richTextProperty: any): string {
+    if (!richTextProperty?.rich_text) return '';
+    return richTextProperty.rich_text.map((t: any) => t.plain_text).join('');
+  }
+
+  private extractDate(dateProperty: any): string {
+    if (!dateProperty?.date?.start) return '';
+    return dateProperty.date.start;
+  }
+
+  private extractUrl(urlProperty: any): string {
+    return urlProperty?.url || '';
+  }
+
+  private extractSelect(selectProperty: any): string {
+    return selectProperty?.select?.name || '';
+  }
+
+  async getIncompleteRecords(): Promise<NotionNewsItem[]> {
+    try {
+      console.log('🔍 Querying records that need AI content extraction...');
+      
+      const response = await this.client.databases.query({
+        database_id: this.databaseId,
+        filter: {
+          and: [
+            {
+              property: 'Source URL',
+              url: {
+                is_not_empty: true
+              }
+            },
+            {
+              or: [
+                {
+                  property: 'Title',
+                  title: {
+                    is_empty: true
+                  }
+                },
+                {
+                  property: 'Source',
+                  rich_text: {
+                    is_empty: true
+                  }
+                },
+                {
+                  property: 'Publication Date',
+                  date: {
+                    is_empty: true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      });
+
+      console.log(`✅ Found ${response.results.length} records needing content extraction`);
+      
+      return response.results.map((page: any) => {
+        const properties = page.properties;
+        
+        return {
+          id: page.id,
+          title: this.extractTitle(properties.Title),
+          source: this.extractRichText(properties.Source),
+          publishedDate: this.extractDate(properties['Publication Date']),
+          sourceUrl: this.extractUrl(properties['Source URL']),
+          status: this.extractSelect(properties.Status),
+        };
+      });
+    } catch (error) {
+      console.error('❌ Failed to query incomplete records:', error);
+      throw error;
+    }
+  }
+
+  async updateRecord(pageId: string, updates: {
+    title?: string;
+    source?: string;
+    publishedDate?: string;
+  }): Promise<void> {
+    try {
+      console.log(`🔄 Updating record ${pageId} with AI-extracted content...`);
+      
+      const properties: any = {};
+      
+      if (updates.title) {
+        properties.Title = {
+          title: [
+            {
+              text: {
+                content: updates.title
+              }
+            }
+          ]
+        };
+      }
+      
+      if (updates.source) {
+        properties.Source = {
+          rich_text: [
+            {
+              text: {
+                content: updates.source
+              }
+            }
+          ]
+        };
+      }
+      
+      if (updates.publishedDate) {
+        properties['Publication Date'] = {
+          date: {
+            start: updates.publishedDate
+          }
+        };
+      }
+
+      // Automatically set Status to "Published" when AI populates the record
+      properties.Status = {
+        select: {
+          name: "Published"
+        }
+      };
+
+      await this.client.pages.update({
+        page_id: pageId,
+        properties
+      });
+
+      console.log(`✅ Successfully updated record ${pageId}`);
+      
+    } catch (error) {
+      console.error(`❌ Failed to update record ${pageId}:`, error);
+      throw error;
+    }
+  }
+
+  async getRecordById(pageId: string): Promise<NotionNewsItem | null> {
+    try {
+      const page = await this.client.pages.retrieve({ page_id: pageId });
+      
+      if (!('properties' in page)) {
+        return null;
+      }
+
+      const properties = page.properties;
+      
+      return {
+        id: page.id,
+        title: this.extractTitle(properties.Title),
+        source: this.extractRichText(properties.Source),
+        publishedDate: this.extractDate(properties['Publication Date']),
+        sourceUrl: this.extractUrl(properties['Source URL']),
+        status: this.extractSelect(properties.Status),
+      };
+    } catch (error) {
+      console.error(`❌ Failed to get record ${pageId}:`, error);
+      return null;
+    }
+  }
+}
+
+export default NotionClient; 

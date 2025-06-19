@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/ai-processing",
-      "schedule": "0 */3 * * *"
+      "schedule": "0 6,9,12 * * *"
     }
   ]
 } 

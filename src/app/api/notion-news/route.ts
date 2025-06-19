@@ -4,9 +4,9 @@ import NotionClient from '../../../../lib/notion-client';
 export async function GET() {
   try {
     // Check if Notion credentials are configured
-    if (!process.env.NOTION_TOKEN || !process.env.NOTION_DATABASE_ID) {
+    if ((!process.env.NOTION_API_KEY && !process.env.NOTION_TOKEN) || !process.env.NOTION_DATABASE_ID) {
       return NextResponse.json({ 
-        error: 'Notion credentials not configured. Please set NOTION_TOKEN and NOTION_DATABASE_ID environment variables.' 
+        error: 'Notion credentials not configured. Please set NOTION_API_KEY (or NOTION_TOKEN) and NOTION_DATABASE_ID environment variables.' 
       }, { status: 500 });
     }
 

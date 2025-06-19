@@ -15,7 +15,7 @@ class NotionClient {
 
   constructor() {
     this.client = new Client({
-      auth: process.env.NOTION_TOKEN,
+      auth: process.env.NOTION_API_KEY || process.env.NOTION_TOKEN,
     });
     this.databaseId = process.env.NOTION_DATABASE_ID || '';
   }

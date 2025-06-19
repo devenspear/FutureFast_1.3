@@ -1381,7 +1381,7 @@ export default function MailerLiteEmbed() {
                   <div class="ml-form-fieldRow ">
                     <div class="ml-field-group ml-field-name ml-validate-required">
 
-                      <label>First Name</label>
+                      <label>First name</label>
 
 
                       <!-- input -->

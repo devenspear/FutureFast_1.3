@@ -114,10 +114,17 @@ export default function NewsAndDisruptionSection() {
           return;
         }
 
-        // If no valid cache, fetch from API
-        console.log('Fetching fresh news data from API');
-        const response = await fetch('/api/news');
-        console.log('News API response status:', response.status);
+        // If no valid cache, fetch from API (try Notion first, fallback to regular news)
+        console.log('Fetching fresh news data from Notion API');
+        let response = await fetch('/api/notion-news');
+        console.log('Notion News API response status:', response.status);
+        
+        // If Notion API fails, fallback to regular news API
+        if (!response.ok) {
+          console.log('Notion API failed, falling back to regular news API');
+          response = await fetch('/api/news');
+          console.log('Fallback News API response status:', response.status);
+        }
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -127,8 +134,8 @@ export default function NewsAndDisruptionSection() {
         console.log('Fetched news items:', data);
         
         if (Array.isArray(data) && data.length > 0) {
-          // Limit to 4 items for display
-          const limitedItems = data.slice(0, 4);
+          // Show all 5 Notion articles (or limit to 5 if more)
+          const limitedItems = data.slice(0, 5);
           setCachedData(limitedItems);
           setNewsItems(limitedItems);
         } else {
@@ -153,11 +160,11 @@ export default function NewsAndDisruptionSection() {
       
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
         {/* News Articles - Left Side */}
-        <div className="lg:w-1/2">
+        <div className="lg:w-1/2 lg:pr-4">
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-pulse space-y-4">
-                {Array.from({ length: 4 }).map((_, index) => (
+                {Array.from({ length: 5 }).map((_, index) => (
                   <div key={index} className="py-4 px-3">
                     <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-700 rounded w-1/2"></div>
@@ -170,37 +177,37 @@ export default function NewsAndDisruptionSection() {
               {newsItems.map((item, idx) => (
                 <li 
                   key={idx} 
-                  className="py-4 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg"
+                  className="py-3 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg border-b border-gray-800/50 last:border-b-0"
                 >
                   <a 
                     href={item.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     onClick={() => trackNewsClick(item.title, item.source, item.url)}
-                    className="flex flex-col md:flex-row md:items-center gap-2 w-full group"
+                    className="flex flex-col sm:flex-row sm:items-center gap-2 w-full group"
                   >
-                    <div className="flex-1">
-                      <h2 className="text-lg font-bold group-hover:text-cyan-400 transition-colors">
-                        {item.icon && <span className="mr-2" style={{fontSize: '1.25rem'}}>{item.icon}</span>}
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-base sm:text-lg font-bold group-hover:text-cyan-400 transition-colors leading-tight line-clamp-2">
+                        {item.icon && <span className="mr-2 text-lg">{item.icon}</span>}
                         {item.title}
                       </h2>
                       
-                      <div className="flex flex-wrap items-center mt-1 text-xs text-gray-400 gap-3">
+                      <div className="flex flex-wrap items-center mt-2 text-xs text-gray-400 gap-3">
                         <div className="flex items-center gap-1">
-                          <FaNewspaper className="text-cyan-500" />
-                          <span>{item.source}</span>
+                          <FaNewspaper className="text-cyan-500 text-xs" />
+                          <span className="truncate">{item.source}</span>
                         </div>
                         
                         <div className="flex items-center gap-1">
-                          <FaCalendarAlt className="text-cyan-500" />
-                          <span>{item.date}</span>
+                          <FaCalendarAlt className="text-cyan-500 text-xs" />
+                          <span className="whitespace-nowrap">{item.date}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-end flex-shrink-0">
                       <span className="text-cyan-500 group-hover:translate-x-1 transition-transform duration-200">
-                        <FaExternalLinkAlt />
+                        <FaExternalLinkAlt className="text-sm" />
                       </span>
                     </div>
                   </a>
@@ -211,7 +218,7 @@ export default function NewsAndDisruptionSection() {
         </div>
         
         {/* Disruption Weekly - Right Side */}
-        <div className="lg:w-1/2 flex flex-col items-center">
+        <div className="lg:w-1/2 lg:pl-4 flex flex-col items-center">
           <h2 className="text-2xl font-bold text-white mb-4 text-center">Disruption Weekly</h2>
           <p className="text-center text-gray-300 mb-4">Click below to subscribe on LinkedIn</p>
           <a 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormSubmit } from '../../../hooks/useFormSubmit';
 import { NewsItem } from '../../../../lib/content-loader';
 
@@ -8,7 +8,9 @@ interface NewsSectionProps {
   newsItems: NewsItem[];
 }
 
-export default function NewsSection({ newsItems }: NewsSectionProps) {
+export default function NewsSection({ newsItems: initialNewsItems }: NewsSectionProps) {
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(initialNewsItems);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [url, setUrl] = useState('');
   const [featured, setFeatured] = useState(false);
   const [manualDate, setManualDate] = useState('');
@@ -16,6 +18,45 @@ export default function NewsSection({ newsItems }: NewsSectionProps) {
   const [generatedMarkdown, setGeneratedMarkdown] = useState<string>('');
   const [autoDeployed, setAutoDeployed] = useState(false);
   
+  // Function to refresh news items from the API
+  const refreshNewsItems = async () => {
+    try {
+      setIsRefreshing(true);
+      const response = await fetch('/api/news');
+      if (response.ok) {
+        const freshNewsData = await response.json();
+        // Transform API data to match admin interface format
+        const transformedNews = freshNewsData.map((item: any) => ({
+          title: item.title,
+          source: item.source,
+          url: item.url,
+          publishedDate: item.date, // API uses 'date' field
+          featured: item.featured,
+        }));
+        setNewsItems(transformedNews);
+      }
+    } catch (error) {
+      console.error('Error refreshing news items:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Auto-refresh on component mount and when page becomes visible
+  useEffect(() => {
+    refreshNewsItems();
+
+    // Refresh when page becomes visible (user returns to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refreshNewsItems();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
     async (formData: { url: string; featured: boolean; manualDate?: string }) => {
       const response = await fetch('/api/admin/news/add', {
@@ -63,9 +104,11 @@ ${data.metadata.summary}
       return data;
     },
     () => {
-      // Reset form on success
+      // Reset form on success and refresh news list
       setUrl('');
       setFeatured(false);
+      // Refresh the news list to show the newly added article
+      setTimeout(() => refreshNewsItems(), 1000);
     },
     (error) => {
       console.error('Error adding news article:', error);
@@ -97,13 +140,31 @@ ${data.metadata.summary}
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-white">News Article Management</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md text-sm transition-colors"
-        >
-          {showForm ? 'Hide Form' : 'Add News Article'}
-        </button>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-white">News Article Management</h2>
+          {isRefreshing && (
+            <div className="flex items-center gap-2 text-cyan-400 text-sm">
+              <div className="animate-spin w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full"></div>
+              <span>Refreshing...</span>
+            </div>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={refreshNewsItems}
+            disabled={isRefreshing}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 text-white rounded-md text-sm transition-colors flex items-center gap-2"
+          >
+            <span className={isRefreshing ? 'animate-spin' : ''}>🔄</span>
+            Refresh
+          </button>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md text-sm transition-colors"
+          >
+            {showForm ? 'Hide Form' : 'Add News Article'}
+          </button>
+        </div>
       </div>
       
       {showForm && (

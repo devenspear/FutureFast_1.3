@@ -177,12 +177,12 @@ export default function NewsAndDisruptionSection() {
               {newsItems.map((item, idx) => (
                 <li 
                   key={idx} 
-                  className="py-4 transition-all duration-200 hover:bg-gray-900/50 px-4 rounded-lg border-b border-gray-800/50 last:border-b-0"
+                  className="transition-all duration-200 hover:bg-gray-900/50 rounded-lg border-b border-gray-800/50 last:border-b-0 group"
                 >
-                  <div className="flex items-start gap-4 w-full group">
+                  <div className="flex items-start gap-4 w-full py-4 px-4">
                     {/* Date and Source - Left Side */}
                     <div className="flex-shrink-0 min-w-0 sm:min-w-[140px] sm:max-w-[140px]">
-                      <div className="text-xs text-gray-400 mb-1 leading-tight font-bold">
+                      <div className="text-xs text-gray-400 mb-1 leading-tight font-bold group-hover:text-gray-300 transition-colors">
                         {(() => {
                           // Format date to "Month Day, Year"
                           try {
@@ -198,17 +198,25 @@ export default function NewsAndDisruptionSection() {
                           }
                         })()}
                       </div>
-                      <div className="text-xs text-gray-300 italic truncate" title={item.source}>
+                      <div className="text-xs text-gray-300 italic truncate group-hover:text-gray-200 transition-colors" title={item.source}>
                         {item.source}
                       </div>
                     </div>
                     
-                    {/* Title - Center */}
+                    {/* Title - Center - Clickable */}
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-sm sm:text-base font-medium group-hover:text-cyan-400 transition-colors leading-tight line-clamp-2 text-gray-200">
-                        {item.icon && <span className="mr-2 text-base">{item.icon}</span>}
-                        {item.title}
-                      </h2>
+                      <a 
+                        href={item.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => trackNewsClick(item.title, item.source, item.url)}
+                        className="block"
+                      >
+                        <h2 className="text-sm sm:text-base font-medium group-hover:text-cyan-400 transition-colors leading-tight line-clamp-2 text-gray-200 cursor-pointer">
+                          {item.icon && <span className="mr-2 text-base">{item.icon}</span>}
+                          {item.title}
+                        </h2>
+                      </a>
                     </div>
                     
                     {/* Launch Button - Right Side */}

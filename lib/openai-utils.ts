@@ -59,7 +59,7 @@ export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
         },
         {
           role: "user",
-          content: `Generate metadata for this news article: ${url}\n\nPlease format your response as JSON with the following fields: title, source, publishedDate (use today's date in ISO format), summary (1-2 sentences), and tags (array of 3-5 relevant keywords). Always use today's date for publishedDate to show this as recently added content.`
+          content: `Generate metadata for this news article: ${url}\n\nPlease format your response as JSON with the following fields: title, source, publishedDate (extract the actual publication date from the article and format as ISO), summary (1-2 sentences), and tags (array of 3-5 relevant keywords). If you cannot determine the publication date, use today's date as fallback.`
         }
       ],
       response_format: { type: "json_object" }
@@ -67,12 +67,28 @@ export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
 
     const result = JSON.parse(response.choices[0].message.content || '{}');
     
-    // Always use current date regardless of what AI extracts
-    // This ensures new content appears at top of news list
+    // Use AI-extracted date if available, otherwise use current date
+    let publishedDate = result.publishedDate;
+    if (!publishedDate) {
+      publishedDate = new Date().toISOString();
+    } else {
+      // Validate and ensure it's in ISO format
+      try {
+        const date = new Date(publishedDate);
+        if (isNaN(date.getTime())) {
+          publishedDate = new Date().toISOString();
+        } else {
+          publishedDate = date.toISOString();
+        }
+      } catch {
+        publishedDate = new Date().toISOString();
+      }
+    }
+    
     return {
       title: result.title || 'Untitled Article',
       source: result.source || 'Unknown Source',
-      publishedDate: new Date().toISOString(), // Always current date
+      publishedDate,
       summary: result.summary || 'No summary available',
       tags: Array.isArray(result.tags) ? result.tags : ['news'],
     };

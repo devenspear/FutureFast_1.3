@@ -179,10 +179,10 @@ export default function NewsAndDisruptionSection() {
                   key={idx} 
                   className="py-4 transition-all duration-200 hover:bg-gray-900/50 px-4 rounded-lg border-b border-gray-800/50 last:border-b-0"
                 >
-                  <div className="flex items-start gap-3 w-full group">
+                  <div className="flex items-start gap-4 w-full group">
                     {/* Date and Source - Left Side */}
-                    <div className="flex-shrink-0 min-w-0 sm:min-w-[140px]">
-                      <div className="text-xs text-gray-400 mb-1 leading-tight">
+                    <div className="flex-shrink-0 min-w-0 sm:min-w-[140px] sm:max-w-[140px]">
+                      <div className="text-xs text-gray-400 mb-1 leading-tight font-bold">
                         {(() => {
                           // Format date to "Month Day, Year"
                           try {
@@ -198,7 +198,7 @@ export default function NewsAndDisruptionSection() {
                           }
                         })()}
                       </div>
-                      <div className="text-xs text-cyan-400 font-medium">
+                      <div className="text-xs text-gray-300 italic truncate" title={item.source}>
                         {item.source}
                       </div>
                     </div>

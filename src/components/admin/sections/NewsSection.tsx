@@ -30,8 +30,8 @@ export default function NewsSection({ newsItems: initialNewsItems }: NewsSection
           title: item.title,
           source: item.source,
           url: item.url,
-          publishedDate: item.date, // API uses 'date' field
-          featured: item.featured,
+          publishedDate: item.date || item.publishedDate, // Handle both field names
+          featured: item.featured || false,
         }));
         setNewsItems(transformedNews);
       }

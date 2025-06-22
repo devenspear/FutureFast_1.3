@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { FaExternalLinkAlt, FaCalendarAlt, FaNewspaper } from 'react-icons/fa';
+import { FaExternalLinkAlt } from 'react-icons/fa';
 import { trackNewsClick, trackDisruptionWeeklyClick } from '../lib/analytics';
 
 // Define the NewsItem type
@@ -177,40 +177,54 @@ export default function NewsAndDisruptionSection() {
               {newsItems.map((item, idx) => (
                 <li 
                   key={idx} 
-                  className="py-3 transition-all duration-200 hover:bg-gray-900/50 px-3 rounded-lg border-b border-gray-800/50 last:border-b-0"
+                  className="py-4 transition-all duration-200 hover:bg-gray-900/50 px-4 rounded-lg border-b border-gray-800/50 last:border-b-0"
                 >
-                  <a 
-                    href={item.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    onClick={() => trackNewsClick(item.title, item.source, item.url)}
-                    className="flex flex-col sm:flex-row sm:items-center gap-2 w-full group"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <h2 className="text-base sm:text-lg font-bold group-hover:text-cyan-400 transition-colors leading-tight line-clamp-2">
-                        {item.icon && <span className="mr-2 text-lg">{item.icon}</span>}
-                        {item.title}
-                      </h2>
-                      
-                      <div className="flex flex-wrap items-center mt-2 text-xs text-gray-400 gap-3">
-                        <div className="flex items-center gap-1">
-                          <FaNewspaper className="text-cyan-500 text-xs" />
-                          <span className="truncate">{item.source}</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-1">
-                          <FaCalendarAlt className="text-cyan-500 text-xs" />
-                          <span className="whitespace-nowrap">{item.date}</span>
-                        </div>
+                  <div className="flex items-start gap-3 w-full group">
+                    {/* Date and Source - Left Side */}
+                    <div className="flex-shrink-0 min-w-0 sm:min-w-[140px]">
+                      <div className="text-xs text-gray-400 mb-1 leading-tight">
+                        {(() => {
+                          // Format date to "Month Day, Year"
+                          try {
+                            const date = new Date(item.date);
+                            const options: Intl.DateTimeFormatOptions = { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            };
+                            return date.toLocaleDateString('en-US', options);
+                          } catch {
+                            return item.date; // Fallback to original date string
+                          }
+                        })()}
+                      </div>
+                      <div className="text-xs text-cyan-400 font-medium">
+                        {item.source}
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-end flex-shrink-0">
-                      <span className="text-cyan-500 group-hover:translate-x-1 transition-transform duration-200">
-                        <FaExternalLinkAlt className="text-sm" />
-                      </span>
+                    {/* Title - Center */}
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-sm sm:text-base font-medium group-hover:text-cyan-400 transition-colors leading-tight line-clamp-2 text-gray-200">
+                        {item.icon && <span className="mr-2 text-base">{item.icon}</span>}
+                        {item.title}
+                      </h2>
                     </div>
-                  </a>
+                    
+                    {/* Launch Button - Right Side */}
+                    <div className="flex-shrink-0">
+                      <a 
+                        href={item.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => trackNewsClick(item.title, item.source, item.url)}
+                        className="inline-flex items-center justify-center w-8 h-8 bg-gray-800 hover:bg-cyan-600 border border-gray-600 hover:border-cyan-400 rounded-lg transition-all duration-200 group-hover:scale-110"
+                        aria-label="Read article"
+                      >
+                        <FaExternalLinkAlt className="text-xs text-gray-400 group-hover:text-white" />
+                      </a>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

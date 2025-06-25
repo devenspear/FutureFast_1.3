@@ -161,7 +161,7 @@ export default function NewsAndDisruptionSection() {
       <p className="font-sans mb-12 text-lg md:text-xl text-cyan-100 text-center max-w-3xl mx-auto">
         Real signals. No hype.<br />
         We track the world's most important tech stories so you don't have to. Get curated insights on AI, Web3, robotics, biotech, and the cultural ripples they cause.<br />
-        This isn't just news. It's navigation.
+        This isn&apos;t just news. It&apos;s navigation.
       </p>
       
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-8">

@@ -189,7 +189,7 @@ export default function LearningResourcesSection() {
           </h1>
           <p className="font-sans text-lg md:text-xl text-cyan-100 max-w-3xl mx-auto">
             Learn fast. Adapt faster.<br />
-            FutureFast's Learning Lab offers immersive pathways into AI, blockchain, climate tech, futurism, and more. Build the mental models you need to thrive in a world of accelerating feedback loops.
+            FutureFast&apos;s Learning Lab offers immersive pathways into AI, blockchain, climate tech, futurism, and more. Build the mental models you need to thrive in a world of accelerating feedback loops.
           </p>
         </div>
 

@@ -180,7 +180,7 @@ export default function VideoInterviewsSection() {
         </h1>
         <p className="font-sans text-lg md:text-xl text-cyan-100 text-center max-w-3xl mx-auto mb-8 md:mb-12">
           See the future. Hear it speak.<br />
-          Watch deep dives, visionary interviews, and visual explainers designed to wake up your strategic senses. These aren't just conversations—they're transmissions from tomorrow.
+          Watch deep dives, visionary interviews, and visual explainers designed to wake up your strategic senses. These aren&apos;t just conversations—they&apos;re transmissions from tomorrow.
         </p>
 
         <div className="relative">

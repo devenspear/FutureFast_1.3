@@ -156,7 +156,13 @@ export default function NewsAndDisruptionSection() {
 
   return (
     <section className="py-16 bg-black text-white" id="news-and-disruption">
-      <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">In The News</h1>
+      <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">In The News</h1>
+      
+      <p className="font-sans mb-12 text-lg md:text-xl text-cyan-100 text-center max-w-3xl mx-auto">
+        Real signals. No hype.<br />
+        We track the world's most important tech stories so you don't have to. Get curated insights on AI, Web3, robotics, biotech, and the cultural ripples they cause.<br />
+        This isn't just news. It's navigation.
+      </p>
       
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
         {/* News Articles - Left Side */}

@@ -51,11 +51,13 @@ export default function ResourceLibrarySectionClient({ cards }: { cards: CMSCard
     <section className="py-12 md:py-16 bg-black text-white" id="resource-library">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8 md:mb-12">
-          <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
+          <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
             Resource Library
           </h1>
           <p className="font-sans text-lg md:text-xl text-cyan-100 max-w-3xl mx-auto">
-            Explore a curated collection of essential guides, articles, and courses. Build your foundational knowledge and master new skills at your own pace.
+            Master exponential fluency.<br />
+            Tap into a curated library of whitepapers, frameworks, field guides, and interactive explainers. Built for builders, thinkers, and the boldly curious.<br />
+            The faster the change, the more vital the compass. Start here.
           </p>
         </div>
         <div className="relative">

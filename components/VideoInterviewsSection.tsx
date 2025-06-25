@@ -175,11 +175,12 @@ export default function VideoInterviewsSection() {
   return (
     <section className="py-12 md:py-16 bg-black text-white">
       <div className="container mx-auto px-4">
-        <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
+        <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
           Video/Interviews
         </h1>
         <p className="font-sans text-lg md:text-xl text-cyan-100 text-center max-w-3xl mx-auto mb-8 md:mb-12">
-          Tune into insightful discussions, expert interviews, and visual explainers. Stay updated with the latest trends and deepen your understanding through engaging video content.
+          See the future. Hear it speak.<br />
+          Watch deep dives, visionary interviews, and visual explainers designed to wake up your strategic senses. These aren't just conversations—they're transmissions from tomorrow.
         </p>
 
         <div className="relative">

@@ -184,11 +184,12 @@ export default function LearningResourcesSection() {
     <section className="py-12 md:py-16 bg-black text-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8 md:mb-12">
-          <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
-            Learning Resources
+          <h1 className="font-orbitron text-3xl md:text-4xl lg:text-5xl font-bold mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
+            Learning Lab
           </h1>
           <p className="font-sans text-lg md:text-xl text-cyan-100 max-w-3xl mx-auto">
-            Explore a curated collection of essential guides, articles, and courses. Build your foundational knowledge and master new skills at your own pace.
+            Learn fast. Adapt faster.<br />
+            FutureFast's Learning Lab offers immersive pathways into AI, blockchain, climate tech, futurism, and more. Build the mental models you need to thrive in a world of accelerating feedback loops.
           </p>
         </div>
 

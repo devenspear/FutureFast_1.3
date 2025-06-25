@@ -33,6 +33,7 @@ export default function YouTubeSubmitForm({ categories = [] }: YouTubeSubmitForm
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include', // This is needed to send the auth cookie
       });
       
       if (!response.ok) {

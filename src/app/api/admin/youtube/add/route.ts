@@ -218,7 +218,8 @@ export async function POST(request: Request) {
     
     // Trigger the YouTube API cache refresh (this will update the metadata)
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/youtube?refresh=true`, { 
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      await fetch(`${baseUrl}/api/youtube?refresh=true`, { 
         method: 'GET',
         cache: 'no-store'
       });

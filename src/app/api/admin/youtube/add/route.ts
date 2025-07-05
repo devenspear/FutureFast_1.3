@@ -21,32 +21,63 @@ function extractVideoId(url: string): string | null {
 }
 
 export async function POST(request: Request) {
+  console.log('🎯 [YouTube Add API] Request received');
+  console.log('🌍 [YouTube Add API] Environment check:', {
+    NODE_ENV: process.env.NODE_ENV,
+    BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    hasYouTubeKey: !!process.env.YOUTUBE_API_KEY
+  });
+  
   try {
+    // Log all request headers for debugging
+    const headers = Object.fromEntries(request.headers.entries());
+    console.log('📋 [YouTube Add API] Request headers:', headers);
+    
     // Verify authentication by reading the auth-token cookie
-    const authToken = request.headers.get('cookie')?.split(';')
+    const cookieHeader = request.headers.get('cookie');
+    console.log('🍪 [YouTube Add API] Cookie header:', cookieHeader ? 'Present' : 'Missing');
+    if (cookieHeader) {
+      console.log('🍪 [YouTube Add API] Cookie header preview:', cookieHeader.substring(0, 100) + '...');
+    }
+    
+    const authToken = cookieHeader?.split(';')
       .find(c => c.trim().startsWith('auth-token='))?.split('=')[1];
+    
+    console.log('🔑 [YouTube Add API] Auth token extracted:', !!authToken);
+    if (authToken) {
+      console.log('🔑 [YouTube Add API] Auth token preview:', authToken.substring(0, 50) + '...');
+    }
       
     if (!authToken) {
+      console.error('❌ [YouTube Add API] No auth token found in cookies');
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
+    console.log('✅ [YouTube Add API] Authentication successful');
+
     // Parse the request body
     const body = await request.json();
+    console.log('📦 [YouTube Add API] Request body:', body);
     const { url, category = 'Interview', featured = false } = body;
 
     if (!url) {
+      console.error('❌ [YouTube Add API] Missing URL in request');
       return NextResponse.json(
         { error: 'YouTube URL is required' },
         { status: 400 }
       );
     }
 
+    console.log('🔍 [YouTube Add API] Processing URL:', url);
+
     // Validate YouTube URL
     const videoId = extractVideoId(url);
+    console.log('🆔 [YouTube Add API] Extracted video ID:', videoId);
     if (!videoId) {
+      console.error('❌ [YouTube Add API] Invalid YouTube URL');
       return NextResponse.json(
         { error: 'Invalid YouTube URL' },
         { status: 400 }
@@ -219,22 +250,27 @@ export async function POST(request: Request) {
     // Trigger the YouTube API cache refresh (this will update the metadata)
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      console.log('🔄 [YouTube Add API] Triggering cache refresh:', `${baseUrl}/api/youtube?refresh=true`);
       await fetch(`${baseUrl}/api/youtube?refresh=true`, { 
         method: 'GET',
         cache: 'no-store'
       });
+      console.log('✅ [YouTube Add API] Cache refresh completed');
     } catch (error) {
-      console.error('Error refreshing YouTube API cache:', error);
+      console.error('⚠️ [YouTube Add API] Error refreshing YouTube API cache:', error);
       // Continue anyway, as this is not critical
     }
     
-    return NextResponse.json({ 
+    const successResponse = { 
       success: true, 
       message: 'Video added successfully',
       videoId
-    });
+    };
+    console.log('🎉 [YouTube Add API] Returning success response:', successResponse);
+    return NextResponse.json(successResponse);
   } catch (error) {
-    console.error('Error adding YouTube video:', error);
+    console.error('💥 [YouTube Add API] Unexpected error:', error);
+    console.error('💥 [YouTube Add API] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
       { error: 'Failed to add YouTube video' },
       { status: 500 }

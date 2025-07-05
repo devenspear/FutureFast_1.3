@@ -34,56 +34,56 @@ async function generateJWT(): Promise<string> {
 // Note: Password hashing is handled elsewhere in the authentication flow
 
 export async function POST(request: Request) {
+  console.log('🔐 [Admin Login API] Login attempt started');
+  console.log('🌍 [Admin Login API] Environment check:', {
+    NODE_ENV: process.env.NODE_ENV,
+    hasUsername: !!ADMIN_USERNAME,
+    hasPassword: !!ADMIN_PASSWORD,
+    hasJWTSecret: !!process.env.JWT_SECRET
+  });
+  
   try {
     // Get client IP for rate limiting
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    const clientIp = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
+    const clientIp = request.headers.get('x-forwarded-for') || 
+                    request.headers.get('x-real-ip') || 
+                    'unknown';
+    console.log('🌐 [Admin Login API] Client IP:', clientIp);
     
-    // Check if the IP is currently locked out
     const now = Date.now();
     const ipAttempts = attemptsByIp[clientIp] || { count: 0, lastAttempt: 0, lockedUntil: 0 };
     
+    // Check if IP is locked out
     if (ipAttempts.lockedUntil > now) {
-      const remainingSeconds = Math.ceil((ipAttempts.lockedUntil - now) / 1000);
+      const remainingTime = Math.ceil((ipAttempts.lockedUntil - now) / 1000 / 60);
+      console.log('🚫 [Admin Login API] IP locked out:', clientIp, 'for', remainingTime, 'minutes');
       return NextResponse.json({
         success: false,
-        error: `Too many failed attempts. Please try again in ${remainingSeconds} seconds.`
+        error: `Too many failed attempts. Try again in ${remainingTime} minutes.`
       }, { status: 429 });
     }
     
-    // Parse request body
-    const body = await request.json().catch(() => ({}));
+    // Parse the request body
+    const body = await request.json();
+    console.log('📦 [Admin Login API] Request body keys:', Object.keys(body));
     const { username, password } = body;
     
-    // Validate credentials
+    console.log('👤 [Admin Login API] Username provided:', !!username);
+    console.log('🔑 [Admin Login API] Password provided:', !!password);
+    
     if (!username || !password) {
-      // Increment attempt counter
-      ipAttempts.count += 1;
-      ipAttempts.lastAttempt = now;
-      
-      // Check if max attempts reached
-      if (ipAttempts.count >= MAX_ATTEMPTS) {
-        ipAttempts.lockedUntil = now + LOCKOUT_TIME;
-        attemptsByIp[clientIp] = ipAttempts;
-        
-        return NextResponse.json({
-          success: false,
-          error: 'Too many failed attempts. Please try again later.'
-        }, { status: 429 });
-      }
-      
-      attemptsByIp[clientIp] = ipAttempts;
-      
+      console.error('❌ [Admin Login API] Missing credentials');
       return NextResponse.json({
         success: false,
         error: 'Username and password are required'
       }, { status: 400 });
     }
     
-    // In production, you would use a secure password comparison
-    // Here we're using a simple comparison for development
+    // Validate credentials
     const isValidUsername = username === ADMIN_USERNAME;
     const isValidPassword = password === ADMIN_PASSWORD;
+    
+    console.log('✅ [Admin Login API] Username valid:', isValidUsername);
+    console.log('✅ [Admin Login API] Password valid:', isValidPassword);
     
     if (!isValidUsername || !isValidPassword) {
       // Increment attempt counter
@@ -106,8 +106,11 @@ export async function POST(request: Request) {
     // Reset attempts on successful login
     attemptsByIp[clientIp] = { count: 0, lastAttempt: now, lockedUntil: 0 };
     
+    console.log('🎉 [Admin Login API] Login successful, generating JWT');
+    
     // Generate a secure JWT token
     const token = await generateJWT();
+    console.log('🔐 [Admin Login API] JWT generated, length:', token.length);
     
     const response = NextResponse.json({
       success: true,
@@ -115,19 +118,28 @@ export async function POST(request: Request) {
     });
     
     // Set the auth cookie with secure settings
-    response.cookies.set({
+    const cookieOptions = {
       name: 'auth-token',
       value: token,
       httpOnly: true, // Prevents JavaScript access
       secure: process.env.NODE_ENV === 'production', // HTTPS only in production
       path: '/',
       maxAge: 60 * 60 * 2, // 2 hours
-      sameSite: 'strict', // Prevents CSRF
+      sameSite: 'strict' as const, // Prevents CSRF
+    };
+    
+    console.log('🍪 [Admin Login API] Setting cookie with options:', {
+      ...cookieOptions,
+      value: token.substring(0, 50) + '...' // Don't log full token
     });
     
+    response.cookies.set(cookieOptions);
+    
+    console.log('✅ [Admin Login API] Response prepared with auth cookie');
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('💥 [Admin Login API] Unexpected error:', error);
+    console.error('💥 [Admin Login API] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json({
       success: false,
       error: 'An error occurred during authentication'

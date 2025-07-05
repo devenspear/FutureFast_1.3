@@ -33,22 +33,51 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
   
   const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
     async (formData: { url: string; category: string; featured: boolean; id?: string }) => {
+      console.log('🚀 [YouTubeSection] Starting video submission:', formData);
+      
       const endpoint = editingVideo ? '/api/admin/youtube/update' : '/api/admin/youtube/add';
+      console.log('🔗 [YouTubeSection] API endpoint:', endpoint);
+      
+      // Check if we have auth cookies before making the request
+      const allCookies = document.cookie;
+      console.log('🍪 [YouTubeSection] All cookies:', allCookies);
+      const authToken = document.cookie.split(';').find(c => c.trim().startsWith('auth-token='));
+      console.log('🔑 [YouTubeSection] Auth token found:', !!authToken);
+      if (authToken) {
+        console.log('🔑 [YouTubeSection] Auth token preview:', authToken.substring(0, 50) + '...');
+      }
+      
+      const requestBody = editingVideo ? {...formData, id: editingVideo.id} : formData;
+      console.log('📦 [YouTubeSection] Request body:', requestBody);
+      
+      console.log('📡 [YouTubeSection] Making fetch request with credentials: include');
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editingVideo ? {...formData, id: editingVideo.id} : formData),
+        body: JSON.stringify(requestBody),
         credentials: 'include',
       });
       
+      console.log('📬 [YouTubeSection] Response status:', response.status);
+      console.log('📬 [YouTubeSection] Response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('❌ [YouTubeSection] API error response:', errorData);
+        console.error('❌ [YouTubeSection] Full response:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          data: errorData
+        });
         throw new Error(errorData.error || `Failed to ${editingVideo ? 'update' : 'add'} YouTube video`);
       }
       
-      return response.json();
+      const responseData = await response.json();
+      console.log('✅ [YouTubeSection] Success response:', responseData);
+      return responseData;
     },
     () => {
       // Reset form on success
@@ -126,12 +155,33 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-white">YouTube Video Management</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md text-sm transition-colors"
-        >
-          {showForm ? 'Hide Form' : 'Add New Video'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              console.log('🔍 [Debug] Testing auth debug endpoint');
+              try {
+                const response = await fetch('/api/admin/auth/debug', {
+                  credentials: 'include'
+                });
+                const data = await response.json();
+                console.log('🔍 [Debug] Auth debug response:', data);
+                alert('Debug info logged to console. Check browser dev tools.');
+              } catch (error) {
+                console.error('🔍 [Debug] Auth debug failed:', error);
+                alert('Debug failed. Check console for details.');
+              }
+            }}
+            className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm transition-colors"
+          >
+            🔍 Debug Auth
+          </button>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md text-sm transition-colors"
+          >
+            {showForm ? 'Hide Form' : 'Add New Video'}
+          </button>
+        </div>
       </div>
       
       {showForm && (

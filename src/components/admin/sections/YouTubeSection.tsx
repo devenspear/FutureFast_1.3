@@ -64,15 +64,35 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       console.log('📬 [YouTubeSection] Response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('❌ [YouTubeSection] API error response:', errorData);
+        let errorData;
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        
+        try {
+          const responseText = await response.text();
+          console.log('📄 [YouTubeSection] Raw response text:', responseText);
+          
+          // Try to parse as JSON
+          if (responseText.trim().startsWith('{')) {
+            errorData = JSON.parse(responseText);
+            errorMessage = errorData.error || errorMessage;
+          } else {
+            // If not JSON, use the raw text
+            errorMessage = responseText || errorMessage;
+          }
+        } catch (parseError) {
+          console.error('🔧 [YouTubeSection] Error parsing response:', parseError);
+          errorMessage = `Server error (${response.status}): Unable to parse response`;
+        }
+        
+        console.error('❌ [YouTubeSection] API error response:', errorData || errorMessage);
         console.error('❌ [YouTubeSection] Full response:', {
           status: response.status,
           statusText: response.statusText,
           headers: Object.fromEntries(response.headers.entries()),
-          data: errorData
+          data: errorData || errorMessage
         });
-        throw new Error(errorData.error || `Failed to ${editingVideo ? 'update' : 'add'} YouTube video`);
+        
+        throw new Error(errorMessage);
       }
       
       const responseData = await response.json();

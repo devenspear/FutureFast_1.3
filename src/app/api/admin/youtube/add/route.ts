@@ -84,10 +84,17 @@ export async function POST(request: Request) {
       );
     }
 
+    console.log('📁 [YouTube Add API] Checking file structure...');
     // Check if we're using the new structure (individual files) or the old structure
     const indexPath = path.join(process.cwd(), 'content/youtube/index.md');
     const videosDir = path.join(process.cwd(), 'content/youtube/videos');
     const oldFilePath = path.join(process.cwd(), 'content/youtube/videos.md');
+    
+    console.log('📁 [YouTube Add API] Paths:', {
+      indexPath: existsSync(indexPath),
+      videosDir: existsSync(videosDir),
+      oldFilePath: existsSync(oldFilePath)
+    });
     
     // Generate a slug for the video
     const generateSlug = (videoId: string) => {
@@ -99,80 +106,95 @@ export async function POST(request: Request) {
     
     // If using the new structure with individual files
     if (existsSync(indexPath) && existsSync(videosDir)) {
-      // Read the index file
-      const indexContent = await fs.readFile(indexPath, 'utf8');
-      const { data: indexData, content: indexContentText } = matter(indexContent);
-      
-      if (!Array.isArray(indexData.videos)) {
-        indexData.videos = [];
-      }
-      
-      // Check if the video already exists in the index
-      // Use a synchronous check first with the available data
-      videoExists = indexData.videos.some((video: { slug?: string }) => {
-        if (!video.slug) return false;
-        return false; // We'll do a more thorough check below
-      });
-      
-      // If not found in the quick check, do a more thorough check of all video files
-      if (!videoExists) {
-        // Check each video file manually
-        for (const video of indexData.videos) {
-          if (!video.slug) continue;
-          
-          const videoPath = path.join(videosDir, `${video.slug}.md`);
-          if (existsSync(videoPath)) {
-            try {
-              const videoContent = await fs.readFile(videoPath, 'utf8');
-              const { data: videoData } = matter(videoContent);
-              const existingVideoId = extractVideoId(videoData.url);
-              if (existingVideoId === videoId) {
-                videoExists = true;
-                break;
+      console.log('📁 [YouTube Add API] Using new structure (individual files)');
+      try {
+        // Read the index file
+        const indexContent = await fs.readFile(indexPath, 'utf8');
+        const { data: indexData, content: indexContentText } = matter(indexContent);
+        
+        if (!Array.isArray(indexData.videos)) {
+          indexData.videos = [];
+        }
+        
+        console.log('📊 [YouTube Add API] Current video count:', indexData.videos.length);
+        
+        // Check if the video already exists in the index
+        // Use a synchronous check first with the available data
+        videoExists = indexData.videos.some((video: { slug?: string }) => {
+          if (!video.slug) return false;
+          return false; // We'll do a more thorough check below
+        });
+        
+        // If not found in the quick check, do a more thorough check of all video files
+        if (!videoExists) {
+          console.log('🔍 [YouTube Add API] Checking existing videos for duplicates...');
+          // Check each video file manually
+          for (const video of indexData.videos) {
+            if (!video.slug) continue;
+            
+            const videoPath = path.join(videosDir, `${video.slug}.md`);
+            if (existsSync(videoPath)) {
+              try {
+                const videoContent = await fs.readFile(videoPath, 'utf8');
+                const { data: videoData } = matter(videoContent);
+                const existingVideoId = extractVideoId(videoData.url);
+                if (existingVideoId === videoId) {
+                  videoExists = true;
+                  console.log('🔍 [YouTube Add API] Found duplicate video:', video.slug);
+                  break;
+                }
+              } catch (fileError) {
+                console.error('⚠️ [YouTube Add API] Error reading video file:', video.slug, fileError);
+                // Continue checking other videos
               }
-            } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-                   _) {
-              // Continue checking other videos
             }
           }
         }
+        
+        if (videoExists) {
+          console.log('❌ [YouTube Add API] Video already exists');
+          return NextResponse.json(
+            { error: 'Video already exists', videoId },
+            { status: 409 }
+          );
+        }
+        
+        // Create a slug for the new video
+        const slug = generateSlug(videoId);
+        console.log('🏷️ [YouTube Add API] Generated slug:', slug);
+        
+        // Add the video to the index
+        indexData.videos.push({
+          slug,
+          category,
+          featured
+        });
+        
+        console.log('💾 [YouTube Add API] Writing updated index file...');
+        // Write the updated index back to the file
+        const updatedIndexContent = matter.stringify(indexContentText, indexData);
+        await fs.writeFile(indexPath, updatedIndexContent, 'utf8');
+        
+        console.log('💾 [YouTube Add API] Creating individual video file...');
+        // Create the individual video file
+        const videoData = {
+          url,
+          title: "[Pending YouTube API]",
+          description: "[Will be filled by API]",
+          category,
+          featured
+          // Note: We don't include publishedAt and channelName if they're undefined
+          // This avoids YAML serialization errors
+        };
+        
+        const videoContent = matter.stringify('', videoData);
+        const videoPath = path.join(videosDir, `${slug}.md`);
+        await fs.writeFile(videoPath, videoContent, 'utf8');
+        console.log('✅ [YouTube Add API] Video file created successfully');
+      } catch (fileError) {
+        console.error('💥 [YouTube Add API] File operation error in new structure:', fileError);
+        throw new Error(`File system error: ${fileError instanceof Error ? fileError.message : 'Unknown file error'}`);
       }
-      
-      if (videoExists) {
-        return NextResponse.json(
-          { error: 'Video already exists', videoId },
-          { status: 409 }
-        );
-      }
-      
-      // Create a slug for the new video
-      const slug = generateSlug(videoId);
-      
-      // Add the video to the index
-      indexData.videos.push({
-        slug,
-        category,
-        featured
-      });
-      
-      // Write the updated index back to the file
-      const updatedIndexContent = matter.stringify(indexContentText, indexData);
-      await fs.writeFile(indexPath, updatedIndexContent, 'utf8');
-      
-      // Create the individual video file
-      const videoData = {
-        url,
-        title: "[Pending YouTube API]",
-        description: "[Will be filled by API]",
-        category,
-        featured
-        // Note: We don't include publishedAt and channelName if they're undefined
-        // This avoids YAML serialization errors
-      };
-      
-      const videoContent = matter.stringify('', videoData);
-      const videoPath = path.join(videosDir, `${slug}.md`);
-      await fs.writeFile(videoPath, videoContent, 'utf8');
     }
     // If using the old structure with a single file
     else if (existsSync(oldFilePath)) {

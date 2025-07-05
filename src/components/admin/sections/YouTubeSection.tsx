@@ -40,6 +40,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(editingVideo ? {...formData, id: editingVideo.id} : formData),
+        credentials: 'include',
       });
       
       if (!response.ok) {
@@ -79,6 +80,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ id: videoId }),
+        credentials: 'include',
       });
       
       if (!response.ok) {

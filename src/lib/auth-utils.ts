@@ -41,6 +41,7 @@ export async function checkAuthStatus(): Promise<boolean> {
     const response = await fetch(`${baseUrl}/api/admin/auth/status`, {
       method: 'GET',
       cache: 'no-store',
+      credentials: 'include',
     });
     
     if (!response.ok) return false;

@@ -50,6 +50,7 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
         const uploadRes = await fetch('/api/admin/upload', {
           method: 'POST',
           body: uploadData,
+          credentials: 'include',
         });
         if (!uploadRes.ok) {
           const err = await uploadRes.json();
@@ -72,6 +73,7 @@ export default function ResourceSection({ resources, types }: ResourceSectionPro
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(bodyToSend),
+        credentials: 'include',
       });
       
       if (!response.ok) {

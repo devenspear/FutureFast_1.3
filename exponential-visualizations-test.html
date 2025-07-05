@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exponential Change Visualizations - Test Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .visualization-section {
+            margin-bottom: 80px;
+            padding: 40px;
+            border: 1px solid #333;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        .viz-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00c8ff, #99731A, #D4AF37);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .viz-description {
+            font-size: 1.1rem;
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .viz-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            border: 1px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
+        }
+
+        /* 1. Enhanced Velocity Timeline - Full Section */
+        .fastlane-section-mockup {
+            width: 100%;
+            min-height: 500px;
+            position: relative;
+            border: 1px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #000 100%);
+            padding: 40px;
+        }
+
+        .fastlane-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline-visual-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content-column {
+            flex: 1;
+            padding-left: 20px;
+        }
+
+        .enhanced-timeline-container {
+            position: relative;
+            width: 400px;
+            height: 350px;
+            border-radius: 15px;
+            background: radial-gradient(circle at center, rgba(0, 200, 255, 0.05) 0%, transparent 70%);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .timeline-background-grid {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+            background-image: 
+                linear-gradient(rgba(0, 200, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 200, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: gridShift 20s linear infinite;
+        }
+
+        @keyframes gridShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
+        }
+
+        .timeline-path {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .timeline-curve {
+            stroke-dasharray: 500;
+            stroke-dashoffset: 500;
+            animation: drawPath 3s ease-out forwards;
+        }
+
+        @keyframes drawPath {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .timeline-nodes {
+            position: absolute;
+            inset: 0;
+        }
+
+        .enhanced-timeline-node {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, transparent 70%);
+            box-shadow: 0 0 20px;
+            opacity: 0;
+            transform: scale(0);
+            animation: nodeAppear 0.8s ease-out forwards;
+        }
+
+        .enhanced-timeline-node.early {
+            border-color: #00c8ff;
+            box-shadow: 0 0 20px #00c8ff;
+        }
+
+        .enhanced-timeline-node.mid {
+            border-color: #D4AF37;
+            box-shadow: 0 0 20px #D4AF37;
+        }
+
+        .enhanced-timeline-node.recent {
+            border-color: #ff4444;
+            box-shadow: 0 0 20px #ff4444;
+            animation: nodeAppear 0.8s ease-out forwards, recentPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes nodeAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes recentPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); box-shadow: 0 0 30px #ff4444; }
+        }
+
+        .enhanced-timeline-label {
+            position: absolute;
+            font-size: 0.75rem;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            animation: labelFade 0.5s ease-out forwards;
+        }
+
+        @keyframes labelFade {
+            to { opacity: 1; }
+        }
+
+        .velocity-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+        }
+
+        .velocity-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 200, 255, 0.3);
+        }
+
+        .velocity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00c8ff 0%, #D4AF37 50%, #ff4444 100%);
+            width: 0%;
+            animation: velocityFill 4s ease-out forwards;
+            box-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+        }
+
+        @keyframes velocityFill {
+            0% { width: 0%; }
+            20% { width: 20%; }
+            40% { width: 45%; }
+            60% { width: 70%; }
+            80% { width: 90%; }
+            100% { width: 100%; }
+        }
+
+        .velocity-label {
+            display: block;
+            font-size: 0.7rem;
+            color: #ccc;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* Content Column Styles */
+        .fastlane-headline {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #99731A, #D4AF37, #99731A);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .fastlane-intro {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+
+        .why-matters-heading {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .bullet-points {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .bullet-points li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .bullet-points li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #00c8ff;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .closing-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .call-to-action {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .fastlane-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .enhanced-timeline-container {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .fastlane-headline {
+                font-size: 2rem;
+            }
+        }
+
+        /* 2. Data Stream */
+        .stream-container {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .data-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00c8ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00c8ff;
+        }
+
+        @keyframes streamFlow {
+            0% { 
+                transform: translateX(-20px) translateY(0);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateX(calc(100vw + 20px)) translateY(0);
+                opacity: 0;
+            }
+        }
+
+        /* 3. Cascade Reaction */
+        .cascade-container {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cascade-element {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #D4AF37;
+            border-radius: 3px;
+            box-shadow: 0 0 15px #D4AF37;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        @keyframes cascadeGrow {
+            0% { 
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.2);
+            }
+            100% { 
+                opacity: 0.7;
+                transform: scale(1);
+            }
+        }
+
+        /* 4. Orbit System */
+        .orbit-container {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .orbit-center {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 30px #fff;
+        }
+
+        .orbit-ring {
+            position: absolute;
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            border-radius: 50%;
+            animation: rotate linear infinite;
+        }
+
+        .orbit-planet {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #00c8ff;
+            border-radius: 50%;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px #00c8ff;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 5. Neural Network */
+        .neural-container {
+            position: relative;
+            height: 100%;
+        }
+
+        .neural-node {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #D4AF37;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #D4AF37;
+            opacity: 0;
+            animation: nodeGrow 0.5s ease-out forwards;
+        }
+
+        .neural-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00c8ff, transparent);
+            opacity: 0;
+            animation: connectionGrow 0.8s ease-out forwards;
+        }
+
+        @keyframes nodeGrow {
+            0% { 
+                opacity: 0;
+                transform: scale(0);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes connectionGrow {
+            0% { 
+                opacity: 0;
+                width: 0;
+            }
+            100% { 
+                opacity: 0.7;
+                width: 100%;
+            }
+        }
+
+        /* 6. Time Distortion */
+        .clock-container {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 40px;
+        }
+
+        .clock {
+            width: 120px;
+            height: 120px;
+            border: 3px solid #00c8ff;
+            border-radius: 50%;
+            position: relative;
+            background: rgba(0, 200, 255, 0.1);
+        }
+
+        .clock-hand {
+            position: absolute;
+            background: #fff;
+            transform-origin: bottom center;
+            left: 50%;
+            bottom: 50%;
+        }
+
+        .hour-hand {
+            width: 3px;
+            height: 30px;
+            margin-left: -1.5px;
+            animation: normalTick 12s linear infinite;
+        }
+
+        .minute-hand {
+            width: 2px;
+            height: 40px;
+            margin-left: -1px;
+        }
+
+        .clock-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        @keyframes normalTick {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fastTick {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes blurTick {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #00c8ff;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .reset-btn:hover {
+            background: #D4AF37;
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #00c8ff, #D4AF37);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title">Exponential Change Visualizations</h1>
+        
+        <!-- 1. Enhanced Velocity Timeline - Full Section Mockup -->
+        <div class="visualization-section">
+            <h2 class="viz-title">Enhanced Velocity Timeline - Complete "Fast Lane" Section</h2>
+            <p class="viz-description">
+                Full section mockup showing how the velocity timeline integrates with your content layout.
+            </p>
+            <div class="fastlane-section-mockup">
+                <button class="reset-btn" onclick="resetEnhancedTimeline()">Reset</button>
+                
+                <!-- Two-column layout like your actual section -->
+                <div class="fastlane-content">
+                    <!-- Left column: Enhanced Timeline -->
+                    <div class="timeline-visual-column">
+                        <div class="enhanced-timeline-container" id="enhanced-timeline">
+                            <!-- Background grid for depth -->
+                            <div class="timeline-background-grid"></div>
+                            
+                            <!-- Main timeline path -->
+                            <svg class="timeline-path" viewBox="0 0 400 300">
+                                <defs>
+                                    <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#00c8ff;stop-opacity:0.3" />
+                                        <stop offset="50%" style="stop-color:#D4AF37;stop-opacity:0.8" />
+                                        <stop offset="100%" style="stop-color:#ff4444;stop-opacity:1" />
+                                    </linearGradient>
+                                    <filter id="glow">
+                                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                        <feMerge> 
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/> 
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <path class="timeline-curve" d="M20,200 Q100,180 200,150 Q300,120 380,80" 
+                                      stroke="url(#pathGradient)" stroke-width="3" fill="none" filter="url(#glow)"/>
+                            </svg>
+                            
+                            <!-- Timeline nodes and labels -->
+                            <div class="timeline-nodes" id="timeline-nodes"></div>
+                            
+                            <!-- Velocity indicator -->
+                            <div class="velocity-indicator">
+                                <div class="velocity-bar">
+                                    <div class="velocity-fill" id="velocity-fill"></div>
+                                </div>
+                                <span class="velocity-label">Innovation Velocity</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right column: Content (matching your actual copy) -->
+                    <div class="content-column">
+                        <h2 class="fastlane-headline">Welcome to the Fast Lane</h2>
+                        
+                        <p class="fastlane-intro">
+                            The pace of change is accelerating—yet despite constant headlines and bold predictions, the urgency of exponential disruption rarely registers in boardrooms or strategic plans. FutureFast was created to bridge that gap: turning the abstract hum of exponential change into actionable insight before it blindsides organizations.
+                        </p>
+                        
+                        <h3 class="why-matters-heading">Why It Matters</h3>
+                        
+                        <ul class="bullet-points">
+                            <li>Product cycles are compressing from years to months</li>
+                            <li>AI models are advancing by entire generations every season</li>
+                            <li>The digital and physical worlds are converging in real time</li>
+                            <li>Today's essential skills risk obsolescence by next quarter</li>
+                        </ul>
+                        
+                        <p class="closing-text">
+                            While most leaders glance at trends, few grasp the velocity behind them. FutureFast functions as both clutch and accelerator—filtering noise, surfacing meaningful signals, and delivering practical frameworks to build, invest, and lead ahead of the curve.
+                        </p>
+                        
+                        <p class="call-to-action">
+                            Ready to keep pace? Scroll down and let's move. ⚡️
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Data Stream -->
+        <div class="visualization-section">
+            <h2 class="viz-title">2. Morphing Data Stream</h2>
+            <p class="viz-description">
+                Data particles flowing and multiplying exponentially, representing information acceleration.
+            </p>
+            <div class="viz-container">
+                <button class="reset-btn" onclick="resetStream()">Reset</button>
+                <div class="stream-container" id="stream"></div>
+            </div>
+        </div>
+
+        <!-- 3. Cascade Reaction -->
+        <div class="visualization-section">
+            <h2 class="viz-title">3. Cascade Reaction</h2>
+            <p class="viz-description">
+                One trigger creates exponentially multiplying effects, like innovation cascading through industries.
+            </p>
+            <div class="viz-container">
+                <button class="reset-btn" onclick="resetCascade()">Reset</button>
+                <div class="cascade-container" id="cascade"></div>
+            </div>
+        </div>
+
+        <!-- 4. Technology Orbit System -->
+        <div class="visualization-section">
+            <h2 class="viz-title">4. Technology Orbit System</h2>
+            <p class="viz-description">
+                Technologies orbiting at increasing speeds, showing convergence and acceleration of innovation.
+            </p>
+            <div class="viz-container">
+                <button class="reset-btn" onclick="resetOrbits()">Reset</button>
+                <div class="orbit-container" id="orbits">
+                    <div class="orbit-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Neural Network Growth -->
+        <div class="visualization-section">
+            <h2 class="viz-title">5. Neural Network Growth</h2>
+            <p class="viz-description">
+                Network connections growing exponentially, perfect metaphor for AI and interconnected systems.
+            </p>
+            <div class="viz-container">
+                <button class="reset-btn" onclick="resetNeural()">Reset</button>
+                <div class="neural-container" id="neural"></div>
+            </div>
+        </div>
+
+        <!-- 6. Time Distortion -->
+        <div class="visualization-section">
+            <h2 class="viz-title">6. Clock/Time Distortion</h2>
+            <p class="viz-description">
+                Multiple clocks showing how exponential change outpaces our perception of time.
+            </p>
+            <div class="viz-container">
+                <button class="reset-btn" onclick="resetClocks()">Reset</button>
+                <div class="clock-container" id="clocks">
+                    <div class="clock">
+                        <div class="clock-hand hour-hand" style="animation-duration: 12s;"></div>
+                        <div class="clock-hand minute-hand" style="animation: normalTick 1s linear infinite;"></div>
+                        <div class="clock-label">Linear Time</div>
+                    </div>
+                    <div class="clock">
+                        <div class="clock-hand hour-hand" style="animation-duration: 6s;"></div>
+                        <div class="clock-hand minute-hand" style="animation: fastTick 0.5s linear infinite;"></div>
+                        <div class="clock-label">2x Speed</div>
+                    </div>
+                    <div class="clock">
+                        <div class="clock-hand hour-hand" style="animation-duration: 1s;"></div>
+                        <div class="clock-hand minute-hand" style="animation: blurTick 0.1s linear infinite; filter: blur(2px);"></div>
+                        <div class="clock-label">Exponential</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Enhanced Timeline Animation
+        function resetEnhancedTimeline() {
+            const container = document.getElementById('timeline-nodes');
+            const velocityFill = document.getElementById('velocity-fill');
+            
+            // Clear existing elements
+            if (container) {
+                container.innerHTML = '';
+            }
+            
+            // Reset velocity bar
+            if (velocityFill) {
+                velocityFill.style.animation = 'none';
+                velocityFill.offsetHeight; // Trigger reflow
+                velocityFill.style.animation = 'velocityFill 4s ease-out forwards';
+            }
+            
+            // Enhanced milestones with curved path positions
+            const milestones = [
+                { year: '1440', name: 'Printing Press', x: 5, y: 75, era: 'early', delay: 0.5 },
+                { year: '1876', name: 'Telephone', x: 15, y: 70, era: 'early', delay: 1.0 },
+                { year: '1969', name: 'Internet', x: 25, y: 65, era: 'mid', delay: 1.5 },
+                { year: '1995', name: 'World Wide Web', x: 35, y: 58, era: 'mid', delay: 2.0 },
+                { year: '2007', name: 'iPhone', x: 50, y: 48, era: 'mid', delay: 2.3 },
+                { year: '2016', name: 'AI Boom', x: 65, y: 38, era: 'recent', delay: 2.6 },
+                { year: '2020', name: 'GPT-3', x: 75, y: 32, era: 'recent', delay: 2.8 },
+                { year: '2023', name: 'ChatGPT', x: 85, y: 27, era: 'recent', delay: 3.0 },
+                { year: '2024', name: 'AGI?', x: 92, y: 23, era: 'recent', delay: 3.2 }
+            ];
+            
+            milestones.forEach((milestone, index) => {
+                setTimeout(() => {
+                    // Create node
+                    const node = document.createElement('div');
+                    node.className = `enhanced-timeline-node ${milestone.era}`;
+                    node.style.left = `${milestone.x}%`;
+                    node.style.top = `${milestone.y}%`;
+                    node.style.animationDelay = `${milestone.delay}s`;
+                    
+                    // Create label
+                    const label = document.createElement('div');
+                    label.className = 'enhanced-timeline-label';
+                    label.innerHTML = `<strong>${milestone.year}</strong><br/>${milestone.name}`;
+                    
+                    // Position label to avoid overlaps
+                    const labelOffset = index % 2 === 0 ? -50 : 25;
+                    label.style.left = `${milestone.x}%`;
+                    label.style.top = `${milestone.y + labelOffset}%`;
+                    label.style.animationDelay = `${milestone.delay + 0.3}s`;
+                    
+                    // Transform origin for better positioning
+                    if (index % 2 === 0) {
+                        label.style.transform = 'translate(-50%, -100%)';
+                    } else {
+                        label.style.transform = 'translate(-50%, 0%)';
+                    }
+                    
+                    container.appendChild(node);
+                    container.appendChild(label);
+                    
+                    // Add hover effects
+                    node.addEventListener('mouseenter', () => {
+                        node.style.transform = 'scale(1.5)';
+                        node.style.zIndex = '10';
+                        label.style.zIndex = '11';
+                        label.style.background = 'rgba(0, 200, 255, 0.9)';
+                    });
+                    
+                    node.addEventListener('mouseleave', () => {
+                        node.style.transform = 'scale(1)';
+                        node.style.zIndex = '1';
+                        label.style.zIndex = '2';
+                        label.style.background = 'rgba(0, 0, 0, 0.8)';
+                    });
+                    
+                }, milestone.delay * 1000);
+            });
+            
+            // Add path drawing animation restart
+            const path = document.querySelector('.timeline-curve');
+            if (path) {
+                path.style.animation = 'none';
+                path.offsetHeight; // Trigger reflow
+                path.style.animation = 'drawPath 3s ease-out forwards';
+            }
+        }
+        
+        // Keep original timeline function for other sections
+        function resetTimeline() {
+            // Original function for other timeline visualizations
+        }
+
+        // 2. Data Stream Animation
+        function resetStream() {
+            const container = document.getElementById('stream');
+            container.innerHTML = '';
+            
+            let particleCount = 1;
+            let interval = 1000;
+            
+            function createParticles() {
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'data-particle';
+                    particle.style.top = Math.random() * 380 + 'px';
+                    particle.style.animationDuration = (3 - Math.log(particleCount) * 0.3) + 's';
+                    particle.style.animationDelay = Math.random() * 0.5 + 's';
+                    particle.style.animation = 'streamFlow ' + particle.style.animationDuration + ' linear infinite';
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (container.contains(particle)) {
+                            container.removeChild(particle);
+                        }
+                    }, 4000);
+                }
+                
+                particleCount = Math.min(particleCount * 1.5, 50);
+                interval = Math.max(interval * 0.8, 100);
+                
+                setTimeout(createParticles, interval);
+            }
+            
+            createParticles();
+        }
+
+        // 3. Cascade Animation
+        function resetCascade() {
+            const container = document.getElementById('cascade');
+            container.innerHTML = '';
+            
+            let generation = 0;
+            const maxGenerations = 6;
+            
+            function createGeneration(gen, count, delay) {
+                if (gen >= maxGenerations) return;
+                
+                setTimeout(() => {
+                    for (let i = 0; i < count; i++) {
+                        const element = document.createElement('div');
+                        element.className = 'cascade-element';
+                        
+                        const angle = (i / count) * 2 * Math.PI;
+                        const radius = 50 + gen * 40;
+                        const x = 50 + Math.cos(angle) * radius;
+                        const y = 50 + Math.sin(angle) * radius;
+                        
+                        element.style.left = x + '%';
+                        element.style.top = y + '%';
+                        element.style.animationDelay = (i * 0.1) + 's';
+                        element.style.animation = 'cascadeGrow 1s ease-out forwards';
+                        
+                        container.appendChild(element);
+                    }
+                    
+                    createGeneration(gen + 1, count * 2, 800);
+                }, delay);
+            }
+            
+            createGeneration(0, 1, 0);
+        }
+
+        // 4. Orbit System Animation
+        function resetOrbits() {
+            const container = document.getElementById('orbits');
+            const existingRings = container.querySelectorAll('.orbit-ring');
+            existingRings.forEach(ring => ring.remove());
+            
+            const orbits = [
+                { radius: 80, speed: 4, color: '#00c8ff' },
+                { radius: 120, speed: 2, color: '#D4AF37' },
+                { radius: 160, speed: 1, color: '#ff6b6b' },
+                { radius: 200, speed: 0.5, color: '#4ecdc4' }
+            ];
+            
+            orbits.forEach((orbit, index) => {
+                setTimeout(() => {
+                    const ring = document.createElement('div');
+                    ring.className = 'orbit-ring';
+                    ring.style.width = orbit.radius * 2 + 'px';
+                    ring.style.height = orbit.radius * 2 + 'px';
+                    ring.style.marginLeft = -orbit.radius + 'px';
+                    ring.style.marginTop = -orbit.radius + 'px';
+                    ring.style.animationDuration = orbit.speed + 's';
+                    ring.style.borderColor = orbit.color + '40';
+                    
+                    const planet = document.createElement('div');
+                    planet.className = 'orbit-planet';
+                    planet.style.background = orbit.color;
+                    planet.style.boxShadow = `0 0 15px ${orbit.color}`;
+                    
+                    ring.appendChild(planet);
+                    container.appendChild(ring);
+                }, index * 500);
+            });
+        }
+
+        // 5. Neural Network Animation
+        function resetNeural() {
+            const container = document.getElementById('neural');
+            container.innerHTML = '';
+            
+            const nodes = [];
+            let nodeCount = 1;
+            
+            function addNode() {
+                if (nodeCount > 20) return;
+                
+                const node = document.createElement('div');
+                node.className = 'neural-node';
+                node.style.left = Math.random() * 90 + 5 + '%';
+                node.style.top = Math.random() * 90 + 5 + '%';
+                node.style.animationDelay = '0s';
+                
+                container.appendChild(node);
+                nodes.push(node);
+                
+                // Connect to previous nodes
+                if (nodes.length > 1) {
+                    const prevNode = nodes[Math.floor(Math.random() * (nodes.length - 1))];
+                    createConnection(prevNode, node);
+                }
+                
+                nodeCount++;
+                setTimeout(addNode, Math.max(1000 / nodeCount, 100));
+            }
+            
+            function createConnection(node1, node2) {
+                const connection = document.createElement('div');
+                connection.className = 'neural-connection';
+                
+                const rect1 = node1.getBoundingClientRect();
+                const rect2 = node2.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                const x1 = rect1.left - containerRect.left + rect1.width / 2;
+                const y1 = rect1.top - containerRect.top + rect1.height / 2;
+                const x2 = rect2.left - containerRect.left + rect2.width / 2;
+                const y2 = rect2.top - containerRect.top + rect2.height / 2;
+                
+                const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                
+                connection.style.width = length + 'px';
+                connection.style.left = x1 + 'px';
+                connection.style.top = y1 + 'px';
+                connection.style.transform = `rotate(${angle}deg)`;
+                connection.style.transformOrigin = '0 50%';
+                
+                container.appendChild(connection);
+            }
+            
+            addNode();
+        }
+
+        // 6. Clock Animation (already handled in CSS)
+        function resetClocks() {
+            // Clocks reset automatically with CSS animations
+            console.log('Clocks reset');
+        }
+
+        // Auto-start animations
+        window.addEventListener('load', () => {
+            setTimeout(() => resetEnhancedTimeline(), 500);
+            setTimeout(() => resetStream(), 1000);
+            setTimeout(() => resetCascade(), 1500);
+            setTimeout(() => resetOrbits(), 2000);
+            setTimeout(() => resetNeural(), 2500);
+        });
+    </script>
+</body>
+</html> 

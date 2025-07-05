@@ -57,5 +57,8 @@ videos:
   - slug: video-GqjOaaAYbk8
     category: Web3 & Blockchain
     featured: false
+  - slug: video-NEW_VIDEO_ID123
+    category: Test
+    featured: false
 ---
 

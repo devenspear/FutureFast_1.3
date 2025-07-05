@@ -1,6 +1,7 @@
 {
-  "name": "futurefast-homepage",
-  "version": "0.1.0",
+  "name": "vercel-web-framework",
+  "version": "1.0.0",
+  "description": "A comprehensive Next.js web framework template with content management, admin dashboard, and third-party integrations",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,7 +9,9 @@
     "restart": "kill-port 3000 && next dev --hostname 0.0.0.0 --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup": "node scripts/setup.js",
+    "template:init": "node scripts/template-init.js"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans-devanagari": "^5.2.5",

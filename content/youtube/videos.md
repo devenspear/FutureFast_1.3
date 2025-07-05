@@ -84,13 +84,6 @@ videos:
     featured: false
     publishedAt: '2025-05-12T13:00:59Z'
     channelName: Limitless FT
-  - url: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
-    title: YouTube Video
-    description: Video content from YouTube
-    category: Tech Innovation
-    featured: false
-    publishedAt: '2009-10-25T06:57:33Z'
-    channelName: Rick Astley
   - url: 'https://youtu.be/qyH3NxFz3Aw?si=iW8qrA8aZBZGvAIA'
     title: 'AI, Automation and the Future of Work'
     description: >-
@@ -119,11 +112,6 @@ videos:
       technology and society.
     category: Quantum Computing
     featured: false
-  - url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw'
-    title: '[Pending YouTube API]'
-    description: '[Will be filled by API]'
-    category: Tech History
-    featured: true
 ---
 
 # YouTube Videos Configuration

@@ -275,7 +275,7 @@ export default function VideoInterviewsSection() {
                 <div
                   key={video.id}
                   className="flex-shrink-0 w-72 md:w-80 h-[380px] md:h-[440px] bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-xl overflow-hidden hover:scale-105 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/20 border border-gray-700 hover:border-cyan-400/50 cursor-pointer group"
-                  onClick={() => window.open(video.url, '_blank')}
+                  onClick={() => window.open(`/videos/video-${video.id}`, '_blank')}
                   style={{
                     // Mobile touch optimizations
                     WebkitTapHighlightColor: 'transparent',
@@ -294,7 +294,7 @@ export default function VideoInterviewsSection() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      window.open(video.url, '_blank');
+                      window.open(`/videos/video-${video.id}`, '_blank');
                     }
                   }}
                 >
@@ -364,7 +364,7 @@ export default function VideoInterviewsSection() {
                       <div className="inline-block w-full py-2 md:py-3 px-4 md:px-6 rounded-lg font-medium text-white text-center transition-all duration-200 bg-gradient-to-r from-purple-700 to-indigo-900 hover:from-purple-600 hover:to-indigo-800 shadow-lg cursor-pointer text-sm md:text-base">
                         <div className="flex items-center justify-center gap-1 md:gap-2">
                           <FaPlay className="text-xs" />
-                          <span className="text-xs md:text-sm">Watch on YouTube</span>
+                          <span className="text-xs md:text-sm">View Details</span>
                         </div>
                       </div>
                     </div>

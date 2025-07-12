@@ -99,9 +99,7 @@ const NewsListSection: React.FC<NewsListProps> = ({ newsItems = sampleNewsItems 
                   </div>
                   
                   <a 
-                    href={item.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                    href={`/news/${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
                     className="relative z-10 block p-8 transition-all duration-300"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -138,7 +136,7 @@ const NewsListSection: React.FC<NewsListProps> = ({ newsItems = sampleNewsItems 
                           
                           {/* Hover Tooltip */}
                           <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap">
-                            Read Article
+                            View Details
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
                           </div>
                         </div>

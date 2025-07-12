@@ -56,60 +56,81 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-lg shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white font-orbitron">
-            FutureFast.AI Admin
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-300 font-sans">
-            Secure Administration Portal
-          </p>
+    <div className="min-h-screen flex items-center justify-center admin-bg-primary py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-500/10 to-pink-500/10 rounded-full blur-3xl"></div>
         </div>
         
-        <div className="mt-8 space-y-6">
+        <div className="relative admin-card p-8 admin-shadow-lg">
+          {/* Header */}
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-3xl font-bold admin-text-primary font-orbitron mb-2">
+              FutureFast.AI
+            </h2>
+            <p className="admin-text-secondary font-sans text-lg">
+              Admin Portal
+            </p>
+            <div className="mt-4 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+          </div>
+          
+          {/* Error Alert */}
           {error && (
-            <div className="rounded-md bg-red-900 p-4 text-white">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-300">{error}</p>
+            <div className="admin-alert admin-alert-error mt-6">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="font-medium">Authentication Failed</p>
+                  <p className="text-sm opacity-90">{error}</p>
                 </div>
               </div>
             </div>
           )}
 
+          {/* Login Form */}
           <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-            <div className="rounded-md shadow-sm -space-y-px">
-              <div>
-                <label htmlFor="username" className="sr-only">Username</label>
+            <div className="space-y-4">
+              <div className="admin-form-group">
+                <label htmlFor="username" className="admin-form-label">
+                  Username
+                </label>
                 <input
                   id="username"
                   name="username"
                   type="text"
                   autoComplete="username"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-700 rounded-t-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm"
-                  placeholder="Username"
+                  className="admin-input"
+                  placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
                 />
               </div>
-              <div>
-                <label htmlFor="password" className="sr-only">Password</label>
+              
+              <div className="admin-form-group">
+                <label htmlFor="password" className="admin-form-label">
+                  Password
+                </label>
                 <input
                   id="password"
                   name="password"
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-700 rounded-b-md focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm"
-                  placeholder="Password"
+                  className="admin-input"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
@@ -117,34 +138,49 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div>
+            <div className="pt-4">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="admin-btn w-full py-3 text-base font-medium relative overflow-hidden group"
               >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign in to Admin Dashboard'
-                )}
+                <span className="relative z-10 flex items-center justify-center">
+                  {isLoading ? (
+                    <>
+                      <div className="admin-spinner mr-3"></div>
+                      Authenticating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                      </svg>
+                      Sign In to Dashboard
+                    </>
+                  )}
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             </div>
           </form>
           
-          <div className="mt-4 text-center">
-            <p className="text-xs text-gray-400 font-sans">
-              Secure access for authorized administrators only.
-              <br />
-              All login attempts are monitored and logged.
-            </p>
+          {/* Footer */}
+          <div className="mt-8 pt-6 border-t admin-border">
+            <div className="text-center">
+              <p className="text-xs admin-text-muted font-sans leading-relaxed">
+                🔒 Secure access for authorized administrators only
+                <br />
+                All login attempts are monitored and logged for security
+              </p>
+            </div>
           </div>
+        </div>
+        
+        {/* Additional Security Info */}
+        <div className="text-center">
+          <p className="text-xs admin-text-muted font-sans">
+            Protected by enterprise-grade security protocols
+          </p>
         </div>
       </div>
     </div>

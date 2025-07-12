@@ -51,6 +51,9 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       console.log('📦 [YouTubeSection] Request body:', requestBody);
       
       console.log('📡 [YouTubeSection] Making fetch request with credentials: include');
+      console.log('📡 [YouTubeSection] Request URL:', endpoint);
+      console.log('📡 [YouTubeSection] Request body:', JSON.stringify(requestBody, null, 2));
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -163,12 +166,35 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
   
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Client-side validation
+    if (!url.trim()) {
+      alert('Please enter a YouTube URL');
+      return;
+    }
+    
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      alert('Please enter a valid YouTube URL. Make sure it includes the video ID (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)');
+      return;
+    }
+    
     handleSubmit({ 
-      url, 
+      url: url.trim(), 
       category, 
       featured, 
       ...(editingVideo && editingVideo.id ? { id: editingVideo.id } : {})
     });
+  };
+
+  // Helper function to extract video ID from a YouTube URL
+  const extractVideoId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      return match[2];
+    }
+    return null;
   };
   
   return (
@@ -229,14 +255,47 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                 type="url"
                 id="url"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  // Clear any previous errors when user starts typing
+                  if (error && e.target.value) {
+                    // This will be handled by the form validation
+                  }
+                }}
+                placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                 required
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
               <p className="mt-1 text-sm font-sans text-gray-400">
                 Paste the full YouTube URL (supports youtube.com and youtu.be formats)
               </p>
+              {/* URL validation preview */}
+              {url && (
+                <div className="mt-2 p-2 bg-gray-800 rounded text-sm">
+                  {(() => {
+                    const videoId = extractVideoId(url);
+                    if (videoId) {
+                      return (
+                        <div className="text-green-400">
+                          ✅ Valid YouTube URL - Video ID: {videoId}
+                        </div>
+                      );
+                    } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                      return (
+                        <div className="text-yellow-400">
+                          ⚠️ YouTube URL detected but invalid format. Make sure it includes the video ID (v=...)
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="text-red-400">
+                          ❌ Not a valid YouTube URL
+                        </div>
+                      );
+                    }
+                  })()}
+                </div>
+              )}
             </div>
             
             <div>

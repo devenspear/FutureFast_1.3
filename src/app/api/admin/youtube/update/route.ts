@@ -22,11 +22,41 @@ function extractVideoId(url: string): string | null {
 
 export async function POST(request: Request) {
   try {
-    // Verify authentication by reading the auth-token cookie
-    const authToken = request.headers.get('cookie')?.split(';')
-      .find(c => c.trim().startsWith('auth-token='))?.split('=')[1];
+    // Verify authentication - support both JWT cookie and Basic Auth
+    const cookieHeader = request.headers.get('cookie');
+    const authHeader = request.headers.get('authorization');
+    
+    let isAuthenticated = false;
+    
+    // Check for JWT token in cookies first
+    if (cookieHeader) {
+      const authToken = cookieHeader.split(';')
+        .find(c => c.trim().startsWith('auth-token='))?.split('=')[1];
       
-    if (!authToken) {
+      if (authToken) {
+        isAuthenticated = true;
+      }
+    }
+    
+    // If no JWT token, check for Basic Auth
+    if (!isAuthenticated && authHeader?.startsWith('Basic ')) {
+      try {
+        const base64Credentials = authHeader.split(' ')[1];
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+        const [username, password] = credentials.split(':');
+        
+        const expectedUsername = process.env.ADMIN_USERNAME;
+        const expectedPassword = process.env.ADMIN_PASSWORD;
+        
+        if (username === expectedUsername && password === expectedPassword) {
+          isAuthenticated = true;
+        }
+      } catch (error) {
+        console.error('Basic Auth parsing error:', error);
+      }
+    }
+      
+    if (!isAuthenticated) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

@@ -60,5 +60,8 @@ videos:
   - slug: video-NEW_VIDEO_ID123
     category: Test
     featured: false
+  - slug: video-camlUwrxsfs
+    category: Interview
+    featured: false
 ---
 

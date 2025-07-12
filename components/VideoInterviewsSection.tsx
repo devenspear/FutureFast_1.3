@@ -24,9 +24,9 @@ export default function VideoInterviewsSection() {
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  // Client-side cache key and duration (30 minutes)
+  // Client-side cache key and duration (5 minutes for development, 30 minutes for production)
   const CACHE_KEY = 'youtube_videos_cache';
-  const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+  const CACHE_DURATION = process.env.NODE_ENV === 'development' ? 5 * 60 * 1000 : 30 * 60 * 1000; // 5 minutes in dev, 30 minutes in prod
 
   // Check if cached data is still valid
   const getCachedData = useCallback((): YouTubeVideo[] | null => {

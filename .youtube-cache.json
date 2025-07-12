@@ -1,6 +1,17 @@
 {
   "videos": [
     {
+      "id": "camlUwrxsfs",
+      "title": "AI Experts React: Elon’s Grok 4 Is Now #1 in AI —This Changes Everything w/ Emad, Salim & Dave #182",
+      "description": "Get access to metatrends 10+ years before anyone else - https://qr.diamandis.com/metatrends  \n\nSalim Ismail is the founder of OpenExO\n\nDave Blundin is the founder of Link Ventures\n\nEmad Mostaque is th...",
+      "thumbnail": "https://i.ytimg.com/vi/camlUwrxsfs/maxresdefault.jpg",
+      "publishedAt": "2025-07-11T15:40:54Z",
+      "channelTitle": "Peter H. Diamandis",
+      "url": "https://www.youtube.com/watch?v=camlUwrxsfs",
+      "category": "Interview",
+      "featured": false
+    },
+    {
       "id": "GqjOaaAYbk8",
       "title": "Billionaire Reveals How Bitcoin Hits $21M By 2046! (FULL BREAKDOWN)",
       "description": "Michael Saylor's keynote presentation from BTC Prague 2025 could be the single greatest explanation of Bitcoin ever.\n\nIf you enjoyed this speech, make sure you save the date and get you tickets for Bt...",
@@ -175,29 +186,7 @@
       "url": "https://youtu.be/qyH3NxFz3Aw?si=iW8qrA8aZBZGvAIA",
       "category": "AI & Future of Work",
       "featured": true
-    },
-    {
-      "id": "dQw4w9WgXcQ",
-      "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
-      "description": "The official video for “Never Gonna Give You Up” by Rick Astley. \n\nNever: The Autobiography 📚 OUT NOW! \nFollow this link to get your copy and listen to Rick’s ‘Never’ playlist ❤️ #RickAstleyNever\nhtt...",
-      "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-      "publishedAt": "2009-10-25T06:57:33Z",
-      "channelTitle": "Rick Astley",
-      "url": "https://youtube.com/watch?v=dQw4w9WgXcQ",
-      "category": "Tech Innovation",
-      "featured": false
-    },
-    {
-      "id": "jNQXAC9IVRw",
-      "title": "Me at the zoo",
-      "description": "Microplastics are accumulating in human brains at an alarming rate\nhttps://www.youtube.com/watch?v=0PT5c1z3LL8\n\n“Nanoplastics and Human Health” with Matthew J Campen, PhD, MSPH\nhttps://www.youtube.com...",
-      "thumbnail": "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
-      "publishedAt": "2005-04-24T03:31:52Z",
-      "channelTitle": "jawed",
-      "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-      "category": "Tech History",
-      "featured": true
     }
   ],
-  "timestamp": 1751718642329
+  "timestamp": 1752287431822
 }

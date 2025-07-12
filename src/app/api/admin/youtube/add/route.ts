@@ -33,23 +33,51 @@ export async function POST(request: Request) {
     const headers = Object.fromEntries(request.headers.entries());
     console.log('📋 [YouTube Add API] Request headers:', headers);
     
-    // Verify authentication by reading the auth-token cookie
+    // Verify authentication - support both JWT cookie and Basic Auth
     const cookieHeader = request.headers.get('cookie');
+    const authHeader = request.headers.get('authorization');
+    
     console.log('🍪 [YouTube Add API] Cookie header:', cookieHeader ? 'Present' : 'Missing');
+    console.log('🔑 [YouTube Add API] Authorization header:', authHeader ? 'Present' : 'Missing');
+    
+    let isAuthenticated = false;
+    
+    // Check for JWT token in cookies first
     if (cookieHeader) {
       console.log('🍪 [YouTube Add API] Cookie header preview:', cookieHeader.substring(0, 100) + '...');
+      const authToken = cookieHeader.split(';')
+        .find(c => c.trim().startsWith('auth-token='))?.split('=')[1];
+      
+      if (authToken) {
+        console.log('🔑 [YouTube Add API] JWT token found');
+        isAuthenticated = true;
+      }
     }
     
-    const authToken = cookieHeader?.split(';')
-      .find(c => c.trim().startsWith('auth-token='))?.split('=')[1];
-    
-    console.log('🔑 [YouTube Add API] Auth token extracted:', !!authToken);
-    if (authToken) {
-      console.log('🔑 [YouTube Add API] Auth token preview:', authToken.substring(0, 50) + '...');
+    // If no JWT token, check for Basic Auth
+    if (!isAuthenticated && authHeader?.startsWith('Basic ')) {
+      console.log('🔑 [YouTube Add API] Checking Basic Auth');
+      try {
+        const base64Credentials = authHeader.split(' ')[1];
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+        const [username, password] = credentials.split(':');
+        
+        const expectedUsername = process.env.ADMIN_USERNAME;
+        const expectedPassword = process.env.ADMIN_PASSWORD;
+        
+        if (username === expectedUsername && password === expectedPassword) {
+          console.log('✅ [YouTube Add API] Basic Auth successful');
+          isAuthenticated = true;
+        } else {
+          console.log('❌ [YouTube Add API] Basic Auth failed - invalid credentials');
+        }
+      } catch (error) {
+        console.error('❌ [YouTube Add API] Basic Auth parsing error:', error);
+      }
     }
       
-    if (!authToken) {
-      console.error('❌ [YouTube Add API] No auth token found in cookies');
+    if (!isAuthenticated) {
+      console.error('❌ [YouTube Add API] No valid authentication found');
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

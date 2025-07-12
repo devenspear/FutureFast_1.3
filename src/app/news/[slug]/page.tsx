@@ -15,15 +15,16 @@ interface NewsFrontmatter {
   tags?: string[];
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { frontmatter } = await getNewsBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const { frontmatter } = await getNewsBySlug(slug);
   return {
     title: `${frontmatter.title} | News | FutureFast` || 'News Article',
     description: frontmatter.summary || `Read the latest news: ${frontmatter.title}`,
     openGraph: {
       title: frontmatter.title,
       description: frontmatter.summary || '',
-      url: `https://futurefast.ai/news/${params.slug}`,
+      url: `https://futurefast.ai/news/${slug}`,
       type: 'article',
       siteName: 'FutureFast',
       images: [
@@ -63,8 +64,9 @@ async function getNewsBySlug(slug: string) {
   return found;
 }
 
-export default async function NewsArticlePage({ params }: { params: { slug: string } }) {
-  const { frontmatter, content } = await getNewsBySlug(params.slug);
+export default async function NewsArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const { frontmatter, content } = await getNewsBySlug(slug);
   return (
     <main className="min-h-screen bg-black text-white py-12 px-4">
       <article className="max-w-2xl mx-auto bg-gray-900/80 rounded-xl shadow-lg p-8 border border-gray-800">
@@ -88,8 +90,8 @@ export default async function NewsArticlePage({ params }: { params: { slug: stri
             headline: frontmatter.title,
             datePublished: frontmatter.date,
             author: { '@type': 'Organization', name: frontmatter.source },
-            url: `https://futurefast.ai/news/${params.slug}`,
-            mainEntityOfPage: `https://futurefast.ai/news/${params.slug}`,
+            url: `https://futurefast.ai/news/${slug}`,
+            mainEntityOfPage: `https://futurefast.ai/news/${slug}`,
             description: frontmatter.summary || '',
             image: 'https://futurefast.ai/social-share.png',
           }),

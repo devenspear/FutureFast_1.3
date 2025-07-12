@@ -14,15 +14,16 @@ interface BlogPostFrontmatter {
   featured?: boolean;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { frontmatter } = await getBlogPostBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const { frontmatter } = await getBlogPostBySlug(slug);
   return {
     title: `${frontmatter.title} | Blog | FutureFast`,
     description: frontmatter.excerpt || `Read: ${frontmatter.title}`,
     openGraph: {
       title: frontmatter.title,
       description: frontmatter.excerpt || '',
-      url: `https://futurefast.ai/blog/${params.slug}`,
+      url: `https://futurefast.ai/blog/${slug}`,
       type: 'article',
       siteName: 'FutureFast',
       publishedTime: frontmatter.date,
@@ -54,8 +55,9 @@ async function getBlogPostBySlug(slug: string) {
   return { frontmatter: data as BlogPostFrontmatter, content };
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const { frontmatter, content } = await getBlogPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const { frontmatter, content } = await getBlogPostBySlug(slug);
   
   return (
     <main className="min-h-screen bg-black text-white py-12 px-4">
@@ -153,8 +155,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               name: 'FutureFast',
               url: 'https://futurefast.ai',
             },
-            url: `https://futurefast.ai/blog/${params.slug}`,
-            mainEntityOfPage: `https://futurefast.ai/blog/${params.slug}`,
+            url: `https://futurefast.ai/blog/${slug}`,
+            mainEntityOfPage: `https://futurefast.ai/blog/${slug}`,
             description: frontmatter.excerpt || '',
             image: 'https://futurefast.ai/social-share.png',
             keywords: frontmatter.tags.join(', '),

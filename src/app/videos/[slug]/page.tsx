@@ -14,15 +14,16 @@ interface VideoFrontmatter {
   channelTitle?: string;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { frontmatter } = await getVideoBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const { frontmatter } = await getVideoBySlug(slug);
   return {
     title: `${frontmatter.title} | Video | FutureFast` || 'Video Interview',
     description: frontmatter.description || `Watch: ${frontmatter.title}`,
     openGraph: {
       title: frontmatter.title,
       description: frontmatter.description || '',
-      url: `https://futurefast.ai/videos/${params.slug}`,
+      url: `https://futurefast.ai/videos/${slug}`,
       type: 'video.other',
       siteName: 'FutureFast',
       videos: [
@@ -72,8 +73,9 @@ async function getVideoBySlug(slug: string) {
   return { frontmatter: data as VideoFrontmatter, content };
 }
 
-export default async function VideoDetailPage({ params }: { params: { slug: string } }) {
-  const { frontmatter } = await getVideoBySlug(params.slug);
+export default async function VideoDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const { frontmatter } = await getVideoBySlug(slug);
   const videoId = extractVideoId(frontmatter.url);
   return (
     <main className="min-h-screen bg-black text-white py-12 px-4">

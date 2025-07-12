@@ -26,8 +26,6 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       url: `https://futurefast.ai/news/${params.slug}`,
       type: 'article',
       siteName: 'FutureFast',
-      publishedTime: frontmatter.date,
-      authors: [frontmatter.source],
       images: [
         {
           url: 'https://futurefast.ai/social-share.png',

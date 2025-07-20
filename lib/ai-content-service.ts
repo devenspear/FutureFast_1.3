@@ -1,6 +1,7 @@
 import ContentExtractor from './content-extractor';
 import NotionClient from './notion-client';
 import { ContentClassifier } from './content-classifier';
+import NotionYouTubeService from './notion-youtube-service';
 import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
@@ -34,11 +35,13 @@ class AIContentService {
   private contentExtractor: ContentExtractor;
   private notionClient: NotionClient;
   private contentClassifier: ContentClassifier;
+  private youtubeService: NotionYouTubeService;
 
   constructor() {
     this.contentExtractor = new ContentExtractor();
     this.notionClient = new NotionClient();
     this.contentClassifier = new ContentClassifier();
+    this.youtubeService = new NotionYouTubeService();
   }
 
   /**
@@ -301,22 +304,70 @@ class AIContentService {
   }
 
   /**
-   * Get processing statistics
+   * Get processing statistics including YouTube data
    */
-  async getProcessingStats(): Promise<{ incompleteCount: number; totalCount: number }> {
+  async getProcessingStats(): Promise<{ 
+    incompleteCount: number; 
+    totalCount: number; 
+    youtubeCount: number;
+    totalNotionRecords: number;
+  }> {
     try {
-      const [incompleteRecords, allRecords] = await Promise.all([
+      const [incompleteRecords, allRecords, youtubeStats] = await Promise.all([
         this.notionClient.getIncompleteRecords(),
-        this.notionClient.getNewsArticles()
+        this.notionClient.getNewsArticles(),
+        this.youtubeService.getProcessingStats()
       ]);
 
       return {
         incompleteCount: incompleteRecords.length,
-        totalCount: allRecords.length
+        totalCount: allRecords.length,
+        youtubeCount: youtubeStats.youtubeRecordCount,
+        totalNotionRecords: youtubeStats.totalNotionRecords
       };
     } catch (error) {
       console.error('❌ Failed to get processing stats:', error);
-      return { incompleteCount: 0, totalCount: 0 };
+      return { 
+        incompleteCount: 0, 
+        totalCount: 0, 
+        youtubeCount: 0,
+        totalNotionRecords: 0 
+      };
+    }
+  }
+
+  /**
+   * Process both news and YouTube content from Notion
+   */
+  async processAllContent(): Promise<{
+    newsStats: ProcessingStats;
+    youtubeStats: any;
+    summary: string;
+  }> {
+    console.log('🚀 Starting comprehensive Notion content processing...');
+
+    try {
+      // Process news content (excluding YouTube URLs)
+      const newsStats = await this.processIncompleteRecords();
+      
+      // Process YouTube content
+      const youtubeStats = await this.youtubeService.processAllYouTubeRecords();
+
+      const summary = `Content processing complete:
+        • News articles: ${newsStats.successful} processed, ${newsStats.failed} failed
+        • YouTube videos: ${youtubeStats.successful} processed, ${youtubeStats.failed} failed
+        • Total: ${newsStats.successful + youtubeStats.successful} items processed successfully`;
+
+      console.log(summary);
+
+      return {
+        newsStats,
+        youtubeStats,
+        summary
+      };
+    } catch (error) {
+      console.error('❌ Error processing all content:', error);
+      throw error;
     }
   }
 

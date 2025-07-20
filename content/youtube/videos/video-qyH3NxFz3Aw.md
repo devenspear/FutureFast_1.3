@@ -1,9 +1,12 @@
 ---
 url: 'https://youtu.be/qyH3NxFz3Aw?si=iW8qrA8aZBZGvAIA'
-title: 'AI, Automation and the Future of Work'
+title: >-
+  Full interview: "Godfather of AI" shares prediction for future of AI, issues
+  warnings
 description: >-
-  Exploring how artificial intelligence and automation are reshaping the
-  workplace and what it means for the future of employment.
+  Nobel laureate Geoffrey Hinton, often called a "godfather of artificial
+  intelligence," spoke with Brook Silva-Braga at the Toronto offices of Radical
+  Ventures about the future of AI earlier this month...
 category: AI & Future of Work
 featured: true
 publishedAt: '2025-04-26T11:56:53Z'

@@ -113,6 +113,8 @@ async function writeCacheFile(videos: YouTubeVideoData[]): Promise<void> {
                 // Update with the latest metadata from the API
                 const updatedVideoData = {
                   ...videoData,
+                  title: cacheVideo.title,
+                  description: cacheVideo.description,
                   publishedAt: cacheVideo.publishedAt,
                   channelName: cacheVideo.channelTitle
                 };
@@ -145,6 +147,8 @@ async function writeCacheFile(videos: YouTubeVideoData[]): Promise<void> {
               // Update with the latest metadata from the API
               data.videos[markdownVideoIndex] = {
                 ...data.videos[markdownVideoIndex],
+                title: cacheVideo.title,
+                description: cacheVideo.description,
                 publishedAt: cacheVideo.publishedAt,
                 channelName: cacheVideo.channelTitle
               };

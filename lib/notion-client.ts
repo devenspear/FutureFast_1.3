@@ -84,6 +84,72 @@ class NotionClient {
     return selectProperty?.select?.name || '';
   }
 
+  /**
+   * Check if a URL is a YouTube URL
+   */
+  private isYouTubeUrl(url: string): boolean {
+    if (!url) return false;
+    const youtubePatterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+    ];
+    return youtubePatterns.some(pattern => pattern.test(url));
+  }
+
+  /**
+   * Get records that contain YouTube URLs (for YouTube processing)
+   */
+  async getYouTubeRecords(): Promise<NotionNewsItem[]> {
+    try {
+      console.log('🎥 Querying records with YouTube URLs...');
+      
+      const response = await this.client.databases.query({
+        database_id: this.databaseId,
+        filter: {
+          and: [
+            {
+              property: 'Source URL',
+              url: {
+                is_not_empty: true
+              }
+            },
+            {
+              property: 'Status',
+              select: {
+                equals: 'Published'
+              }
+            }
+          ]
+        }
+      });
+
+      // Filter for YouTube URLs on the client side since Notion doesn't support URL pattern filtering
+      const youtubeRecords = response.results
+        .map((page: any) => {
+          const properties = page.properties;
+          return {
+            id: page.id,
+            title: this.extractTitle(properties.Title),
+            source: this.extractRichText(properties.Source),
+            publishedDate: this.extractDate(properties['Publication Date']),
+            sourceUrl: this.extractUrl(properties['Source URL']),
+            status: this.extractSelect(properties.Status),
+          };
+        })
+        .filter(record => this.isYouTubeUrl(record.sourceUrl));
+
+      console.log(`✅ Found ${youtubeRecords.length} YouTube records`);
+      return youtubeRecords;
+      
+    } catch (error) {
+      console.error('❌ Failed to query YouTube records:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get records that need AI content extraction (excluding YouTube URLs)
+   */
   async getIncompleteRecords(): Promise<NotionNewsItem[]> {
     try {
       console.log('🔍 Querying records that need AI content extraction...');
@@ -124,20 +190,24 @@ class NotionClient {
         }
       });
 
-      console.log(`✅ Found ${response.results.length} records needing content extraction`);
+      // Filter out YouTube URLs from news processing
+      const nonYouTubeRecords = response.results
+        .map((page: any) => {
+          const properties = page.properties;
+          return {
+            id: page.id,
+            title: this.extractTitle(properties.Title),
+            source: this.extractRichText(properties.Source),
+            publishedDate: this.extractDate(properties['Publication Date']),
+            sourceUrl: this.extractUrl(properties['Source URL']),
+            status: this.extractSelect(properties.Status),
+          };
+        })
+        .filter(record => !this.isYouTubeUrl(record.sourceUrl)); // Exclude YouTube URLs
+
+      console.log(`✅ Found ${nonYouTubeRecords.length} non-YouTube records needing content extraction`);
       
-      return response.results.map((page: any) => {
-        const properties = page.properties;
-        
-        return {
-          id: page.id,
-          title: this.extractTitle(properties.Title),
-          source: this.extractRichText(properties.Source),
-          publishedDate: this.extractDate(properties['Publication Date']),
-          sourceUrl: this.extractUrl(properties['Source URL']),
-          status: this.extractSelect(properties.Status),
-        };
-      });
+      return nonYouTubeRecords;
     } catch (error) {
       console.error('❌ Failed to query incomplete records:', error);
       throw error;

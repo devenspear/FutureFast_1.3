@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import AIContentService from '../../../../../lib/ai-content-service';
+import UnifiedContentService from '../../../../../lib/unified-content-service';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('🤖 Starting scheduled AI content processing...');
+    console.log('🤖 Starting scheduled unified content processing...');
     
-    const aiContentService = new AIContentService();
-    const stats = await aiContentService.processIncompleteRecords();
+    const unifiedService = new UnifiedContentService();
+    const stats = await unifiedService.processAllContent();
     
     const message = `Scheduled processing complete: ${stats.successful} successful, ${stats.failed} failed out of ${stats.total} total records`;
     

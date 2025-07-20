@@ -8,14 +8,25 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'process-all':
-        // Process all incomplete records
-        console.log('🚀 Processing all incomplete records...');
+        // Process all incomplete records (news only, excluding YouTube)
+        console.log('🚀 Processing all incomplete news records...');
         const stats = await aiContentService.processIncompleteRecords();
         
         return NextResponse.json({
           success: true,
-          message: `Processed ${stats.total} records. ${stats.successful} successful, ${stats.failed} failed.`,
+          message: `Processed ${stats.total} news records. ${stats.successful} successful, ${stats.failed} failed.`,
           data: stats
+        });
+
+      case 'process-all-content':
+        // Process both news and YouTube content
+        console.log('🚀 Processing all Notion content (news + YouTube)...');
+        const allContentStats = await aiContentService.processAllContent();
+        
+        return NextResponse.json({
+          success: true,
+          message: allContentStats.summary,
+          data: allContentStats
         });
 
       case 'process-url':

@@ -353,7 +353,7 @@ export default function UnifiedContentTestPage() {
             </ul>
             
             <p className="mt-4 text-yellow-300">
-              <strong>💡 How to use:</strong> Just add a Source URL and the system will automatically detect if it's a news article or YouTube video, then extract all metadata!
+              <strong>💡 How to use:</strong> Just add a Source URL and the system will automatically detect if it&apos;s a news article or YouTube video, then extract all metadata!
             </p>
           </div>
         </div>

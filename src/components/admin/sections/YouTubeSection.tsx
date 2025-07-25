@@ -391,7 +391,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                   <p className="text-sm text-gray-400 mb-1">Channel: {video.channelName}</p>
                 )}
                 {video.publishedAt && (
-                  <p className="text-sm text-gray-400 mb-1">Published: {new Date(video.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                  <p className="text-sm text-gray-400 mb-1">Published: {new Date(video.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}</p>
                 )}
                 <p className="text-sm text-gray-400 mb-3 line-clamp-2">{video.description}</p>
                 

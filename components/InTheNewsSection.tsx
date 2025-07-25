@@ -62,6 +62,22 @@ export default function InTheNewsSection() {
                     {item.title}
                   </h2>
                   
+                  <div className="text-xs text-gray-400 mb-1">
+                  {(() => {
+                    try {
+                      const date = new Date(item.date);
+                      const options: Intl.DateTimeFormatOptions = { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        timeZone: 'UTC' // Force UTC to prevent date shifts
+                      };
+                      return date.toLocaleDateString('en-US', options);
+                    } catch {
+                      return item.date;
+                    }
+                  })()}
+                </div>
                   <div className="flex flex-wrap items-center mt-2 text-sm text-gray-400 gap-4">
                     <div className="flex items-center gap-1">
                       <FaNewspaper className="text-cyan-500" />

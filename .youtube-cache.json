@@ -1,6 +1,17 @@
 {
   "videos": [
     {
+      "id": "aYn8VKW6vXA",
+      "title": "Sam Altman | This Past Weekend w/ Theo Von #599",
+      "description": "Sam Altman is an entrepreneur, investor and CEO of the artificial intelligence company OpenAI, known for their popular program ChatGPT.\n\nTheo joins Sam at the OpenAI office in San Francisco to talk ab...",
+      "thumbnail": "https://i.ytimg.com/vi/aYn8VKW6vXA/maxresdefault.jpg",
+      "publishedAt": "2025-07-23T17:19:20Z",
+      "channelTitle": "Theo Von",
+      "url": "https://youtu.be/aYn8VKW6vXA?si=n5u8ja_gddIMEyea",
+      "category": "Interview",
+      "featured": false
+    },
+    {
       "id": "IIf-hc_SagA",
       "title": "\"People Don't Know What's Coming\" | Chainlink Founder on Trump GENIUS Act, CLARITY Act, & MORE!",
       "description": "Sergey Nazarov Interview 2025\n🔵 Follow Sergey: https://x.com/SergeyNazarov\n🔴  https://x.com/chainlink\n\n🔥 SIGN UP with WEEX and get $100 Bonus and VIP 2 instantly (limited time): https://www.weex.co...",
@@ -197,7 +208,29 @@
       "url": "https://youtu.be/qyH3NxFz3Aw?si=iW8qrA8aZBZGvAIA",
       "category": "AI & Future of Work",
       "featured": true
+    },
+    {
+      "id": "dQw4w9WgXcQ",
+      "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+      "description": "The official video for “Never Gonna Give You Up” by Rick Astley. \n\nNever: The Autobiography 📚 OUT NOW! \nFollow this link to get your copy and listen to Rick’s ‘Never’ playlist ❤️ #RickAstleyNever\nhtt...",
+      "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+      "publishedAt": "2009-10-25T06:57:33Z",
+      "channelTitle": "Rick Astley",
+      "url": "https://youtu.be/dQw4w9WgXcQ",
+      "category": "Interview",
+      "featured": false
+    },
+    {
+      "id": "dQw4w9WgXcQ",
+      "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+      "description": "The official video for “Never Gonna Give You Up” by Rick Astley. \n\nNever: The Autobiography 📚 OUT NOW! \nFollow this link to get your copy and listen to Rick’s ‘Never’ playlist ❤️ #RickAstleyNever\nhtt...",
+      "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+      "publishedAt": "2009-10-25T06:57:33Z",
+      "channelTitle": "Rick Astley",
+      "url": "https://youtu.be/dQw4w9WgXcQ",
+      "category": "Interview",
+      "featured": false
     }
   ],
-  "timestamp": 1752978394650
+  "timestamp": 1753487628497
 }

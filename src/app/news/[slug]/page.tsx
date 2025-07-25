@@ -74,7 +74,7 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
         <div className="flex items-center text-sm text-gray-400 mb-4 gap-4">
           <span>{frontmatter.source}</span>
           <span>•</span>
-          <span>{new Date(frontmatter.date).toLocaleDateString()}</span>
+          <span>{new Date(frontmatter.date).toLocaleDateString('en-US', { timeZone: 'UTC' })}</span>
         </div>
         {frontmatter.summary && <p className="text-lg text-gray-200 mb-6">{frontmatter.summary}</p>}
         <div className="prose prose-invert max-w-none mb-8" dangerouslySetInnerHTML={{ __html: content }} />

@@ -92,7 +92,7 @@ export default function BlogPage() {
                   <p className="text-gray-300 mb-4 line-clamp-3">{post.excerpt}</p>
                   <div className="flex items-center justify-between text-sm text-gray-400">
                     <span>{post.author}</span>
-                    <span>{new Date(post.date).toLocaleDateString()}</span>
+                    <span>{new Date(post.date).toLocaleDateString('en-US', { timeZone: 'UTC' })}</span>
                   </div>
                 </article>
               ))}
@@ -114,7 +114,7 @@ export default function BlogPage() {
                   <div className="flex items-center gap-4 text-sm text-gray-400">
                     <span>{post.author}</span>
                     <span>•</span>
-                    <span>{new Date(post.date).toLocaleDateString()}</span>
+                    <span>{new Date(post.date).toLocaleDateString('en-US', { timeZone: 'UTC' })}</span>
                   </div>
                   {post.tags.length > 0 && (
                     <div className="flex gap-2">

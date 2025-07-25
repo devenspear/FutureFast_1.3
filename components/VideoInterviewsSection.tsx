@@ -149,7 +149,8 @@ export default function VideoInterviewsSection() {
       return date.toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'short', 
-        day: 'numeric' 
+        day: 'numeric',
+        timeZone: 'UTC' // Force UTC to prevent date shifts
       });
     } catch (err) {
       console.error('Error formatting date:', err, 'Date string:', dateString);

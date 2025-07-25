@@ -190,13 +190,15 @@ export default function NewsAndDisruptionSection() {
                     <div className="flex-shrink-0 min-w-0 sm:min-w-[140px] sm:max-w-[140px]">
                       <div className="text-xs text-gray-400 mb-1 leading-tight font-bold group-hover:text-gray-300 transition-colors">
                         {(() => {
-                          // Format date to "Month Day, Year"
+                          // Format date to "Month Day, Year" using UTC to prevent timezone issues
                           try {
                             const date = new Date(item.date);
+                            // Use UTC methods to avoid timezone offset
                             const options: Intl.DateTimeFormatOptions = { 
                               year: 'numeric', 
                               month: 'long', 
-                              day: 'numeric' 
+                              day: 'numeric',
+                              timeZone: 'UTC' // Force UTC to prevent date shifts
                             };
                             return date.toLocaleDateString('en-US', options);
                           } catch {

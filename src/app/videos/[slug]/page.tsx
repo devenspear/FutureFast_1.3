@@ -83,7 +83,7 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ sl
         <h1 className="text-3xl font-bold font-orbitron mb-2">{frontmatter.title}</h1>
         <div className="flex items-center text-sm text-gray-400 mb-4 gap-4">
           <span>{frontmatter.channelTitle || 'YouTube'}</span>
-          {frontmatter.publishedAt && <><span>•</span><span>{new Date(frontmatter.publishedAt).toLocaleDateString()}</span></>}
+          {frontmatter.publishedAt && <><span>•</span><span>{new Date(frontmatter.publishedAt).toLocaleDateString('en-US', { timeZone: 'UTC' })}</span></>}
         </div>
         {frontmatter.description && <p className="text-lg text-gray-200 mb-6">{frontmatter.description}</p>}
         {videoId && (

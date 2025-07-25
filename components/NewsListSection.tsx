@@ -122,7 +122,21 @@ const NewsListSection: React.FC<NewsListProps> = ({ newsItems = sampleNewsItems 
                             <div className="p-2 bg-purple-500/10 rounded-lg">
                               <FaCalendarAlt className="text-purple-500" />
                             </div>
-                            <span>{formattedDate}</span>
+                            <time className="text-sm text-gray-400">
+                              {(() => {
+                                try {
+                                  const date = new Date(item.publishedDate);
+                                  return date.toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    timeZone: 'UTC' // Force UTC to prevent date shifts
+                                  });
+                                } catch {
+                                  return item.publishedDate;
+                                }
+                              })()}
+                            </time>
                           </div>
                         </div>
                       </div>

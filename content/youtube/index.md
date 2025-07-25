@@ -69,5 +69,8 @@ videos:
   - slug: video-dQw4w9WgXcQ
     category: Interview
     featured: false
+  - slug: video-aYn8VKW6vXA
+    category: Interview
+    featured: false
 ---
 

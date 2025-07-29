@@ -13,48 +13,63 @@ When you add new URLs to your Notion database, you'll now see:
 
 This is the **most visible** way to monitor processing since you see it every time you add new content.
 
-### 2. **Email Notifications**
+### 2. **Email Notifications via MailerLite**
 Get email alerts for:
 - ✅ Processing summaries after each cron run
 - ❌ Critical errors and failures
 - 🚨 Unauthorized access attempts
+- 📝 New content added notifications
 
-## 📧 **Email Setup Options**
+## 📧 **Email Setup - MailerLite (Recommended)**
 
-### Option A: Resend (Recommended)
-1. Go to [resend.com](https://resend.com) and create an account
-2. Get your API key
-3. Add to Vercel environment variables:
+Since FutureFast.AI already uses MailerLite for form submissions, we've integrated it as the primary email notification provider for consistency.
+
+### Getting Your MailerLite API Key:
+
+1. **Log into MailerLite Dashboard**
+   - Go to [app.mailerlite.com](https://app.mailerlite.com)
+   - Use your existing FutureFast.AI MailerLite account
+
+2. **Generate API Key**
+   - Click on your profile (top right)
+   - Go to **Integrations** → **API**
+   - Generate a new API token
+   - Copy the token (starts with `ml_...`)
+
+3. **Add to Vercel Environment Variables:**
    ```
-   RESEND_API_KEY=re_your_api_key_here
+   MAILERLITE_API_KEY=ml_your_api_token_here
    ADMIN_EMAIL=your-email@domain.com
    ```
 
-### Option B: Console Logging (Default)
-If no email service is configured, notifications will appear in:
-- Vercel function logs
-- Local development console
+### Alternative Email Providers (Fallback):
+- **Resend**: Set `RESEND_API_KEY` if you prefer Resend
+- **Console Logging**: Works automatically if no email service is configured
 
 ## 🚨 **What You'll Be Notified About**
 
-### Processing Summaries
-After each cron run (every 2 hours), you'll get an email like:
+### Processing Summaries (Every 2 Hours)
+Beautiful branded emails like:
 ```
-Subject: [INFO] Content Processing Complete: 3/4 successful
+✅ Content Processing Complete: 3/4 successful
 Message: Cron job completed with 3 successful and 1 failed out of 4 total records.
 ```
 
 ### Critical Errors
-For serious issues:
 ```
-Subject: [ERROR] Critical Error in Content Processing
+❌ Critical Error in Content Processing
 Message: A critical error occurred during content processing: Failed to extract content from URL
 ```
 
-### Security Alerts
-If someone tries to access the cron job without authorization:
+### New Content Added
 ```
-Subject: [ERROR] Unauthorized cron request detected
+📝 New Content Added to Notion - Processing Started
+Message: New content "AI Breakthrough Article" has been added and will be processed in the next cycle.
+```
+
+### Security Alerts
+```
+🚨 Unauthorized cron request detected
 ```
 
 ## 📊 **Monitoring Dashboard**
@@ -74,9 +89,13 @@ When you add new URLs, immediately check:
 Add these to your Vercel project settings:
 
 ```env
-# Email Notifications
-RESEND_API_KEY=re_your_api_key_here
+# Email Notifications (MailerLite Primary)
+MAILERLITE_API_KEY=ml_your_api_token_here
 ADMIN_EMAIL=your-email@domain.com
+
+# Alternative Email Services (Optional)
+RESEND_API_KEY=re_your_api_key_here
+SENDGRID_API_KEY=your_sendgrid_key_here
 
 # Already configured (but verify they exist)
 NOTION_TOKEN=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
@@ -96,13 +115,22 @@ curl -X POST -H "Authorization: Bearer CRONKEY2025" \
   https://futurefast.ai/api/cron/ai-processing
 ```
 
-This will trigger the processing and send you a test notification.
+This will trigger the processing and send you a test notification via MailerLite.
+
+## 🌟 **Why MailerLite?**
+
+✅ **Already Integrated**: Your forms already use MailerLite  
+✅ **Consistent Branding**: Same email provider for all communications  
+✅ **Cost Effective**: No additional email service needed  
+✅ **Reliability**: Proven track record with your existing setup  
+✅ **Beautiful Templates**: Professional-looking alert emails  
 
 ## 🚀 **What's Fixed**
 1. ✅ **Root Cause Fixed**: Markdown file creation now works
 2. ✅ **Status Tracking**: Visible in Notion database
-3. ✅ **Email Alerts**: Get notified of issues immediately
+3. ✅ **Email Alerts**: Get notified via MailerLite immediately
 4. ✅ **Error Details**: Know exactly what went wrong
 5. ✅ **Vercel Cron**: Fixed authentication for production
+6. ✅ **Consistent Email**: All emails through MailerLite
 
-The system is now **bulletproof** - if something goes wrong, you'll know about it! 
+The system is now **bulletproof** - if something goes wrong, you'll know about it within minutes! 

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import UnifiedContentService from '../../../../../lib/unified-content-service';
+import NotificationService from '../../../../../lib/notification-service';
 
 export async function GET(request: NextRequest) {
+  const notificationService = new NotificationService();
+  
   try {
     // Log incoming headers for debugging
     console.log('🔍 Cron request headers:', Object.fromEntries(request.headers.entries()));
@@ -19,6 +22,15 @@ export async function GET(request: NextRequest) {
     
     if (!isVercelCron && !isLocalCron) {
       console.log('❌ Unauthorized cron request:', { authHeader, vercelCronAuth });
+      
+      // Send critical error notification for unauthorized access
+      await notificationService.sendCriticalError('Unauthorized cron request detected', {
+        authHeader,
+        vercelCronAuth,
+        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        userAgent: request.headers.get('user-agent')
+      });
+      
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -32,6 +44,9 @@ export async function GET(request: NextRequest) {
     
     console.log('✅ ' + message);
     
+    // Send summary notification
+    await notificationService.sendProcessingSummary(stats);
+    
     return NextResponse.json({
       success: true,
       message,
@@ -42,9 +57,16 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Scheduled AI processing failed:', error);
     
+    // Send critical error notification
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    await notificationService.sendCriticalError(errorMessage, {
+      timestamp: new Date().toISOString(),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: errorMessage,
       timestamp: new Date().toISOString()
     }, { status: 500 });
   }

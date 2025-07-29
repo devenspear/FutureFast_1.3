@@ -255,6 +255,56 @@ class EnhancedNotionClient {
   }
 
   /**
+   * Update processing status for a record
+   */
+  async updateProcessingStatus(pageId: string, status: 'processing' | 'completed' | 'error', errorMessage?: string): Promise<void> {
+    try {
+      const updateData: any = {
+        'Processing Status': {
+          select: {
+            name: status === 'processing' ? 'Processing' : 
+                  status === 'completed' ? 'Completed' : 'Error'
+          }
+        }
+      };
+
+      // Add error details if present
+      if (errorMessage && status === 'error') {
+        updateData['Processing Error'] = {
+          rich_text: [
+            {
+              text: {
+                content: `${new Date().toISOString()}: ${errorMessage}`
+              }
+            }
+          ]
+        };
+      }
+
+      // Clear error on successful completion
+      if (status === 'completed') {
+        updateData['Processing Error'] = {
+          rich_text: []
+        };
+        updateData['Last Processed'] = {
+          date: {
+            start: new Date().toISOString()
+          }
+        };
+      }
+
+      await this.client.pages.update({
+        page_id: pageId,
+        properties: updateData
+      });
+
+      console.log(`✅ Updated processing status for ${pageId}: ${status}`);
+    } catch (error) {
+      console.error(`❌ Failed to update processing status for ${pageId}:`, error);
+    }
+  }
+
+  /**
    * Auto-populate Content Type based on URL
    */
   async autoPopulateContentType(recordId: string, sourceUrl: string): Promise<void> {

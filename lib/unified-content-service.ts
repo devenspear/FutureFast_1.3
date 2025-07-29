@@ -213,6 +213,9 @@ export class UnifiedContentService {
    */
   private async processNewsContent(record: EnhancedNotionItem): Promise<ProcessingResult> {
     try {
+      // Update status to processing
+      await this.enhancedNotionClient.updateProcessingStatus(record.id, 'processing');
+      
       // Extract content using AI
       const extractedContent = await this.contentExtractor.extractFromUrl(record.sourceUrl);
       
@@ -220,66 +223,79 @@ export class UnifiedContentService {
         throw new Error(extractedContent.error || 'Content extraction failed');
       }
 
+      // Create filename from title
+      const filename = extractedContent.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      // Determine basic category
       const category = await this.determineCategory(
         extractedContent.title,
         extractedContent.source,
         ''
       );
 
-      // Prepare updates (only update empty fields)
-      const updates: any = {
-        contentType: 'News Article' as const,
-        category,
-        featured: category.includes('AI') || category.includes('Future of Work'), // Auto-feature AI content
+      // Create basic content
+      const content = `This article was automatically processed from ${extractedContent.source}.
+
+[Read the full article →](${record.sourceUrl})`;
+
+      // Create markdown file
+      await this.createMarkdownFile({
+        filename: `${filename}.md`,
+        title: extractedContent.title,
+        date: extractedContent.publishedDate,
+        source: extractedContent.source,
+        sourceUrl: record.sourceUrl,
+        category: category,
+        tags: [category],
+        description: extractedContent.title,
+        content: content,
+        type: 'news'
+      });
+
+      // Update the Notion record with extracted information
+      const updateData = {
+        title: extractedContent.title,
+        source: extractedContent.source,
+        publishedDate: extractedContent.publishedDate,
+        category: category,
         processed: true
       };
 
-      if (!record.title && extractedContent.title) {
-        updates.title = extractedContent.title;
-      }
+      await this.enhancedNotionClient.updateRecord(record.id, updateData);
       
-      if (!record.source && extractedContent.source) {
-        updates.source = extractedContent.source;
-      }
-      
-      if (!record.publishedDate && extractedContent.publishedDate) {
-        updates.publishedDate = extractedContent.publishedDate;
-      }
+      // Update status to completed
+      await this.enhancedNotionClient.updateProcessingStatus(record.id, 'completed');
 
-      // Update Notion record
-      await this.enhancedNotionClient.updateRecord(record.id, updates);
-
-      // Create markdown file for news articles
-      const markdownFile = await this.createMarkdownFile({
-        title: updates.title || record.title,
-        source: updates.source || record.source,
-        publishedDate: updates.publishedDate || record.publishedDate,
-        url: record.sourceUrl,
-        category,
-        featured: updates.featured
-      });
-      
       return {
         recordId: record.id,
         sourceUrl: record.sourceUrl,
         contentType: 'News Article',
         success: true,
         extracted: {
-          title: updates.title || record.title,
-          source: updates.source || record.source,
-          publishedDate: updates.publishedDate || record.publishedDate,
-          category,
-          featured: updates.featured,
-          markdownFile
+          title: extractedContent.title,
+          source: extractedContent.source,
+          publishedDate: extractedContent.publishedDate,
+          category: category,
+          markdownFile: `${filename}.md`
         }
       };
+
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`❌ Failed to process news record ${record.id}:`, errorMessage);
+      
+      // Update status to error with details
+      await this.enhancedNotionClient.updateProcessingStatus(record.id, 'error', errorMessage);
+
       return {
         recordId: record.id,
         sourceUrl: record.sourceUrl,
         contentType: 'News Article',
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: errorMessage
       };
     }
   }
@@ -288,25 +304,26 @@ export class UnifiedContentService {
    * Create markdown file from processed content
    */
   private async createMarkdownFile(data: {
+    filename: string;
     title: string;
+    date: string;
     source: string;
-    publishedDate: string;
-    url: string;
+    sourceUrl: string;
     category: string;
-    featured?: boolean;
+    tags?: string[];
+    description?: string;
+    content: string;
+    type: 'news' | 'youtube';
   }): Promise<string> {
     try {
       // Generate filename
-      const slug = this.generateSlug(data.title);
-      const datePrefix = new Date(data.publishedDate).toISOString().split('T')[0];
-      const fileName = `${datePrefix}-${slug}.md`;
-      const filePath = path.join(process.cwd(), 'content/news', fileName);
+      const filePath = path.join(process.cwd(), 'content', data.type, data.filename);
 
       // Check if file already exists
       try {
         await fs.access(filePath);
-        console.log(`📄 Markdown file already exists: ${fileName}`);
-        return fileName;
+        console.log(`📄 Markdown file already exists: ${data.filename}`);
+        return data.filename;
       } catch {
         // File doesn't exist, create it
       }
@@ -318,9 +335,9 @@ export class UnifiedContentService {
       const frontmatter = {
         title: data.title,
         source: data.source,
-        url: data.url,
-        date: data.publishedDate,
-        featured: data.featured || false,
+        url: data.sourceUrl,
+        date: data.date,
+        featured: false, // No auto-feature for news articles
         category: data.category,
         icon: icon,
         createdAt: new Date().toISOString(),
@@ -330,20 +347,20 @@ export class UnifiedContentService {
       // Create content
       const content = `This article was automatically processed from ${data.source}.
 
-[Read the full article →](${data.url})`;
+[Read the full article →](${data.sourceUrl})`;
 
       // Generate markdown with frontmatter
       const markdownContent = matter.stringify(content, frontmatter);
 
       // Ensure news directory exists
-      const newsDir = path.join(process.cwd(), 'content/news');
+      const newsDir = path.join(process.cwd(), 'content', data.type);
       await fs.mkdir(newsDir, { recursive: true });
 
       // Write file
       await fs.writeFile(filePath, markdownContent, 'utf8');
       
-      console.log(`✅ Created markdown file: ${fileName}`);
-      return fileName;
+      console.log(`✅ Created markdown file: ${data.filename}`);
+      return data.filename;
       
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';

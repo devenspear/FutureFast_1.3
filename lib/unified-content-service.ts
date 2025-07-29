@@ -2,6 +2,9 @@ import EnhancedNotionClient, { EnhancedNotionItem } from './enhanced-notion-clie
 import { ContentExtractor } from './content-extractor';
 import NotionYouTubeService from './notion-youtube-service';
 import { generateNewsMetadata } from './openai-utils';
+import fs from 'fs/promises';
+import path from 'path';
+import matter from 'gray-matter';
 
 interface ProcessingResult {
   recordId: string;
@@ -15,6 +18,7 @@ interface ProcessingResult {
     category?: string;
     description?: string;
     featured?: boolean;
+    markdownFile?: string; // Added for news articles
   };
   error?: string;
 }
@@ -246,7 +250,14 @@ export class UnifiedContentService {
       await this.enhancedNotionClient.updateRecord(record.id, updates);
 
       // Create markdown file for news articles
-      // TODO: Implement markdown file creation for news articles
+      const markdownFile = await this.createMarkdownFile({
+        title: updates.title || record.title,
+        source: updates.source || record.source,
+        publishedDate: updates.publishedDate || record.publishedDate,
+        url: record.sourceUrl,
+        category,
+        featured: updates.featured
+      });
       
       return {
         recordId: record.id,
@@ -258,7 +269,8 @@ export class UnifiedContentService {
           source: updates.source || record.source,
           publishedDate: updates.publishedDate || record.publishedDate,
           category,
-          featured: updates.featured
+          featured: updates.featured,
+          markdownFile
         }
       };
     } catch (error) {
@@ -270,6 +282,102 @@ export class UnifiedContentService {
         error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
+  }
+
+  /**
+   * Create markdown file from processed content
+   */
+  private async createMarkdownFile(data: {
+    title: string;
+    source: string;
+    publishedDate: string;
+    url: string;
+    category: string;
+    featured?: boolean;
+  }): Promise<string> {
+    try {
+      // Generate filename
+      const slug = this.generateSlug(data.title);
+      const datePrefix = new Date(data.publishedDate).toISOString().split('T')[0];
+      const fileName = `${datePrefix}-${slug}.md`;
+      const filePath = path.join(process.cwd(), 'content/news', fileName);
+
+      // Check if file already exists
+      try {
+        await fs.access(filePath);
+        console.log(`📄 Markdown file already exists: ${fileName}`);
+        return fileName;
+      } catch {
+        // File doesn't exist, create it
+      }
+
+      // Get icon for category
+      const icon = this.getIconForCategory(data.category);
+
+      // Create frontmatter
+      const frontmatter = {
+        title: data.title,
+        source: data.source,
+        url: data.url,
+        date: data.publishedDate,
+        featured: data.featured || false,
+        category: data.category,
+        icon: icon,
+        createdAt: new Date().toISOString(),
+        processedBy: 'AI-UnifiedProcessor'
+      };
+
+      // Create content
+      const content = `This article was automatically processed from ${data.source}.
+
+[Read the full article →](${data.url})`;
+
+      // Generate markdown with frontmatter
+      const markdownContent = matter.stringify(content, frontmatter);
+
+      // Ensure news directory exists
+      const newsDir = path.join(process.cwd(), 'content/news');
+      await fs.mkdir(newsDir, { recursive: true });
+
+      // Write file
+      await fs.writeFile(filePath, markdownContent, 'utf8');
+      
+      console.log(`✅ Created markdown file: ${fileName}`);
+      return fileName;
+      
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error('❌ Failed to create markdown file:', errorMsg);
+      throw new Error(`Failed to create markdown file: ${errorMsg}`);
+    }
+  }
+
+  /**
+   * Generate URL-safe slug from title
+   */
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .substring(0, 50);
+  }
+
+  /**
+   * Get icon for category
+   */
+  private getIconForCategory(category: string): string {
+    const categoryIcons: { [key: string]: string } = {
+      'AI & Future of Work': '🤖',
+      'Web3 & Blockchain': '🔗',
+      'Robotics & Manufacturing': '🦾',
+      'Tech Innovation': '💡',
+      'Future of Work': '💼',
+      'VR & Metaverse': '🥽',
+      'General': '📰'
+    };
+
+    return categoryIcons[category] || '📰';
   }
 
   /**

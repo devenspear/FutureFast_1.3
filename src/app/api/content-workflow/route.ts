@@ -22,8 +22,8 @@ export async function POST(request: NextRequest) {
         model: 'gpt-3.5-turbo',
       },
       github: {
-        token: process.env.GITHUB_TOKEN || '',
-        repo: process.env.GITHUB_REPO || '',
+            token: process.env.HUB_TOKEN || '',
+    repo: process.env.HUB_REPO || '',
         branch: 'main',
       },
       email: {

@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { generateNewsMetadata } from '@/lib/openai-utils';
 
 // GitHub configuration for automated file creation
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_REPO = process.env.GITHUB_REPO || 'devenspear/FutureFast_1.3';
+const GITHUB_TOKEN = process.env.HUB_TOKEN;
+const GITHUB_REPO = process.env.HUB_REPO || 'devenspear/FutureFast_1.3';
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
 
 // Function to check if URL already exists in any news file

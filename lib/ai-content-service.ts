@@ -119,7 +119,7 @@ class AIContentService {
       console.log(`📄 Created ${markdownFilesCreated} markdown files`);
 
       // Commit new files to GitHub if any were created
-      if (newMarkdownFiles.length > 0 && process.env.GITHUB_TOKEN) {
+      if (newMarkdownFiles.length > 0 && process.env.HUB_TOKEN) {
         try {
           const commitResult = await this.commitToGitHub(newMarkdownFiles, successful);
           stats.gitCommitted = commitResult.success;
@@ -582,9 +582,9 @@ Respond with valid JSON only:
    */
   private async commitToGitHub(files: string[], successful: number): Promise<{ success: boolean; message: string }> {
     try {
-      const token = process.env.GITHUB_TOKEN;
-      const repo = process.env.GITHUB_REPO || 'devenspear/FutureFast_1.3';
-      const branch = process.env.GITHUB_BRANCH || 'main';
+        const token = process.env.HUB_TOKEN;
+  const repo = process.env.HUB_REPO || 'devenspear/FutureFast_1.3';
+      const branch = process.env.HUB_BRANCH || 'main';
 
       if (!token) {
         throw new Error('GitHub token not configured');

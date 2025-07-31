@@ -7,7 +7,7 @@ import { generateNewsMetadata } from '@/lib/openai-utils';
 // GitHub configuration for automated file creation
 const GITHUB_TOKEN = process.env.HUB_TOKEN;
 const GITHUB_REPO = process.env.HUB_REPO || 'devenspear/FutureFast_1.3';
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const GITHUB_BRANCH = process.env.HUB_BRANCH || 'main';
 
 // Function to check if URL already exists in any news file
 async function checkUrlExists(urlToCheck: string): Promise<boolean> {

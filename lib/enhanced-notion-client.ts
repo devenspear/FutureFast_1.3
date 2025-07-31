@@ -12,6 +12,10 @@ export interface EnhancedNotionItem {
   featured?: boolean;
   processed?: boolean;
   description?: string;
+  websiteValidated?: boolean;
+  websiteStatus?: 'Live' | 'Missing' | 'Checking' | 'Error';
+  lastProcessed?: string;
+  processingStatus?: string;
 }
 
 class EnhancedNotionClient {
@@ -189,6 +193,8 @@ class EnhancedNotionClient {
       featured?: boolean;
       processed?: boolean;
       description?: string;
+      websiteValidated?: boolean;
+      websiteStatus?: 'Live' | 'Missing' | 'Checking' | 'Error';
     }
   ): Promise<void> {
     try {
@@ -239,6 +245,18 @@ class EnhancedNotionClient {
       if (updates.description) {
         properties.Description = {
           rich_text: [{ text: { content: updates.description } }]
+        };
+      }
+
+      if (updates.websiteValidated !== undefined) {
+        properties['Website Validated'] = {
+          checkbox: updates.websiteValidated
+        };
+      }
+
+      if (updates.websiteStatus) {
+        properties['Website Status'] = {
+          select: { name: updates.websiteStatus }
         };
       }
 
@@ -330,6 +348,10 @@ class EnhancedNotionClient {
       featured: this.extractCheckbox(properties.Featured),
       processed: this.extractCheckbox(properties.Processed),
       description: this.extractRichText(properties.Description),
+      websiteValidated: this.extractCheckbox(properties['Website Validated']),
+      websiteStatus: this.extractSelect(properties['Website Status']) as 'Live' | 'Missing' | 'Checking' | 'Error',
+      lastProcessed: this.extractDate(properties['Last Processed']),
+      processingStatus: this.extractSelect(properties['Processing Status']),
     };
   }
 

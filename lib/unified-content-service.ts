@@ -1,6 +1,7 @@
 import EnhancedNotionClient, { EnhancedNotionItem } from './enhanced-notion-client';
 import { ContentExtractor } from './content-extractor';
 import NotionYouTubeService from './notion-youtube-service';
+import WebsiteValidationService from './website-validation-service';
 import { generateNewsMetadata } from './openai-utils';
 import fs from 'fs/promises';
 import path from 'path';
@@ -35,11 +36,13 @@ interface UnifiedProcessingStats {
 export class UnifiedContentService {
   private enhancedNotionClient: EnhancedNotionClient;
   private contentExtractor: ContentExtractor;
+  private validationService: WebsiteValidationService;
   private youtubeService: NotionYouTubeService;
 
   constructor() {
     this.enhancedNotionClient = new EnhancedNotionClient();
     this.contentExtractor = new ContentExtractor();
+    this.validationService = new WebsiteValidationService();
     this.youtubeService = new NotionYouTubeService();
   }
 
@@ -268,6 +271,16 @@ export class UnifiedContentService {
       
       // Update status to completed
       await this.enhancedNotionClient.updateProcessingStatus(record.id, 'completed');
+
+      // Validate the article is live on website (automated validation)
+      console.log(`🔍 Auto-validating article: ${extractedContent.title}`);
+      try {
+        const validationResult = await this.validationService.validateSpecificArticle(record.id);
+        console.log(`✅ Validation complete for ${extractedContent.title}: ${validationResult.status}`);
+      } catch (validationError) {
+        console.error(`⚠️ Website validation failed for ${extractedContent.title}:`, validationError);
+        // Don't fail the entire processing if validation fails
+      }
 
       return {
         recordId: record.id,

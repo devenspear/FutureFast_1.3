@@ -18,7 +18,7 @@ export interface EnhancedNotionItem {
   processingStatus?: string;
 }
 
-class EnhancedNotionClient {
+export class EnhancedNotionClient {
   private client: Client;
   private databaseId: string;
 

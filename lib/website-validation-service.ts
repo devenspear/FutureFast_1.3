@@ -1,4 +1,4 @@
-import { EnhancedNotionClient, EnhancedNotionItem } from './enhanced-notion-client';
+import EnhancedNotionClient, { EnhancedNotionItem } from './enhanced-notion-client';
 
 export interface ValidationResult {
   recordId: string;

@@ -98,7 +98,7 @@ export default function HeroSection() {
       }
       
       // Calculate maximum speed based on diameter and speed category
-      let baseSpeedPerFrame = size / 50000; // Base speed calculation
+      const baseSpeedPerFrame = size / 50000; // Base speed calculation
       let speedMultiplier: number;
       
       // Apply different speed multipliers based on category
@@ -196,7 +196,7 @@ export default function HeroSection() {
 
     // Apply diameter-based speed limiting with category-specific multipliers
     // Maximum speed = diameter per second = diameter / 60 pixels per frame (at 60fps)
-    let baseSpeedLimit = bubble.size / 800; // Base speed limit
+    const baseSpeedLimit = bubble.size / 800; // Base speed limit
     let speedMultiplier: number;
     
     // Apply the same speed multipliers as during initialization

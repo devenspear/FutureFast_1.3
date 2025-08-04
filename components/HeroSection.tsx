@@ -19,6 +19,7 @@ interface Bubble {
   scale: number;
   lastDirectionChange: number;
   pathMemory: Array<{x: number, y: number}>;
+  speedCategory: 'fast' | 'medium' | 'slow';
 }
 
 // Sampled hero image colors (example):
@@ -80,20 +81,44 @@ export default function HeroSection() {
   // Initialize random bubbles with unique characteristics
   const initializeBubbles = () => {
     const newBubbles: Bubble[] = [];
-    const bubbleCount = 9; // Reduced from 18 to 9 (50% reduction)
+    const bubbleCount = 6; // Further reduced for calmer effect
     
     for (let i = 0; i < bubbleCount; i++) {
       // Create unique random characteristics for each bubble
       const size = Math.random() * 60 + 20; // 20-80px diameter (never larger than background circles)
       
-      // Calculate maximum speed based on diameter (diameter per second = diameter/60 per frame at 60fps)
-      // Significantly reduced speed for gentle, barely detectable movement
-      const maxSpeedPerFrame = size / 18000; // Changed from 3600 to 18000 (5x slower than before)
+      // Assign speed category - distribute evenly across three categories
+      let speedCategory: 'fast' | 'medium' | 'slow';
+      if (i % 3 === 0) {
+        speedCategory = 'fast';
+      } else if (i % 3 === 1) {
+        speedCategory = 'medium';
+      } else {
+        speedCategory = 'slow';
+      }
       
-      // Generate random initial velocity within the diameter-based speed limit
+      // Calculate maximum speed based on diameter and speed category
+      let baseSpeedPerFrame = size / 50000; // Base speed calculation
+      let speedMultiplier: number;
+      
+      // Apply different speed multipliers based on category
+      switch (speedCategory) {
+        case 'fast':
+          speedMultiplier = 0.25; // 25% of current max speed for fast objects
+          break;
+        case 'medium':
+          speedMultiplier = 1.0; // Keep current speed for medium objects
+          break;
+        case 'slow':
+          speedMultiplier = 0.6; // Even slower for slow objects
+          break;
+      }
+      
+      const maxSpeedPerFrame = baseSpeedPerFrame * speedMultiplier;
+      
+      // Generate random initial velocity within the category-based speed limit
       const randomDirection = Math.random() * 2 * Math.PI; // Random direction in radians
-      // Extremely reduced initial speed for subtle movement
-      const randomSpeed = Math.random() * maxSpeedPerFrame * 0.008; // Reduced from 0.04 to 0.008 (5x slower)
+      const randomSpeed = Math.random() * maxSpeedPerFrame * 0.002;
       
       const bubble: Bubble = {
         id: i,
@@ -106,12 +131,13 @@ export default function HeroSection() {
         hue: Math.random() * 120 + 180, // Blue to cyan range
         saturation: Math.random() * 40 + 60, // 60-100% saturation
         lightness: Math.random() * 30 + 45, // 45-75% lightness
-        rotationSpeed: (Math.random() - 0.5) * 0.013, // Reduced from 0.065 to 0.013 (5x slower)
+        rotationSpeed: (Math.random() - 0.5) * 0.003, // Ultra-slow rotation for very calm effect
         rotation: Math.random() * 360,
         scaleDirection: Math.random() > 0.5 ? 1 : -1,
         scale: 1,
-        lastDirectionChange: Date.now() + Math.random() * 500000, // Increased from 100000 to 500000 (5x slower)
-        pathMemory: []
+        lastDirectionChange: Date.now() + Math.random() * 1200000 + 300000, // Much less frequent direction changes (10-25 minutes)
+        pathMemory: [],
+        speedCategory
       };
       newBubbles.push(bubble);
     }
@@ -159,19 +185,34 @@ export default function HeroSection() {
     let newVx = bubble.vx;
     let newVy = bubble.vy;
 
-    // Add random direction changes to prevent repetitive patterns
+    // Add very subtle random direction changes to prevent repetitive patterns
     if (now > bubble.lastDirectionChange) {
-      const randomFactor = 0.0015; // Reduced from 0.0075 to 0.0015 (5x slower)
+      const randomFactor = 0.0003; // Much smaller velocity changes for smoother movement
       newVx += (Math.random() - 0.5) * randomFactor;
       newVy += (Math.random() - 0.5) * randomFactor;
       
-      bubble.lastDirectionChange = now + Math.random() * 300000 + 100000; // Increased from 60000+20000 to 300000+100000 (5x slower)
+      bubble.lastDirectionChange = now + Math.random() * 1200000 + 300000; // Very infrequent changes (5-20 minutes)
     }
 
-    // Apply diameter-based speed limiting
+    // Apply diameter-based speed limiting with category-specific multipliers
     // Maximum speed = diameter per second = diameter / 60 pixels per frame (at 60fps)
-    // Significantly reduced for gentle movement
-    const maxSpeedPerFrame = bubble.size / 300; // Reduced from 60 to 300 (5x slower)
+    let baseSpeedLimit = bubble.size / 800; // Base speed limit
+    let speedMultiplier: number;
+    
+    // Apply the same speed multipliers as during initialization
+    switch (bubble.speedCategory) {
+      case 'fast':
+        speedMultiplier = 0.25; // 25% of current max speed for fast objects
+        break;
+      case 'medium':
+        speedMultiplier = 1.0; // Keep current speed for medium objects
+        break;
+      case 'slow':
+        speedMultiplier = 0.6; // Even slower for slow objects
+        break;
+    }
+    
+    const maxSpeedPerFrame = baseSpeedLimit * speedMultiplier;
     const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
     
     if (currentSpeed > maxSpeedPerFrame) {
@@ -181,13 +222,13 @@ export default function HeroSection() {
       newVy *= speedRatio;
     }
 
-    // Bounce off walls with minimal random angle variation
+    // Bounce off walls with ultra-minimal random angle variation
     if (newX <= 0 || newX >= containerWidth - bubble.size) {
-      newVx = -newVx + (Math.random() - 0.5) * 0.01; // Reduced from 0.05 to 0.01 (5x slower)
+      newVx = -newVx + (Math.random() - 0.5) * 0.002; // Much smoother bouncing
       newX = Math.max(0, Math.min(containerWidth - bubble.size, newX));
     }
     if (newY <= 0 || newY >= containerHeight - bubble.size) {
-      newVy = -newVy + (Math.random() - 0.5) * 0.01; // Reduced from 0.05 to 0.01 (5x slower)
+      newVy = -newVy + (Math.random() - 0.5) * 0.002; // Much smoother bouncing
       newY = Math.max(0, Math.min(containerHeight - bubble.size, newY));
     }
 
@@ -222,13 +263,13 @@ export default function HeroSection() {
       const repulsionDistance = Math.sqrt(repulsionX * repulsionX + repulsionY * repulsionY);
       
       if (repulsionDistance > 0) {
-        const repulsionForce = 0.04; // Reduced from 0.2 to 0.04 (5x slower)
+        const repulsionForce = 0.008; // Much gentler repulsion for smoother movement
         newVx += (repulsionX / repulsionDistance) * repulsionForce;
         newVy += (repulsionY / repulsionDistance) * repulsionForce;
       }
     }
 
-    // Apply speed limit again after repulsion forces to ensure we never exceed diameter per second
+    // Apply speed limit again after repulsion forces to ensure we never exceed category-specific limits
     const finalSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
     if (finalSpeed > maxSpeedPerFrame) {
       const speedRatio = maxSpeedPerFrame / finalSpeed;
@@ -238,7 +279,7 @@ export default function HeroSection() {
 
     // Update rotation and scale for visual variety
     const newRotation = bubble.rotation + bubble.rotationSpeed;
-    const scaleSpeed = 0.0004; // Reduced from 0.002 to 0.0004 (5x slower)
+    const scaleSpeed = 0.0001; // Ultra-slow scale animation for very subtle effect
     let newScale = bubble.scale + (bubble.scaleDirection * scaleSpeed);
     let newScaleDirection = bubble.scaleDirection;
     
@@ -253,11 +294,11 @@ export default function HeroSection() {
       newPathMemory.shift();
     }
 
-    // Add slight random drift to prevent identical paths
-    const driftX = (Math.random() - 0.5) * 0.00017; // Reduced from 0.00085 to 0.00017 (5x slower)
-    const driftY = (Math.random() - 0.5) * 0.00017; // Reduced from 0.00085 to 0.00017 (5x slower)
+    // Add ultra-minimal random drift to prevent identical paths
+    const driftX = (Math.random() - 0.5) * 0.00003; // Very minimal drift for smooth movement
+    const driftY = (Math.random() - 0.5) * 0.00003; // Very minimal drift for smooth movement
 
-    // Apply final velocity with drift, ensuring it still respects speed limit
+    // Apply final velocity with drift, ensuring it still respects category-specific speed limit
     let finalVx = newVx + driftX;
     let finalVy = newVy + driftY;
     

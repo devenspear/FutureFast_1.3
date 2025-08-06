@@ -23,8 +23,9 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "FutureFast: Empowering Speed",
-  description: "Animated, mobile-first homepage for FutureFast.ai built with Next.js and Tailwind CSS.",
+  title: "FutureFast: Executive Insights on AI, Web3 & Technology Disruption",
+  description: "Executive insights on AI, Web3, robotics & exponential technology disruption. Real signals, no hype - curated for decision makers navigating the future of business.",
+  keywords: "AI, artificial intelligence, OpenAI, ChatGPT, Claude AI, Web3, blockchain, robotics, future of work, technology disruption, executive insights, C-suite strategy, digital transformation, exponential technology",
   metadataBase: new URL("https://futurefast.ai"),
   robots: { index: true, follow: true },
   icons: { 
@@ -36,8 +37,8 @@ export const metadata: Metadata = {
     apple: "/favicon.svg" 
   },
   openGraph: {
-    title: "FutureFast: Empowering Speed",
-    description: "Animated, mobile-first homepage for FutureFast.ai built with Next.js and Tailwind CSS.",
+    title: "FutureFast: Executive Insights on AI, Web3 & Technology Disruption",
+    description: "Executive insights on AI, Web3, robotics & exponential technology disruption. Real signals, no hype - curated for decision makers navigating the future of business.",
     url: "https://futurefast.ai",
     siteName: "FutureFast",
     images: [{ 
@@ -51,8 +52,8 @@ export const metadata: Metadata = {
   },
   twitter: { 
     card: "summary_large_image", 
-    title: "FutureFast: Empowering Speed", 
-    description: "Animated, mobile-first homepage for FutureFast.ai built with Next.js and Tailwind CSS.", 
+    title: "FutureFast: Executive Insights on AI, Web3 & Technology Disruption", 
+    description: "Executive insights on AI, Web3, robotics & exponential technology disruption. Real signals, no hype - curated for decision makers navigating the future of business.", 
     images: ["https://futurefast.ai/images/design-thinking-ai.jpg"] 
   },
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "" }
@@ -81,14 +82,98 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </Script>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "FutureFast",
+              url: "https://futurefast.ai",
+              description: "Executive insights on AI, Web3, robotics & exponential technology disruption",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://futurefast.ai/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
             name: "FutureFast",
+            alternateName: "FutureFast.ai",
             url: "https://futurefast.ai",
             logo: "https://futurefast.ai/favicon.svg",
-            sameAs: ["https://twitter.com/yourprofile","https://www.linkedin.com/in/yourprofile"]
-          }) }}
+            description: "Executive insights on AI, Web3, robotics & exponential technology disruption. Real signals, no hype - curated for decision makers navigating the future of business.",
+            foundingDate: "2025",
+            expertise: [
+              "Artificial Intelligence",
+              "Web3 Technology", 
+              "Robotics",
+              "Future of Work",
+              "Technology Disruption",
+              "Executive Strategy"
+            ],
+            knowsAbout: [
+              "OpenAI",
+              "ChatGPT",
+              "Claude AI", 
+              "Blockchain",
+              "Machine Learning",
+              "Robotics",
+              "Web3",
+              "Digital Transformation",
+              "Exponential Technology"
+            ],
+            audience: {
+              "@type": "Audience",
+              audienceType: "business executives"
+            },
+            contactPoint: {
+              "@type": "ContactPoint",
+              contactType: "customer service",
+              availableLanguage: "English"
+            },
+            sameAs: [
+              "https://twitter.com/yourprofile",
+              "https://www.linkedin.com/in/yourprofile"
+            ]
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "name": "Deven Spear",
+              "jobTitle": "Technology Strategist and Founder",
+              "worksFor": {
+                "@type": "Organization", 
+                "name": "FutureFast"
+              },
+              "description": "Six-time founder with 30+ years of experience turning technology disruption into scalable business opportunities. Expert in AI strategy, Web3 technology, and digital transformation for executives.",
+              "expertise": [
+                "Artificial Intelligence Strategy",
+                "Web3 Technology Implementation",
+                "Digital Transformation Leadership",
+                "Future of Work Planning",
+                "Technology Disruption Analysis",
+                "Executive Strategy Consulting"
+              ],
+              "knowsAbout": [
+                "OpenAI",
+                "ChatGPT",
+                "Claude AI", 
+                "Blockchain Technology",
+                "Machine Learning Implementation",
+                "Industrial Robotics",
+                "Web3 Business Models",
+                "Digital Transformation Strategy",
+                "Exponential Technology Adoption"
+              ],
+              "alumniOf": "Technology Leadership",
+              "hasCredential": "30+ years technology leadership experience",
+              "url": "https://futurefast.ai",
+              "sameAs": [
+                "https://www.linkedin.com/in/yourprofile"
+              ]
+            }
+          ]) }}
         />
 
       </head>

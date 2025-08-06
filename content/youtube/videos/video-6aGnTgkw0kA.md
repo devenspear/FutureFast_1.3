@@ -13,7 +13,7 @@ description: >-
   00:00 - The AI Revolution: A Week of Major ...
 category: Tech Conferences
 featured: false
-publishedAt: '2025-05-22T22:00:33Z'
+publishedAt: '2025-05-22T22:00:33.000Z'
 channelName: Peter H. Diamandis
 ---
 

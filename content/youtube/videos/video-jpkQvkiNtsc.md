@@ -11,7 +11,7 @@ description: |-
   Wander - https://wan...
 category: Robotics & Manufacturing
 featured: false
-publishedAt: '2025-05-17T00:11:37Z'
+publishedAt: '2025-05-17T00:11:37.000Z'
 channelName: TBPN
 ---
 

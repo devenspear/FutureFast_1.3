@@ -4,7 +4,7 @@ title: 'AI Will Take Your Job in 3 Years: Your Playbook to Survive (& Thrive)'
 description: "\U0001F4AB LIMITLESS | SUBSCRIBE & FOLLOW\nhttps://pod.link/1813210890\nhttps://x.com/LimitlessFT\n\n------\nIn this eye-opening episode, Arjun Bhuptani joins us to unpack the provocative thesis behind his viral t..."
 category: VR & Metaverse
 featured: false
-publishedAt: '2025-05-19T13:00:02Z'
+publishedAt: '2025-05-19T13:00:02.000Z'
 channelName: Limitless FT
 ---
 

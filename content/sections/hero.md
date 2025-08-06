@@ -1,5 +1,5 @@
 ---
-headline: Master Exponential Disruption Now
+headline: Master AI & Web3 Disruption Now
 subheadline: >
-  Transforming tech acceleration into strategic advantage: clarity for decisive leaders
+  Executive insights on OpenAI ChatGPT, Claude AI, blockchain technology, and robotics: strategic clarity for C-suite leaders navigating exponential change
 ---

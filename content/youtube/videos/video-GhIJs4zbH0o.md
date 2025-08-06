@@ -7,7 +7,7 @@ description: >-
   President Trump the day after his inauguration. Sh...
 category: Quantum Computing
 featured: false
-publishedAt: '2025-05-20T12:00:25Z'
+publishedAt: '2025-05-20T12:00:25.000Z'
 channelName: Bloomberg Originals
 ---
 

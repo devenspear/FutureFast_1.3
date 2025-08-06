@@ -10,15 +10,31 @@ import Footer from "../../components/Footer";
 export default function Home() {
 
   return (
-    <main className="bg-black min-h-screen w-full animated-background">
-      <HeroSection />
-      <FastLaneSection />
-      <NewsAndDisruptionSection />
-      <VideoInterviewsSection />
-      <ResourceLibrarySection />
-      <ThoughtLeadersSection />
-      <LearningResourcesSection />
-      <AboutWithSubscription />
+    <main className="bg-black min-h-screen w-full animated-background" role="main">
+      <section aria-labelledby="hero-heading">
+        <HeroSection />
+      </section>
+      <section aria-labelledby="fast-lane-heading">
+        <FastLaneSection />
+      </section>
+      <section aria-labelledby="news-heading">
+        <NewsAndDisruptionSection />
+      </section>
+      <section aria-labelledby="videos-heading">
+        <VideoInterviewsSection />
+      </section>
+      <section aria-labelledby="resources-heading">
+        <ResourceLibrarySection />
+      </section>
+      <section aria-labelledby="thought-leaders-heading">
+        <ThoughtLeadersSection />
+      </section>
+      <section aria-labelledby="learning-heading">
+        <LearningResourcesSection />
+      </section>
+      <section aria-labelledby="about-heading">
+        <AboutWithSubscription />
+      </section>
       <Footer />
     </main>
   );

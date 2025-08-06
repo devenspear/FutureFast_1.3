@@ -155,18 +155,19 @@ export default function NewsAndDisruptionSection() {
   }, [getCachedData, setCachedData]);
 
   return (
-    <section className="py-16 bg-black text-white" id="news-and-disruption">
-      <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">In The News</h1>
+    <section className="py-16 bg-black text-white" id="news-and-disruption" aria-labelledby="news-heading">
+      <h1 id="news-heading" className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">In The News</h1>
       
       <p className="font-sans mb-12 text-lg md:text-xl text-cyan-100 text-center max-w-3xl mx-auto">
         Real signals. No hype.<br />
-        We track the world&apos;s most important tech stories so you don&apos;t have to. Get curated insights on AI, Web3, robotics, biotech, and the cultural ripples they cause.<br />
-        This isn&apos;t just news. It&apos;s navigation. It is fun!
+        We track the world&apos;s most important tech stories so you don&apos;t have to. Get curated insights on <strong>OpenAI ChatGPT</strong>, <strong>Claude AI</strong>, <strong>blockchain technology</strong>, <strong>industrial robotics</strong>, <strong>biotechnology breakthroughs</strong>, and the cultural ripples they cause.<br />
+        This isn&apos;t just news. It&apos;s navigation for <strong>C-suite executives</strong> and <strong>technology leaders</strong>. It is fun!
       </p>
       
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
         {/* News Articles - Left Side */}
-        <div className="lg:w-1/2 lg:pr-4">
+        <div className="lg:w-1/2 lg:pr-4" role="region" aria-labelledby="news-articles-heading">
+          <h2 id="news-articles-heading" className="sr-only">Latest Technology News Articles</h2>
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-pulse space-y-4">
@@ -179,11 +180,13 @@ export default function NewsAndDisruptionSection() {
               </div>
             </div>
           ) : (
-            <ul>
+            <ul role="list" aria-label="Latest technology news articles">
               {newsItems.map((item, idx) => (
                 <li 
                   key={idx} 
                   className="transition-all duration-200 hover:bg-gray-900/50 rounded-lg border-b border-gray-800/50 last:border-b-0 group"
+                  itemScope 
+                  itemType="https://schema.org/NewsArticle"
                 >
                   <div className="flex items-start gap-4 w-full py-4 px-4">
                     {/* Date and Source - Left Side */}
@@ -220,9 +223,9 @@ export default function NewsAndDisruptionSection() {
                         onClick={() => trackNewsClick(item.title, item.source, item.url)}
                         className="block"
                       >
-                        <h2 className="text-sm sm:text-base font-medium group-hover:text-cyan-400 transition-colors leading-tight line-clamp-2 text-gray-200 cursor-pointer">
-                          {item.icon && <span className="mr-2 text-base">{item.icon}</span>}
-                          {item.title}
+                        <h2 className="text-sm sm:text-base font-medium group-hover:text-cyan-400 transition-colors leading-tight line-clamp-2 text-gray-200 cursor-pointer" itemProp="headline">
+                          {item.icon && <span className="mr-2 text-base" aria-hidden="true">{item.icon}</span>}
+                          <span itemProp="name">{item.title}</span>
                         </h2>
                       </a>
                     </div>
@@ -248,8 +251,8 @@ export default function NewsAndDisruptionSection() {
         </div>
         
         {/* Disruption Weekly - Right Side */}
-        <div className="lg:w-1/2 lg:pl-4 flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-white mb-4 text-center">Disruption Weekly</h2>
+        <div className="lg:w-1/2 lg:pl-4 flex flex-col items-center" role="region" aria-labelledby="newsletter-heading">
+          <h2 id="newsletter-heading" className="text-2xl font-bold text-white mb-4 text-center">Disruption Weekly</h2>
           <p className="text-center text-gray-300 mb-4">Click below to subscribe on LinkedIn</p>
           <a 
             href="https://www.linkedin.com/newsletters/disruption-weekly-7120892654304776192/" 

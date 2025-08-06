@@ -10,7 +10,7 @@ description: >-
   for Bt...
 category: Web3 & Blockchain
 featured: false
-publishedAt: '2025-06-24T15:25:51Z'
+publishedAt: '2025-06-24T15:25:51.000Z'
 channelName: BTCPrague
 ---
 

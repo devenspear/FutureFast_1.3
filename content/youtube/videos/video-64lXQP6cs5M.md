@@ -10,7 +10,7 @@ description: >-
   We talk through what’s changed...
 category: AI Technology
 featured: true
-publishedAt: '2025-05-22T21:06:29Z'
+publishedAt: '2025-05-22T21:06:29.000Z'
 channelName: Dwarkesh Patel
 ---
 

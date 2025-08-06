@@ -7,7 +7,7 @@ description: >-
   perfected, programmable capital with massive global dema...
 category: Interview
 featured: false
-publishedAt: '2025-05-30T22:00:17Z'
+publishedAt: '2025-05-30T22:00:17.000Z'
 channelName: Bitcoin Magazine
 ---
 

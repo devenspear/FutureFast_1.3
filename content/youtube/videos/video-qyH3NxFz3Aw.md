@@ -9,7 +9,7 @@ description: >-
   Ventures about the future of AI earlier this month...
 category: AI & Future of Work
 featured: true
-publishedAt: '2025-04-26T11:56:53Z'
+publishedAt: '2025-04-26T11:56:53.000Z'
 channelName: CBS Mornings
 ---
 

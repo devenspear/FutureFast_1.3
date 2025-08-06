@@ -9,7 +9,7 @@ description: >-
   Theo joins Sam at the OpenAI office in San Francisco to talk ab...
 category: Interview
 featured: false
-publishedAt: '2025-07-23T17:19:20Z'
+publishedAt: '2025-07-23T17:19:20.000Z'
 channelName: Theo Von
 ---
 

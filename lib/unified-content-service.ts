@@ -244,19 +244,8 @@ export class UnifiedContentService {
 
 [Read the full article →](${record.sourceUrl})`;
 
-      // Create markdown file
-      await this.createMarkdownFile({
-        filename: `${filename}.md`,
-        title: extractedContent.title,
-        date: extractedContent.publishedDate,
-        source: extractedContent.source,
-        sourceUrl: record.sourceUrl,
-        category: category,
-        tags: [category],
-        description: extractedContent.title,
-        content: content,
-        type: 'news'
-      });
+      // Skip markdown file creation in serverless environment
+      console.log(`ℹ️ Skipping markdown file creation for: ${extractedContent.title} (serverless environment)`);
 
       // Update the Notion record with extracted information
       const updateData = {

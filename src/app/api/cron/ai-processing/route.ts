@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import UnifiedContentService from '../../../../../lib/unified-content-service';
 import NotificationService from '../../../../../lib/notification-service';
+import HealthMonitor from '../../../../../lib/health-monitor';
 
 export async function GET(request: NextRequest) {
   const notificationService = new NotificationService();
@@ -46,6 +47,13 @@ export async function GET(request: NextRequest) {
     
     // Send summary notification
     await notificationService.sendProcessingSummary(stats);
+    
+    // Run health check if there were failures
+    if (stats.failed > 0) {
+      console.log('🏥 Running health check due to processing failures...');
+      const healthMonitor = new HealthMonitor();
+      await healthMonitor.checkSystemHealth();
+    }
     
     return NextResponse.json({
       success: true,

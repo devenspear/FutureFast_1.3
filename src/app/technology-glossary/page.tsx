@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Technology Glossary | AI, Web3 & Exponential Technology Terms | FutureFast",
@@ -160,12 +161,12 @@ export default function TechnologyGlossaryPage() {
             <p className="text-lg text-gray-200 mb-6">
               Get executive insights on the latest AI, Web3, and robotics developments that matter for business strategy.
             </p>
-            <a 
+            <Link 
               href="/"
               className="inline-block px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
             >
               Explore FutureFast Insights
-            </a>
+            </Link>
           </div>
         </footer>
       </div>

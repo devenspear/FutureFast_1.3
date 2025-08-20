@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "FAQ | FutureFast: AI, Web3 & Technology Insights",
@@ -57,7 +58,7 @@ export default function FAQPage() {
             Frequently Asked Questions
           </h1>
           <p className="text-xl text-cyan-100 max-w-3xl mx-auto">
-            Everything you need to know about FutureFast's executive insights on AI, Web3, robotics, and exponential technology disruption.
+            Everything you need to know about FutureFast&apos;s executive insights on AI, Web3, robotics, and exponential technology disruption.
           </p>
         </header>
 
@@ -100,12 +101,12 @@ export default function FAQPage() {
             <p className="text-lg text-gray-200 mb-6">
               Ready to navigate the future of exponential technology disruption?
             </p>
-            <a 
+            <Link 
               href="/"
               className="inline-block px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
             >
               Explore FutureFast Insights
-            </a>
+            </Link>
           </div>
         </footer>
       </div>

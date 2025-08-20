@@ -40,7 +40,7 @@ class NotionClient {
             direction: 'descending'
           }
         ],
-        page_size: 5 // Limit to 5 most recent articles
+        page_size: 20 // Get up to 20 most recent articles
       });
 
       return response.results.map((page: any) => {

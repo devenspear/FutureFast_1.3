@@ -25,11 +25,54 @@ export async function POST(request: Request) {
   console.log('🌍 [YouTube Add API] Environment check:', {
     NODE_ENV: process.env.NODE_ENV,
     BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-    hasYouTubeKey: !!process.env.YOUTUBE_API_KEY
+    hasYouTubeKey: !!process.env.YOUTUBE_API_KEY,
+    isProduction: process.env.NODE_ENV === 'production'
   });
   
   try {
-    // Log all request headers for debugging
+    // For production (Vercel), return a different response since file system is read-only
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🚨 [YouTube Add API] Production environment - file operations not supported');
+      
+      // Parse the request body for validation
+      const body = await request.json();
+      const { url, category = 'Interview', featured = false } = body;
+
+      if (!url) {
+        return NextResponse.json(
+          { error: 'YouTube URL is required' },
+          { status: 400 }
+        );
+      }
+
+      // Validate YouTube URL
+      const videoId = extractVideoId(url);
+      if (!videoId) {
+        return NextResponse.json(
+          { error: 'Invalid YouTube URL' },
+          { status: 400 }
+        );
+      }
+
+      // In production, we'll need to use a database or external storage
+      // For now, return success but log the video details
+      console.log('📝 [YouTube Add API] Video to be added (production):', {
+        url,
+        videoId,
+        category,
+        featured,
+        timestamp: new Date().toISOString()
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Video submission received. Manual processing required in production.',
+        videoId,
+        note: 'In production environment, videos must be added manually to the content files.'
+      });
+    }
+    
+    // Log all request headers for debugging (development only)
     const headers = Object.fromEntries(request.headers.entries());
     console.log('📋 [YouTube Add API] Request headers:', headers);
     
@@ -111,9 +154,13 @@ export async function POST(request: Request) {
 
     console.log('📁 [YouTube Add API] Checking file structure...');
     // Check if we're using the new structure (individual files) or the old structure
-    const indexPath = path.join(process.cwd(), 'content/youtube/index.md');
-    const videosDir = path.join(process.cwd(), 'content/youtube/videos');
-    const oldFilePath = path.join(process.cwd(), 'content/youtube/videos.md');
+    // In production (Vercel), use different base path
+    const isProduction = process.env.NODE_ENV === 'production';
+    const basePath = isProduction ? '/var/task' : process.cwd();
+    
+    const indexPath = path.join(basePath, 'content/youtube/index.md');
+    const videosDir = path.join(basePath, 'content/youtube/videos');
+    const oldFilePath = path.join(basePath, 'content/youtube/videos.md');
     
     console.log('📁 [YouTube Add API] Paths:', {
       indexPath: existsSync(indexPath),

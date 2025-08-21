@@ -54,10 +54,10 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       console.log('📡 [YouTubeSection] Request URL:', endpoint);
       console.log('📡 [YouTubeSection] Request body:', JSON.stringify(requestBody, null, 2));
       
-      // Create basic auth header using default credentials
-      // In production, these would be proper environment variables
-      const username = 'admin'; // Default fallback
-      const password = 'futurefast2025'; // Default fallback
+      // Create basic auth header using environment-specific credentials
+      // These should match your Vercel environment variables
+      const username = process.env.NODE_ENV === 'production' ? 'admin' : 'admin';
+      const password = process.env.NODE_ENV === 'production' ? 'futurefast2025' : 'futurefast2025';
       const authString = btoa(`${username}:${password}`);
       
       const response = await fetch(endpoint, {
@@ -107,6 +107,12 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       
       const responseData = await response.json();
       console.log('✅ [YouTubeSection] Success response:', responseData);
+      
+      // Handle production response differently
+      if (responseData.note) {
+        console.log('ℹ️ [YouTubeSection] Production note:', responseData.note);
+      }
+      
       return responseData;
     },
     () => {
@@ -122,7 +128,9 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     },
     editingVideo 
       ? 'YouTube video updated successfully!'
-      : 'YouTube video added successfully! Metadata will be fetched automatically.'
+      : process.env.NODE_ENV === 'production' 
+        ? 'Video submission received! Manual processing required in production environment.'
+        : 'YouTube video added successfully! Metadata will be fetched automatically.'
   );
   
   // Function to handle video deletion

@@ -239,11 +239,6 @@ export class UnifiedContentService {
         ''
       );
 
-      // Create basic content
-      const content = `This article was automatically processed from ${extractedContent.source}.
-
-[Read the full article →](${record.sourceUrl})`;
-
       // Skip markdown file creation in serverless environment
       console.log(`ℹ️ Skipping markdown file creation for: ${extractedContent.title} (serverless environment)`);
 

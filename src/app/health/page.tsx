@@ -161,7 +161,7 @@ export default function HealthDashboard() {
           <div className="space-y-3 text-sm text-gray-300">
             <p>• <strong>Daily Health Checks:</strong> Automated at 9:00 AM UTC</p>
             <p>• <strong>Processing Monitoring:</strong> Checks run after each CRON job (8 times daily)</p>
-            <p>• <strong>Email Alerts:</strong> You'll receive notifications if issues are detected</p>
+            <p>• <strong>Email Alerts:</strong> You&apos;ll receive notifications if issues are detected</p>
             <p>• <strong>Manual Check:</strong> Use this dashboard anytime to check system status</p>
           </div>
         </div>

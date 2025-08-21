@@ -172,7 +172,7 @@ export class HealthMonitor {
   /**
    * Check failure rates from environment variables or logs
    */
-  private async checkFailureRates(issues: string[]): Promise<void> {
+  private async checkFailureRates(_issues: string[]): Promise<void> {
     // This could be enhanced to check actual logs or store failure metrics
     // For now, we rely on the processing activity check above
     console.log('✅ Failure rate check completed (via processing activity)');

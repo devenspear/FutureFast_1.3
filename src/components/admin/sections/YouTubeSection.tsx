@@ -54,13 +54,15 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       console.log('📡 [YouTubeSection] Request URL:', endpoint);
       console.log('📡 [YouTubeSection] Request body:', JSON.stringify(requestBody, null, 2));
       
+      // Try to get admin credentials from the browser session
+      // This will prompt for credentials if not cached
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
-        credentials: 'same-origin', // Changed from 'include' to 'same-origin'
+        credentials: 'include', // Include credentials for authentication
       });
       
       console.log('📬 [YouTubeSection] Response status:', response.status);

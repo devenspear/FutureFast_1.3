@@ -18,27 +18,30 @@ export function middleware(request: NextRequest) {
     
     let isAuthenticated = false;
     
-    // Check cookie-based auth (for API calls from authenticated browser sessions)
-    if (authCookie?.value === 'authenticated') {
-      console.log('Cookie-based authentication found for:', pathname);
-      isAuthenticated = true;
-    }
-    // Check Basic Auth header
-    else if (authHeader && isValidAuthHeader(authHeader)) {
+    // Check Basic Auth header first (primary authentication)
+    if (authHeader && isValidAuthHeader(authHeader)) {
       console.log('Basic Auth authentication found for:', pathname);
       isAuthenticated = true;
       
       // Set cookie for subsequent API calls from the browser
-      if (isAdminRoute) {
-        const response = NextResponse.next();
-        response.cookies.set('admin-auth', 'authenticated', {
-          httpOnly: false, // Allow JavaScript to read it
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          maxAge: 60 * 60 * 24, // 24 hours
-        });
-        return response;
+      const response = NextResponse.next();
+      response.cookies.set('admin-auth', 'authenticated', {
+        httpOnly: false, // Allow JavaScript to read it
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', // Changed from 'strict' to 'lax' for better compatibility
+        maxAge: 60 * 60 * 24, // 24 hours
+      });
+      
+      if (isAdminAPI) {
+        response.headers.set('x-authenticated', 'true');
       }
+      
+      return response;
+    }
+    // Check cookie-based auth (for API calls from authenticated browser sessions)
+    else if (authCookie?.value === 'authenticated') {
+      console.log('Cookie-based authentication found for:', pathname);
+      isAuthenticated = true;
     }
     
     if (!isAuthenticated) {

@@ -218,3 +218,5 @@ To update the framework:
 ---
 
 **Built with ❤️ using Next.js, TypeScript, and Tailwind CSS**
+
+<!-- Force deployment: 2025-08-21 19:35 -->

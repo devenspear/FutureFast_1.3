@@ -149,6 +149,11 @@ VercelWebFramework1.0/
 - `npm run setup` - Run setup wizard
 - `npm run template:init` - Initialize new project
 
+### 📺 YouTube Video Management Scripts
+
+- `node scripts/check-missing-videos.js` - Check for missing video files
+- `node scripts/create-missing-videos.js` - Create template files for missing videos
+
 ## 📚 Documentation
 
 ### Setup Guides
@@ -165,6 +170,26 @@ VercelWebFramework1.0/
 ### Admin Guides
 - [Admin Dashboard](docs/ADMIN-README.md)
 - [Security Considerations](docs/ADMIN_SECURITY.md)
+- [Production YouTube Workflow](docs/PRODUCTION_YOUTUBE_WORKFLOW.md)
+
+### 🎯 New Features & Workflows
+
+#### Alert Notification Center
+- **Real-time system health monitoring** with automated alerts
+- **Integrated into admin dashboard** under "Alerts & Monitoring" tab
+- **Notion workflow processing status** with failure detection
+- **Manual processing triggers** and health check capabilities
+
+#### YouTube Video Management
+- **Development**: Full file operations with automatic metadata fetching
+- **Production**: Graceful handling with manual processing workflow
+- **Admin Panel Integration**: Add videos via secure admin interface
+- **File Validation**: Automatic detection and creation of missing video files
+
+#### Enhanced Authentication System
+- **Cookie-based session management** for seamless admin API access
+- **Dual authentication support**: Basic Auth + session cookies
+- **Production-ready security** with proper credential handling
 
 ## 🚀 Deployment
 
@@ -178,6 +203,53 @@ VercelWebFramework1.0/
 - **Netlify**: Use `netlify.toml` configuration
 - **Railway**: Add environment variables
 - **DigitalOcean**: Use Docker configuration
+
+### 🔧 Deployment Troubleshooting
+
+#### Domain Configuration Issues
+If changes aren't reflected on your live site:
+
+1. **Check domain assignment**:
+   ```bash
+   vercel domains inspect yourdomain.com
+   vercel ls  # Get latest deployment URL
+   ```
+
+2. **Reassign domain to latest deployment**:
+   ```bash
+   vercel alias [latest-deployment-url] yourdomain.com
+   vercel alias [latest-deployment-url] www.yourdomain.com
+   ```
+
+3. **Force fresh deployment**:
+   ```bash
+   # Make a small change and push
+   git commit --allow-empty -m "Force deployment"
+   git push origin main
+   
+   # Or manually deploy
+   vercel --prod
+   ```
+
+#### Video Management Issues
+If videos aren't appearing after admin panel submission:
+
+1. **Check for missing video files**:
+   ```bash
+   node scripts/check-missing-videos.js
+   ```
+
+2. **Create missing video files**:
+   ```bash
+   node scripts/create-missing-videos.js
+   ```
+
+3. **Commit and deploy**:
+   ```bash
+   git add .
+   git commit -m "Add missing video files"
+   git push origin main
+   ```
 
 ## 🔒 Security
 
@@ -214,6 +286,31 @@ To update the framework:
 3. Test in development
 4. Update dependencies
 5. Deploy to production
+
+## 📈 Recent Enhancements (August 2025)
+
+### Alert Notification Center
+- **Real-time monitoring** of Notion workflow processing
+- **Automated health checks** with email notifications
+- **Admin dashboard integration** for centralized system oversight
+- **Manual processing triggers** for workflow troubleshooting
+
+### Production YouTube Management
+- **Hybrid approach** for development vs production environments
+- **Admin panel validation** with production logging
+- **Helper scripts** for video file management
+- **Automatic deployment** with domain alias management
+
+### Enhanced Authentication
+- **Seamless admin experience** with cookie-based sessions
+- **Production-ready security** with multiple auth methods
+- **API route protection** via middleware and direct validation
+
+### Deployment Improvements
+- **Automated domain assignment** for fresh deployments
+- **Troubleshooting workflows** for common deployment issues
+- **Force deployment mechanisms** for cache clearing
+- **Comprehensive logging** for production debugging
 
 ---
 

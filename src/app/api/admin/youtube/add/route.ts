@@ -155,8 +155,7 @@ export async function POST(request: Request) {
     console.log('📁 [YouTube Add API] Checking file structure...');
     // Check if we're using the new structure (individual files) or the old structure
     // In production (Vercel), use different base path
-    const isProduction = process.env.NODE_ENV === 'production';
-    const basePath = isProduction ? '/var/task' : process.cwd();
+    const basePath = process.cwd();
     
     const indexPath = path.join(basePath, 'content/youtube/index.md');
     const videosDir = path.join(basePath, 'content/youtube/videos');

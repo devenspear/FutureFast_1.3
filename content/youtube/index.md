@@ -30,9 +30,6 @@ videos:
   - slug: video-b-Kn7Ft9LLw
     category: Tech Analysis
     featured: false
-  - slug: video-dQw4w9WgXcQ
-    category: Tech Innovation
-    featured: false
   - slug: video-qyH3NxFz3Aw
     category: AI & Future of Work
     featured: true
@@ -45,9 +42,6 @@ videos:
   - slug: video-GhIJs4zbH0o
     category: Quantum Computing
     featured: false
-  - slug: video-jNQXAC9IVRw
-    category: Tech History
-    featured: true
   - slug: video-s2_Lrrk9Ur4
     category: Emerging Tech
     featured: false
@@ -65,9 +59,6 @@ videos:
     featured: false
   - slug: video-IIf-hc_SagA
     category: AI & Future of Work
-    featured: false
-  - slug: video-dQw4w9WgXcQ
-    category: Interview
     featured: false
   - slug: video-aYn8VKW6vXA
     category: Interview

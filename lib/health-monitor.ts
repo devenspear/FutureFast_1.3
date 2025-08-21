@@ -37,7 +37,7 @@ export class HealthMonitor {
 
       // 3. Check failure rate from recent CRON runs
       console.log('🏥 Checking failure rates...');
-      await this.checkFailureRates(issues);
+      await this.checkFailureRates();
 
       // 4. Check for unprocessed articles that are stuck
       console.log('🏥 Checking for stuck articles...');
@@ -86,7 +86,7 @@ export class HealthMonitor {
   private async checkNotionConnectivity(issues: string[]): Promise<void> {
     try {
       // Try to fetch a small amount of data to test connectivity
-      await this.notionClient.getAllContent(1); // Just get 1 record
+      await this.notionClient.getAllContent();
       console.log('✅ Notion API connectivity: OK');
     } catch (error) {
       const issue = `Notion API connectivity failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -172,7 +172,7 @@ export class HealthMonitor {
   /**
    * Check failure rates from environment variables or logs
    */
-  private async checkFailureRates(_issues: string[]): Promise<void> {
+  private async checkFailureRates(): Promise<void> {
     // This could be enhanced to check actual logs or store failure metrics
     // For now, we rely on the processing activity check above
     console.log('✅ Failure rate check completed (via processing activity)');

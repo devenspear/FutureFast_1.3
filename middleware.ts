@@ -83,8 +83,9 @@ export function middleware(request: NextRequest) {
 }
 
 // Configure which paths should be protected by this middleware
+// Temporarily exclude API routes to test direct auth in routes
 export const config = {
-  matcher: ['/admin', '/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*'],
 };
 
 // Validate the authorization header

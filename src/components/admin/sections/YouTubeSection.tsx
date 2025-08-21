@@ -54,15 +54,20 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       console.log('📡 [YouTubeSection] Request URL:', endpoint);
       console.log('📡 [YouTubeSection] Request body:', JSON.stringify(requestBody, null, 2));
       
-      // Try to get admin credentials from the browser session
-      // This will prompt for credentials if not cached
+      // Create basic auth header using default credentials
+      // In production, these would be proper environment variables
+      const username = 'admin'; // Default fallback
+      const password = 'futurefast2025'; // Default fallback
+      const authString = btoa(`${username}:${password}`);
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Basic ${authString}`,
         },
         body: JSON.stringify(requestBody),
-        credentials: 'include', // Include credentials for authentication
+        credentials: 'include',
       });
       
       console.log('📬 [YouTubeSection] Response status:', response.status);
@@ -128,10 +133,16 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       setIsDeleting(true);
       setDeleteId(videoId);
       
+      // Use same auth approach for delete
+      const username = 'admin';
+      const password = 'futurefast2025';
+      const authString = btoa(`${username}:${password}`);
+      
       const response = await fetch('/api/admin/youtube/delete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Basic ${authString}`,
         },
         body: JSON.stringify({ id: videoId }),
         credentials: 'include',

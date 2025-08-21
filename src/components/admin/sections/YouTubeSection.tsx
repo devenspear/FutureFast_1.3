@@ -60,7 +60,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
-        credentials: 'include',
+        credentials: 'same-origin', // Changed from 'include' to 'same-origin'
       });
       
       console.log('📬 [YouTubeSection] Response status:', response.status);

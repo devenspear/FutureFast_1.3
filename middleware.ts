@@ -11,17 +11,38 @@ export function middleware(request: NextRequest) {
   
   if (isAdminRoute || isAdminAPI) {
     console.log('Middleware triggered for:', pathname);
-    console.log('Request URL:', request.url);
-    console.log('Environment variables present:', {
-      username: !!process.env.ADMIN_USERNAME,
-      password: !!process.env.ADMIN_PASSWORD
-    });
     
-    // Check if the user is authenticated
+    // Check for auth cookie first (set when user logs in via Basic Auth)
+    const authCookie = request.cookies.get('admin-auth');
     const authHeader = request.headers.get('authorization');
     
-    if (!authHeader || !isValidAuthHeader(authHeader)) {
-      console.log('Authentication failed or not provided for:', pathname);
+    let isAuthenticated = false;
+    
+    // Check cookie-based auth (for API calls from authenticated browser sessions)
+    if (authCookie?.value === 'authenticated') {
+      console.log('Cookie-based authentication found for:', pathname);
+      isAuthenticated = true;
+    }
+    // Check Basic Auth header
+    else if (authHeader && isValidAuthHeader(authHeader)) {
+      console.log('Basic Auth authentication found for:', pathname);
+      isAuthenticated = true;
+      
+      // Set cookie for subsequent API calls from the browser
+      if (isAdminRoute) {
+        const response = NextResponse.next();
+        response.cookies.set('admin-auth', 'authenticated', {
+          httpOnly: false, // Allow JavaScript to read it
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
+        return response;
+      }
+    }
+    
+    if (!isAuthenticated) {
+      console.log('Authentication failed for:', pathname);
       
       // For API routes, return JSON error
       if (isAdminAPI) {
@@ -47,10 +68,9 @@ export function middleware(request: NextRequest) {
     
     console.log('Authentication successful for:', pathname);
     
-    // For authenticated requests, pass the auth header to the API routes
+    // For authenticated API requests, pass the auth status to the route
     if (isAdminAPI) {
       const response = NextResponse.next();
-      // Pass the auth header to the API route
       response.headers.set('x-authenticated', 'true');
       return response;
     }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import YouTubeSection from './sections/YouTubeSection';
 import NewsSection from './sections/NewsSection';
 import ResourceSection from './sections/ResourceSection';
+import AlertNotificationCenter from './AlertNotificationCenter';
 import { YouTubeVideoItem } from '../../types/youtube';
 import { NewsItem, CatalogItem } from '../../../lib/content-loader';
 
@@ -26,6 +27,7 @@ export default function AdminDashboard({
   
   const sections = [
     { id: 'overview', name: 'Overview' },
+    { id: 'alerts', name: 'Alerts & Monitoring' },
     { id: 'youtube', name: 'YouTube Videos' },
     { id: 'news', name: 'News Articles' },
     { id: 'resources', name: 'Resource Library' },
@@ -96,6 +98,22 @@ export default function AdminDashboard({
           </div>
           
           <div className="mt-8 bg-gray-800 p-6 rounded-lg">
+            <h3 className="text-xl font-medium text-cyan-100 mb-4">System Status</h3>
+            <div className="bg-gray-700 p-4 rounded-lg mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-400">Workflow Processing</p>
+                  <p className="text-lg font-semibold text-white mt-1">Monitor system health and alerts</p>
+                </div>
+                <button
+                  onClick={() => setActiveSection('alerts')}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md text-sm transition-colors"
+                >
+                  View Alert Center
+                </button>
+              </div>
+            </div>
+            
             <h3 className="text-xl font-medium text-cyan-100 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
@@ -123,6 +141,13 @@ export default function AdminDashboard({
               </button>
             </div>
           </div>
+        </div>
+      )}
+      
+      {/* Alert Notification Center */}
+      {activeSection === 'alerts' && (
+        <div className="p-6">
+          <AlertNotificationCenter />
         </div>
       )}
       

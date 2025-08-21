@@ -33,58 +33,22 @@ export async function POST(request: Request) {
     const headers = Object.fromEntries(request.headers.entries());
     console.log('📋 [YouTube Add API] Request headers:', headers);
     
-    // Verify authentication - support both JWT cookie and Basic Auth
-    const cookieHeader = request.headers.get('cookie');
-    const authHeader = request.headers.get('authorization');
+    // Authentication is now handled by middleware
+    // The middleware sets 'x-authenticated' header if auth is successful
+    const isAuthenticated = request.headers.get('x-authenticated') === 'true';
     
-    console.log('🍪 [YouTube Add API] Cookie header:', cookieHeader ? 'Present' : 'Missing');
-    console.log('🔑 [YouTube Add API] Authorization header:', authHeader ? 'Present' : 'Missing');
+    console.log('🔑 [YouTube Add API] Authentication status:', isAuthenticated ? 'Authenticated' : 'Not authenticated');
     
-    let isAuthenticated = false;
-    
-    // Check for JWT token in cookies first
-    if (cookieHeader) {
-      console.log('🍪 [YouTube Add API] Cookie header preview:', cookieHeader.substring(0, 100) + '...');
-      const authToken = cookieHeader.split(';')
-        .find(c => c.trim().startsWith('auth-token='))?.split('=')[1];
-      
-      if (authToken) {
-        console.log('🔑 [YouTube Add API] JWT token found');
-        isAuthenticated = true;
-      }
-    }
-    
-    // If no JWT token, check for Basic Auth
-    if (!isAuthenticated && authHeader?.startsWith('Basic ')) {
-      console.log('🔑 [YouTube Add API] Checking Basic Auth');
-      try {
-        const base64Credentials = authHeader.split(' ')[1];
-        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-        const [username, password] = credentials.split(':');
-        
-        const expectedUsername = process.env.ADMIN_USERNAME;
-        const expectedPassword = process.env.ADMIN_PASSWORD;
-        
-        if (username === expectedUsername && password === expectedPassword) {
-          console.log('✅ [YouTube Add API] Basic Auth successful');
-          isAuthenticated = true;
-        } else {
-          console.log('❌ [YouTube Add API] Basic Auth failed - invalid credentials');
-        }
-      } catch (error) {
-        console.error('❌ [YouTube Add API] Basic Auth parsing error:', error);
-      }
-    }
-      
+    // Double-check authentication (middleware should have already handled this)
     if (!isAuthenticated) {
-      console.error('❌ [YouTube Add API] No valid authentication found');
+      console.error('❌ [YouTube Add API] Request not authenticated by middleware');
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    console.log('✅ [YouTube Add API] Authentication successful');
+    console.log('✅ [YouTube Add API] Authentication verified');
 
     // Parse the request body
     const body = await request.json();
@@ -321,9 +285,15 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('💥 [YouTube Add API] Unexpected error:', error);
     console.error('💥 [YouTube Add API] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-    return NextResponse.json(
-      { error: 'Failed to add YouTube video' },
-      { status: 500 }
-    );
+    
+    // Return more detailed error message for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorDetails = {
+      error: 'Failed to add YouTube video',
+      message: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    };
+    
+    return NextResponse.json(errorDetails, { status: 500 });
   }
 }

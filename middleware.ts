@@ -3,9 +3,14 @@ import type { NextRequest } from 'next/server';
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
-  // Only protect admin routes
-  if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) {
-    console.log('Middleware triggered for admin route');
+  const pathname = request.nextUrl.pathname;
+  
+  // Check if this is an admin route (UI or API)
+  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
+  const isAdminAPI = pathname.startsWith('/api/admin/');
+  
+  if (isAdminRoute || isAdminAPI) {
+    console.log('Middleware triggered for:', pathname);
     console.log('Request URL:', request.url);
     console.log('Environment variables present:', {
       username: !!process.env.ADMIN_USERNAME,
@@ -16,9 +21,22 @@ export function middleware(request: NextRequest) {
     const authHeader = request.headers.get('authorization');
     
     if (!authHeader || !isValidAuthHeader(authHeader)) {
-      console.log('Authentication failed or not provided');
+      console.log('Authentication failed or not provided for:', pathname);
       
-      // Return a response that will trigger the browser to show a login prompt
+      // For API routes, return JSON error
+      if (isAdminAPI) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { 
+            status: 401,
+            headers: {
+              'WWW-Authenticate': 'Basic realm="FutureFast Admin API"',
+            }
+          }
+        );
+      }
+      
+      // For UI routes, return HTML with auth prompt
       return new NextResponse('Authentication required', {
         status: 401,
         headers: {
@@ -27,7 +45,15 @@ export function middleware(request: NextRequest) {
       });
     }
     
-    console.log('Authentication successful');
+    console.log('Authentication successful for:', pathname);
+    
+    // For authenticated requests, pass the auth header to the API routes
+    if (isAdminAPI) {
+      const response = NextResponse.next();
+      // Pass the auth header to the API route
+      response.headers.set('x-authenticated', 'true');
+      return response;
+    }
   }
   
   return NextResponse.next();
@@ -35,7 +61,7 @@ export function middleware(request: NextRequest) {
 
 // Configure which paths should be protected by this middleware
 export const config = {
-  matcher: ['/admin', '/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/api/admin/:path*'],
 };
 
 // Validate the authorization header

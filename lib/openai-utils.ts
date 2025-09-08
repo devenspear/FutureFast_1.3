@@ -171,6 +171,28 @@ async function fetchWebpageContent(url: string): Promise<{
 }
 
 /**
+ * Normalize text to handle Unicode characters and fix common formatting issues
+ */
+function normalizeText(text: string): string {
+  if (!text) return text;
+  
+  return text
+    // Replace em-dash and en-dash with regular hyphens
+    .replace(/[—–]/g, '-')
+    // Replace curly quotes with straight quotes
+    .replace(/[""]/g, '"')
+    .replace(/['']/g, "'")
+    // Replace other Unicode quotation marks
+    .replace(/[‚„]/g, '"')
+    // Replace non-breaking spaces
+    .replace(/\u00A0/g, ' ')
+    // Replace multiple spaces with single space
+    .replace(/\s+/g, ' ')
+    // Trim whitespace
+    .trim();
+}
+
+/**
  * Generate metadata for a news article URL with enhanced date extraction
  */
 export async function generateNewsMetadata(url: string): Promise<NewsMetadata> {
@@ -253,20 +275,20 @@ Focus especially on finding the correct publication date. Look carefully through
     }
     
     return {
-      title: result.title || metaTags.title || 'Untitled Article',
-      source: result.source || metaTags.siteName || new URL(url).hostname.replace('www.', ''),
+      title: normalizeText(result.title || metaTags.title || 'Untitled Article'),
+      source: normalizeText(result.source || metaTags.siteName || new URL(url).hostname.replace('www.', '')),
       publishedDate: finalPublishedDate,
-      summary: result.summary || metaTags.description || 'No summary available',
+      summary: normalizeText(result.summary || metaTags.description || 'No summary available'),
       tags: Array.isArray(result.tags) ? result.tags : ['news'],
     };
   } catch (error) {
     console.error('Error generating enhanced news metadata:', error);
     // Return fallback metadata
     return {
-      title: 'Article from ' + new URL(url).hostname.replace('www.', ''),
-      source: new URL(url).hostname.replace('www.', ''),
+      title: normalizeText('Article from ' + new URL(url).hostname.replace('www.', '')),
+      source: normalizeText(new URL(url).hostname.replace('www.', '')),
       publishedDate: new Date().toISOString(),
-      summary: 'Summary unavailable. Please check the article at the provided URL.',
+      summary: normalizeText('Summary unavailable. Please check the article at the provided URL.'),
       tags: ['news'],
     };
   }

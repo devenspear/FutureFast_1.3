@@ -1,6 +1,17 @@
 {
   "videos": [
     {
+      "id": "ziLmtuLm-LU",
+      "title": "Generative AI Playbook for Enterprise Leaders",
+      "description": "Strategic breakdown of how large organizations are building AI-first operations, covering data foundation upgrades, talent models, guardrails for responsible deployment, and board-level metrics for measuring automation value.",
+      "thumbnail": "https://img.youtube.com/vi/ziLmtuLm-LU/maxresdefault.jpg",
+      "publishedAt": "2025-09-19T00:00:00.000Z",
+      "channelTitle": "FutureFast Curated",
+      "url": "https://www.youtube.com/watch?v=ziLmtuLm-LU&t=2261s",
+      "category": "AI & Future of Work",
+      "featured": false
+    },
+    {
       "id": "aYn8VKW6vXA",
       "title": "Sam Altman | This Past Weekend w/ Theo Von #599",
       "description": "Sam Altman is an entrepreneur, investor and CEO of the artificial intelligence company OpenAI, known for their popular program ChatGPT.\n\nTheo joins Sam at the OpenAI office in San Francisco to talk ab...",

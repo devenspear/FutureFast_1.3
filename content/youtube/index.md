@@ -1,5 +1,8 @@
 ---
 videos:
+  - slug: video-ziLmtuLm-LU
+    category: AI & Future of Work
+    featured: false
   - slug: video-reVebuAf_Cs
     category: Interview
     featured: false

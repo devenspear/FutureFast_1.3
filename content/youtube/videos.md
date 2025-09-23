@@ -1,5 +1,10 @@
 ---
 videos:
+  - url: 'https://youtu.be/SE0FFypxBAo?si=-0pY02LCWayLFXrr'
+    title: '[Pending YouTube API]'
+    description: '[Will be filled by API]'
+    category: Interview
+    featured: false
   - url: 'https://www.youtube.com/watch?v=ziLmtuLm-LU&t=2261s'
     title: Generative AI Playbook for Enterprise Leaders
     description: >-

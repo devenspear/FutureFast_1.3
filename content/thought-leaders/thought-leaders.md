@@ -9,9 +9,6 @@ leaders:
       - emoji: "💼"
         label: "LinkedIn"
         url: "https://www.linkedin.com/in/brettadcock/"
-      - emoji: "🎙️"
-        label: "Moonshots Podcast"
-        url: "https://www.brettadcock.com/podcast"
   - name: "Mark Andreessen"
     expertise: "Venture Capital, Web3, AI"
     socialLinks:

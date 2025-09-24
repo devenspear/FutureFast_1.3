@@ -16,6 +16,15 @@ export interface EnhancedNotionItem {
   websiteStatus?: 'Live' | 'Missing' | 'Checking' | 'Error';
   lastProcessed?: string;
   processingStatus?: string;
+  // Enhanced date extraction fields
+  dateConfidence?: number;
+  dateExtractionMethod?: string;
+  needsReview?: boolean;
+  dateExtractionNotes?: string;
+  manualDateOverride?: string;
+  reviewPriority?: 'Critical' | 'High' | 'Standard' | 'Low';
+  reviewedBy?: string;
+  reviewedAt?: string;
 }
 
 export class EnhancedNotionClient {
@@ -183,7 +192,7 @@ export class EnhancedNotionClient {
    * Update a record with extracted metadata
    */
   async updateRecord(
-    recordId: string, 
+    recordId: string,
     updates: {
       title?: string;
       source?: string;
@@ -195,6 +204,15 @@ export class EnhancedNotionClient {
       description?: string;
       websiteValidated?: boolean;
       websiteStatus?: 'Live' | 'Missing' | 'Checking' | 'Error';
+      // Enhanced date extraction fields
+      dateConfidence?: number;
+      dateExtractionMethod?: string;
+      needsReview?: boolean;
+      dateExtractionNotes?: string;
+      manualDateOverride?: string;
+      reviewPriority?: 'Critical' | 'High' | 'Standard' | 'Low';
+      reviewedBy?: string;
+      reviewedAt?: string;
     }
   ): Promise<void> {
     try {
@@ -257,6 +275,55 @@ export class EnhancedNotionClient {
       if (updates.websiteStatus) {
         properties['Website Status'] = {
           select: { name: updates.websiteStatus }
+        };
+      }
+
+      // Enhanced date extraction fields
+      if (updates.dateConfidence !== undefined) {
+        properties['Date Confidence'] = {
+          number: updates.dateConfidence
+        };
+      }
+
+      if (updates.dateExtractionMethod) {
+        properties['Date Extraction Method'] = {
+          select: { name: updates.dateExtractionMethod }
+        };
+      }
+
+      if (updates.needsReview !== undefined) {
+        properties['Needs Review'] = {
+          checkbox: updates.needsReview
+        };
+      }
+
+      if (updates.dateExtractionNotes) {
+        properties['Date Extraction Notes'] = {
+          rich_text: [{ text: { content: updates.dateExtractionNotes } }]
+        };
+      }
+
+      if (updates.manualDateOverride) {
+        properties['Manual Date Override'] = {
+          date: { start: updates.manualDateOverride }
+        };
+      }
+
+      if (updates.reviewPriority) {
+        properties['Review Priority'] = {
+          select: { name: updates.reviewPriority }
+        };
+      }
+
+      if (updates.reviewedBy) {
+        properties['Reviewed By'] = {
+          rich_text: [{ text: { content: updates.reviewedBy } }]
+        };
+      }
+
+      if (updates.reviewedAt) {
+        properties['Reviewed At'] = {
+          date: { start: updates.reviewedAt }
         };
       }
 
@@ -331,11 +398,139 @@ export class EnhancedNotionClient {
   }
 
   /**
+   * Get records that need human review
+   */
+  async getRecordsNeedingReview(): Promise<EnhancedNotionItem[]> {
+    try {
+      console.log('🔍 Querying records needing human review...');
+
+      const response = await this.client.databases.query({
+        database_id: this.databaseId,
+        filter: {
+          property: 'Needs Review',
+          checkbox: {
+            equals: true
+          }
+        },
+        sorts: [
+          {
+            property: 'Review Priority',
+            direction: 'ascending'
+          },
+          {
+            property: 'Publication Date',
+            direction: 'descending'
+          }
+        ]
+      });
+
+      const items = response.results.map((page: any) => this.mapPageToItem(page));
+      console.log(`✅ Found ${items.length} records needing review`);
+
+      return items;
+    } catch (error) {
+      console.error('❌ Failed to query records needing review:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mark a record as reviewed
+   */
+  async markAsReviewed(recordId: string, reviewedBy: string, finalDate?: string): Promise<void> {
+    const updates: any = {
+      needsReview: false,
+      reviewedBy,
+      reviewedAt: new Date().toISOString()
+    };
+
+    if (finalDate) {
+      updates.manualDateOverride = finalDate;
+      updates.publishedDate = finalDate;
+    }
+
+    await this.updateRecord(recordId, updates);
+    console.log(`✅ Marked record ${recordId} as reviewed by ${reviewedBy}`);
+  }
+
+  /**
+   * Get processing statistics including review metrics
+   */
+  async getEnhancedProcessingStats(): Promise<{
+    totalRecords: number;
+    newsArticles: number;
+    youtubeVideos: number;
+    incompleteRecords: number;
+    processedRecords: number;
+    needingReview: number;
+    highConfidenceExtractions: number;
+    mediumConfidenceExtractions: number;
+    lowConfidenceExtractions: number;
+    byExtractionMethod: { [key: string]: number };
+    reviewQueue: {
+      critical: number;
+      high: number;
+      standard: number;
+      low: number;
+    };
+  }> {
+    try {
+      const [allContent, incompleteRecords, reviewRecords] = await Promise.all([
+        this.getAllContent(),
+        this.getIncompleteRecords(),
+        this.getRecordsNeedingReview()
+      ]);
+
+      const newsArticles = allContent.filter(item => item.contentType === 'News Article').length;
+      const youtubeVideos = allContent.filter(item => item.contentType === 'YouTube Video').length;
+      const processedRecords = allContent.filter(item => item.processed).length;
+
+      // Confidence statistics
+      const highConfidence = allContent.filter(item => (item.dateConfidence || 0) >= 85).length;
+      const mediumConfidence = allContent.filter(item => (item.dateConfidence || 0) >= 60 && (item.dateConfidence || 0) < 85).length;
+      const lowConfidence = allContent.filter(item => (item.dateConfidence || 0) < 60 && (item.dateConfidence || 0) > 0).length;
+
+      // Extraction method statistics
+      const byExtractionMethod: { [key: string]: number } = {};
+      allContent.forEach(item => {
+        if (item.dateExtractionMethod) {
+          byExtractionMethod[item.dateExtractionMethod] = (byExtractionMethod[item.dateExtractionMethod] || 0) + 1;
+        }
+      });
+
+      // Review queue by priority
+      const reviewQueue = {
+        critical: reviewRecords.filter(item => item.reviewPriority === 'Critical').length,
+        high: reviewRecords.filter(item => item.reviewPriority === 'High').length,
+        standard: reviewRecords.filter(item => item.reviewPriority === 'Standard').length,
+        low: reviewRecords.filter(item => item.reviewPriority === 'Low').length,
+      };
+
+      return {
+        totalRecords: allContent.length,
+        newsArticles,
+        youtubeVideos,
+        incompleteRecords: incompleteRecords.length,
+        processedRecords,
+        needingReview: reviewRecords.length,
+        highConfidenceExtractions: highConfidence,
+        mediumConfidenceExtractions: mediumConfidence,
+        lowConfidenceExtractions: lowConfidence,
+        byExtractionMethod,
+        reviewQueue
+      };
+    } catch (error) {
+      console.error('❌ Failed to get enhanced processing stats:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Map Notion page to our item interface
    */
   private mapPageToItem(page: any): EnhancedNotionItem {
     const properties = page.properties;
-    
+
     return {
       id: page.id,
       title: this.extractTitle(properties.Title),
@@ -352,6 +547,15 @@ export class EnhancedNotionClient {
       websiteStatus: this.extractSelect(properties['Website Status']) as 'Live' | 'Missing' | 'Checking' | 'Error',
       lastProcessed: this.extractDate(properties['Last Processed']),
       processingStatus: this.extractSelect(properties['Processing Status']),
+      // Enhanced date extraction fields
+      dateConfidence: this.extractNumber(properties['Date Confidence']),
+      dateExtractionMethod: this.extractSelect(properties['Date Extraction Method']),
+      needsReview: this.extractCheckbox(properties['Needs Review']),
+      dateExtractionNotes: this.extractRichText(properties['Date Extraction Notes']),
+      manualDateOverride: this.extractDate(properties['Manual Date Override']),
+      reviewPriority: this.extractSelect(properties['Review Priority']) as 'Critical' | 'High' | 'Standard' | 'Low',
+      reviewedBy: this.extractRichText(properties['Reviewed By']),
+      reviewedAt: this.extractDate(properties['Reviewed At']),
     };
   }
 
@@ -378,6 +582,10 @@ export class EnhancedNotionClient {
 
   private extractCheckbox(property: any): boolean {
     return property?.checkbox || false;
+  }
+
+  private extractNumber(property: any): number | undefined {
+    return property?.number || undefined;
   }
 }
 

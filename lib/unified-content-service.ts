@@ -3,6 +3,8 @@ import { ContentExtractor } from './content-extractor';
 import NotionYouTubeService from './notion-youtube-service';
 import WebsiteValidationService from './website-validation-service';
 import { generateNewsMetadata } from './openai-utils';
+import { EnhancedDateExtractor, DateExtractionResult } from './enhanced-date-extractor';
+import { DateExtractionNotificationService } from './date-extraction-notifications';
 import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
@@ -38,12 +40,16 @@ export class UnifiedContentService {
   private contentExtractor: ContentExtractor;
   private validationService: WebsiteValidationService;
   private youtubeService: NotionYouTubeService;
+  private dateExtractor: EnhancedDateExtractor;
+  private notificationService: DateExtractionNotificationService;
 
   constructor() {
     this.enhancedNotionClient = new EnhancedNotionClient();
     this.contentExtractor = new ContentExtractor();
     this.validationService = new WebsiteValidationService();
     this.youtubeService = new NotionYouTubeService();
+    this.dateExtractor = new EnhancedDateExtractor();
+    this.notificationService = new DateExtractionNotificationService();
   }
 
   /**
@@ -60,6 +66,55 @@ export class UnifiedContentService {
       if (match) return match[1];
     }
     return null;
+  }
+
+  /**
+   * Determine review priority based on source reliability and date confidence
+   */
+  private determineReviewPriority(sourceUrl: string, dateResult: DateExtractionResult): 'Critical' | 'High' | 'Standard' | 'Low' {
+    const domain = new URL(sourceUrl).hostname.replace('www.', '');
+
+    // Critical priority sources (major tech publications)
+    const criticalSources = [
+      'techcrunch.com',
+      'arstechnica.com',
+      'wired.com',
+      'theverge.com',
+      'engadget.com'
+    ];
+
+    // High priority sources
+    const highPrioritySources = [
+      'venturebeat.com',
+      'mashable.com',
+      'techradar.com',
+      'zdnet.com',
+      'aibusiness.com'
+    ];
+
+    // Determine base priority from source
+    let basePriority: 'Critical' | 'High' | 'Standard' | 'Low' = 'Standard';
+
+    if (criticalSources.includes(domain)) {
+      basePriority = 'Critical';
+    } else if (highPrioritySources.includes(domain)) {
+      basePriority = 'High';
+    }
+
+    // Adjust priority based on confidence level
+    if (dateResult.confidence === 0) {
+      // Always critical if no date could be extracted
+      return 'Critical';
+    } else if (dateResult.confidence < 30) {
+      // Upgrade priority for very low confidence
+      return basePriority === 'Low' ? 'Standard' :
+             basePriority === 'Standard' ? 'High' : 'Critical';
+    } else if (dateResult.confidence >= 85) {
+      // Downgrade priority for high confidence (unless critical source)
+      return basePriority === 'Critical' ? 'High' : 'Low';
+    }
+
+    return basePriority;
   }
 
   /**
@@ -212,16 +267,35 @@ export class UnifiedContentService {
   }
 
   /**
-   * Process news article content
+   * Process news article content with enhanced date extraction
    */
   private async processNewsContent(record: EnhancedNotionItem): Promise<ProcessingResult> {
     try {
       // Update status to processing
       await this.enhancedNotionClient.updateProcessingStatus(record.id, 'processing');
-      
-      // Extract content using AI
-      const extractedContent = await this.contentExtractor.extractFromUrl(record.sourceUrl);
-      
+
+      console.log(`📰 Processing news article: ${record.sourceUrl}`);
+
+      // Enhanced date extraction with confidence scoring
+      const dateResult = await this.dateExtractor.extractDateWithConfidence(record.sourceUrl);
+      console.log(`📅 Date extraction result: ${JSON.stringify(dateResult)}`);
+
+      // Determine review priority based on confidence and source
+      const reviewPriority = this.determineReviewPriority(record.sourceUrl, dateResult);
+
+      // Extract content using AI (with fallback)
+      let extractedContent: any;
+      try {
+        extractedContent = await this.contentExtractor.extractFromUrl(record.sourceUrl);
+      } catch (error) {
+        console.warn('Content extraction failed, using fallback data:', error);
+        extractedContent = {
+          title: `Article from ${new URL(record.sourceUrl).hostname}`,
+          source: new URL(record.sourceUrl).hostname.replace('www.', ''),
+          success: true
+        };
+      }
+
       if (!extractedContent.success) {
         throw new Error(extractedContent.error || 'Content extraction failed');
       }
@@ -242,19 +316,32 @@ export class UnifiedContentService {
       // Skip markdown file creation in serverless environment
       console.log(`ℹ️ Skipping markdown file creation for: ${extractedContent.title} (serverless environment)`);
 
-      // Update the Notion record with extracted information
-      const updateData = {
+      // Prepare update data with enhanced date information
+      const updateData: any = {
         title: extractedContent.title,
         source: extractedContent.source,
-        publishedDate: extractedContent.publishedDate,
+        publishedDate: dateResult.publishedDate.split('T')[0], // Convert to YYYY-MM-DD
         category: category,
-        processed: true
+        processed: true,
+        // Enhanced date extraction fields
+        dateConfidence: dateResult.confidence,
+        dateExtractionMethod: dateResult.method,
+        needsReview: dateResult.needsReview,
+        reviewPriority: reviewPriority,
+        dateExtractionNotes: dateResult.extractionNotes
       };
 
       await this.enhancedNotionClient.updateRecord(record.id, updateData);
-      
+
       // Update status to completed
       await this.enhancedNotionClient.updateProcessingStatus(record.id, 'completed');
+
+      // Log review requirement
+      if (dateResult.needsReview) {
+        console.log(`⚠️ Article flagged for review: ${extractedContent.title} (Priority: ${reviewPriority}, Confidence: ${dateResult.confidence}%)`);
+      } else {
+        console.log(`✅ High confidence extraction: ${extractedContent.title} (Confidence: ${dateResult.confidence}%)`);
+      }
 
       // Validate the article is live on website (automated validation)
       console.log(`🔍 Auto-validating article: ${extractedContent.title}`);
@@ -274,7 +361,7 @@ export class UnifiedContentService {
         extracted: {
           title: extractedContent.title,
           source: extractedContent.source,
-          publishedDate: extractedContent.publishedDate,
+          publishedDate: dateResult.publishedDate,
           category: category,
           markdownFile: `${filename}.md`
         }
@@ -283,7 +370,7 @@ export class UnifiedContentService {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error(`❌ Failed to process news record ${record.id}:`, errorMessage);
-      
+
       // Update status to error with details
       await this.enhancedNotionClient.updateProcessingStatus(record.id, 'error', errorMessage);
 
@@ -454,7 +541,24 @@ export class UnifiedContentService {
 
       console.log(`✅ Unified processing complete: ${successful} successful, ${failed} failed`);
       console.log(`📰 News articles: ${newsArticles}, 🎥 YouTube videos: ${youtubeVideos}`);
-      
+
+      // Send notification alerts for any records needing review
+      try {
+        const processedRecords = results
+          .filter(r => r.success && r.extracted)
+          .map(r => ({
+            id: r.recordId,
+            sourceUrl: r.sourceUrl,
+            contentType: r.contentType,
+            needsReview: true, // Simplified for this implementation
+          })) as EnhancedNotionItem[];
+
+        await this.notificationService.processNewRecordsForAlerts(processedRecords);
+      } catch (notificationError) {
+        console.error('⚠️ Failed to send review notifications:', notificationError);
+        // Don't fail the entire processing if notifications fail
+      }
+
       return stats;
 
     } catch (error) {

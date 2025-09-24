@@ -49,5 +49,7 @@ When making changes that need to be deployed to production:
 
 ## Notes for Claude
 - Always use `vercel ls` to confirm "● Ready" status before marking deployments complete
+- **NEVER say changes are "live" or "deployed" until verifying "● Ready" status**
+- If Vercel shows "● Building" status, wait and check again before confirming deployment
 - This project requires proper Notion API credentials to run cron job locally
 - Use TodoWrite tool for multi-step deployment processes

@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function AncientDarkGalaxy() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying] = useState(true);
   const [currentValue, setCurrentValue] = useState(2);
-  const [phase, setPhase] = useState<'growing' | 'dissolving'>('growing');
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -54,14 +53,12 @@ export default function AncientDarkGalaxy() {
         // Growing phase: 2^1 to 2^9 over 16 seconds (2 seconds per step)
         const growthProgress = localFrame / growthPhase;
         exponentialStep = 1 + (growthProgress * 8); // 1 to 9
-        setPhase('growing');
       } else {
         // Dissolving phase: maintain 512 but fade opacity over 8 seconds
         exponentialStep = 9; // Keep at maximum (2^9 = 512)
         
         const dissolveProgress = (localFrame - growthPhase) / dissolvePhase;
         galaxyOpacity = 1 - (dissolveProgress * 0.9); // Fade to nearly invisible
-        setPhase('dissolving');
       }
       
       const currentExp = Math.floor(exponentialStep);

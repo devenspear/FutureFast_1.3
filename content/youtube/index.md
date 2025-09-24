@@ -51,14 +51,8 @@ videos:
   - slug: video-s2_Lrrk9Ur4
     category: Emerging Tech
     featured: false
-  - slug: video-test123
-    category: Web3 & Blockchain
-    featured: false
   - slug: video-GqjOaaAYbk8
     category: Web3 & Blockchain
-    featured: false
-  - slug: video-NEW_VIDEO_ID123
-    category: Test
     featured: false
   - slug: video-camlUwrxsfs
     category: Interview

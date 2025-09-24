@@ -137,6 +137,9 @@ VercelWebFramework1.0/
 ├── public/                    # Static assets
 ├── docs/                      # Documentation
 ├── scripts/                   # Setup and utility scripts
+│   ├── check-missing-videos.js  # Check for missing video files
+│   ├── create-missing-videos.js # Create template files for missing videos
+│   └── template-init.js      # Initialize new project template
 └── lib/                       # Core library functions
 ```
 
@@ -145,6 +148,7 @@ VercelWebFramework1.0/
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
+- `npm run dev:network` - Start dev server accessible on network
 - `npm run lint` - Run ESLint
 - `npm run setup` - Run setup wizard
 - `npm run template:init` - Initialize new project
@@ -171,6 +175,7 @@ VercelWebFramework1.0/
 - [Admin Dashboard](docs/ADMIN-README.md)
 - [Security Considerations](docs/ADMIN_SECURITY.md)
 - [Production YouTube Workflow](docs/PRODUCTION_YOUTUBE_WORKFLOW.md)
+- [Notification Setup](docs/NOTIFICATION_SETUP.md)
 
 ### 🎯 New Features & Workflows
 

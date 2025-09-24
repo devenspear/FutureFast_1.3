@@ -3,10 +3,10 @@
     {
       "id": "ziLmtuLm-LU",
       "title": "Generative AI Playbook for Enterprise Leaders",
-      "description": "Strategic breakdown of how large organizations are building AI-first operations, covering data foundation upgrades, talent models, guardrails for responsible deployment, and board-level metrics for measuring automation value.",
+      "description": "Strategic breakdown of how large organizations are building AI-first operations, including data foundation upgrades, talent models, guardrails for responsible deployment, and board-level metrics for tracking value creation from automation.",
       "thumbnail": "https://img.youtube.com/vi/ziLmtuLm-LU/maxresdefault.jpg",
-      "publishedAt": "2025-09-19T00:00:00.000Z",
-      "channelTitle": "FutureFast Curated",
+      "publishedAt": "2025-09-24T01:18:15.673Z",
+      "channelTitle": "FutureFast Channel",
       "url": "https://www.youtube.com/watch?v=ziLmtuLm-LU&t=2261s",
       "category": "AI & Future of Work",
       "featured": false
@@ -31,6 +31,28 @@
       "channelTitle": "Altcoin Daily",
       "url": "https://youtu.be/IIf-hc_SagA",
       "category": "AI & Future of Work",
+      "featured": false
+    },
+    {
+      "id": "mYDSSRS-B5U",
+      "title": "[Pending YouTube API]",
+      "description": "[Will be filled by API]",
+      "thumbnail": "https://img.youtube.com/vi/mYDSSRS-B5U/maxresdefault.jpg",
+      "publishedAt": "2025-07-17T01:18:15.673Z",
+      "channelTitle": "FutureFast Channel",
+      "url": "https://www.youtube.com/watch?v=mYDSSRS-B5U",
+      "category": "Interview",
+      "featured": false
+    },
+    {
+      "id": "lWmDiDGsLK4",
+      "title": "[Pending YouTube API]",
+      "description": "[Will be filled by API]",
+      "thumbnail": "https://img.youtube.com/vi/lWmDiDGsLK4/maxresdefault.jpg",
+      "publishedAt": "2025-07-14T01:18:15.673Z",
+      "channelTitle": "FutureFast Channel",
+      "url": "https://youtu.be/lWmDiDGsLK4?si=mUA0Mbn3MVGB7i--",
+      "category": "Interview",
       "featured": false
     },
     {
@@ -252,29 +274,7 @@
       "url": "https://youtu.be/qyH3NxFz3Aw?si=iW8qrA8aZBZGvAIA",
       "category": "AI & Future of Work",
       "featured": true
-    },
-    {
-      "id": "dQw4w9WgXcQ",
-      "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
-      "description": "The official video for “Never Gonna Give You Up” by Rick Astley. \n\nNever: The Autobiography 📚 OUT NOW! \nFollow this link to get your copy and listen to Rick’s ‘Never’ playlist ❤️ #RickAstleyNever\nhtt...",
-      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-      "publishedAt": "2009-10-25T06:57:33.000Z",
-      "channelTitle": "Rick Astley",
-      "url": "https://youtu.be/dQw4w9WgXcQ",
-      "category": "Interview",
-      "featured": false
-    },
-    {
-      "id": "dQw4w9WgXcQ",
-      "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
-      "description": "The official video for “Never Gonna Give You Up” by Rick Astley. \n\nNever: The Autobiography 📚 OUT NOW! \nFollow this link to get your copy and listen to Rick’s ‘Never’ playlist ❤️ #RickAstleyNever\nhtt...",
-      "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-      "publishedAt": "2009-10-25T06:57:33.000Z",
-      "channelTitle": "Rick Astley",
-      "url": "https://youtu.be/dQw4w9WgXcQ",
-      "category": "Interview",
-      "featured": false
     }
   ],
-  "timestamp": 1754268269095
+  "timestamp": 1758677173118
 }

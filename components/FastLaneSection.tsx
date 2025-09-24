@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import ExponentialGrowthChart from './ExponentialGrowthChart';
+import AncientDarkGalaxy from './AncientDarkGalaxy';
 
 // Main FastLaneSection component
 export default function FastLaneSection() {
@@ -56,7 +56,7 @@ export default function FastLaneSection() {
             variants={itemVariants}
           >
             <div className="w-full flex justify-center items-center">
-              <ExponentialGrowthChart />
+              <AncientDarkGalaxy />
             </div>
           </motion.div>
           

@@ -70,7 +70,7 @@ const learningResources: LearningResource[] = [
   },
   {
     id: '4',
-    title: 'Binance Academy - Beginner&apos;s Guide & Tracks',
+    title: 'Binance Academy - Beginner\'s Guide & Tracks',
     description: 'Offers extensive free educational content, including a "Beginner Track," articles, and guides on blockchain, cryptocurrency, trading, security, and specific topics like Bitcoin, Ethereum, and NFTs.',
     link: 'https://academy.binance.com/en/articles?page=1&tags=beginner',
     provider: 'Binance Academy',

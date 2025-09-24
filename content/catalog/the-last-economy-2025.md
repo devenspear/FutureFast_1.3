@@ -5,7 +5,7 @@ year: 2025
 month: August
 type: Book
 tag: economics
-image: /uploads/the-last-economy-cover.jpg
+image: /the-last-economy-cover.jpg
 url: https://webstatics.ii.inc/The%20Last%20Economy.pdf
 ---
 

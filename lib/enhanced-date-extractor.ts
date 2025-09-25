@@ -182,7 +182,7 @@ export class EnhancedDateExtractor {
     let publishedDate: string | undefined;
     let confidence = 0;
     let method: 'meta-tags' | 'json-ld' = 'meta-tags';
-    let rawData: any = {};
+    const rawData: any = {};
 
     // Enhanced meta tag patterns with confidence scoring
     const datePatterns = [

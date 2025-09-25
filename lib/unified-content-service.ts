@@ -93,12 +93,14 @@ export class UnifiedContentService {
     ];
 
     // Determine base priority from source
-    let basePriority: 'Critical' | 'High' | 'Standard' | 'Low' = 'Standard';
+    let basePriority: 'Critical' | 'High' | 'Standard' | 'Low' = 'Low';
 
     if (criticalSources.includes(domain)) {
       basePriority = 'Critical';
     } else if (highPrioritySources.includes(domain)) {
       basePriority = 'High';
+    } else {
+      basePriority = 'Standard';
     }
 
     // Adjust priority based on confidence level
@@ -107,8 +109,7 @@ export class UnifiedContentService {
       return 'Critical';
     } else if (dateResult.confidence < 30) {
       // Upgrade priority for very low confidence
-      return basePriority === 'Low' ? 'Standard' :
-             basePriority === 'Standard' ? 'High' : 'Critical';
+      return basePriority === 'Standard' ? 'High' : 'Critical';
     } else if (dateResult.confidence >= 85) {
       // Downgrade priority for high confidence (unless critical source)
       return basePriority === 'Critical' ? 'High' : 'Low';

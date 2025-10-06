@@ -230,31 +230,8 @@ export async function POST(request: Request) {
 
     console.log('✅ [YouTube Add API] Authentication successful');
 
-    // Parse the request body
-    const body = await request.json();
-    console.log('📦 [YouTube Add API] Request body:', body);
-    const { url, category = 'Interview', featured = false } = body;
-
-    if (!url) {
-      console.error('❌ [YouTube Add API] Missing URL in request');
-      return NextResponse.json(
-        { error: 'YouTube URL is required' },
-        { status: 400 }
-      );
-    }
-
-    console.log('🔍 [YouTube Add API] Processing URL:', url);
-
-    // Validate YouTube URL
-    const videoId = extractVideoId(url);
-    console.log('🆔 [YouTube Add API] Extracted video ID:', videoId);
-    if (!videoId) {
-      console.error('❌ [YouTube Add API] Invalid YouTube URL');
-      return NextResponse.json(
-        { error: 'Invalid YouTube URL' },
-        { status: 400 }
-      );
-    }
+    // Body and videoId were already parsed and validated at the beginning of the function
+    console.log('📦 [YouTube Add API] Request body:', { url, videoId, category, featured });
 
     console.log('📁 [YouTube Add API] Checking file structure...');
     // Check if we're using the new structure (individual files) or the old structure

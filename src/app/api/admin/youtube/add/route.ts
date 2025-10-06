@@ -67,11 +67,40 @@ export async function POST(request: Request) {
       // Generate slug for the video
       const slug = `video-${videoId}`;
 
+      // Fetch YouTube metadata if API key is available
+      let videoTitle = "[Pending YouTube API]";
+      let videoDescription = "[Will be filled by API]";
+      let publishedDate = new Date().toISOString().split('T')[0];
+
+      if (process.env.YOUTUBE_API_KEY) {
+        try {
+          console.log('🎬 [YouTube Add API] Fetching metadata from YouTube API');
+          const ytResponse = await fetch(
+            `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${process.env.YOUTUBE_API_KEY}`
+          );
+
+          if (ytResponse.ok) {
+            const ytData = await ytResponse.json();
+            if (ytData.items && ytData.items[0]) {
+              const snippet = ytData.items[0].snippet;
+              videoTitle = snippet.title || videoTitle;
+              videoDescription = snippet.description || videoDescription;
+              publishedDate = snippet.publishedAt?.split('T')[0] || publishedDate;
+              console.log(`✅ [YouTube Add API] Fetched metadata: ${videoTitle}`);
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ [YouTube Add API] Failed to fetch YouTube metadata:', error);
+          // Continue with placeholder data
+        }
+      }
+
       // Create video file content
       const videoData = {
         url,
-        title: "[Pending YouTube API]",
-        description: "[Will be filled by API]",
+        title: videoTitle,
+        description: videoDescription,
+        publishedDate,
         category,
         featured
       };

@@ -327,12 +327,37 @@ export class EnhancedNotionClient {
         };
       }
 
-      await this.client.pages.update({
-        page_id: recordId,
-        properties
-      });
+      try {
+        await this.client.pages.update({
+          page_id: recordId,
+          properties
+        });
+        console.log(`✅ Updated Notion record: ${recordId}`);
+      } catch (updateError: any) {
+        // If the error is about missing properties, try again without enhanced date fields
+        if (updateError?.message?.includes('is not a property that exists')) {
+          console.warn(`⚠️ Some properties don't exist in Notion, retrying without enhanced date fields...`);
 
-      console.log(`✅ Updated Notion record: ${recordId}`);
+          // Remove enhanced date fields that might not exist
+          const basicProperties = { ...properties };
+          delete basicProperties['Date Confidence'];
+          delete basicProperties['Date Extraction Method'];
+          delete basicProperties['Needs Review'];
+          delete basicProperties['Date Extraction Notes'];
+          delete basicProperties['Manual Date Override'];
+          delete basicProperties['Review Priority'];
+          delete basicProperties['Reviewed By'];
+          delete basicProperties['Reviewed At'];
+
+          await this.client.pages.update({
+            page_id: recordId,
+            properties: basicProperties
+          });
+          console.log(`✅ Updated Notion record (without enhanced fields): ${recordId}`);
+        } else {
+          throw updateError;
+        }
+      }
     } catch (error) {
       console.error(`❌ Failed to update record ${recordId}:`, error);
       throw error;

@@ -334,12 +334,13 @@ export class EnhancedNotionClient {
         });
         console.log(`✅ Updated Notion record: ${recordId}`);
       } catch (updateError: any) {
-        // If the error is about missing properties, try again without enhanced date fields
+        // If the error is about missing properties, try again without optional fields
         if (updateError?.message?.includes('is not a property that exists')) {
-          console.warn(`⚠️ Some properties don't exist in Notion, retrying without enhanced date fields...`);
+          console.warn(`⚠️ Some properties don't exist in Notion, retrying without optional fields...`);
 
-          // Remove enhanced date fields that might not exist
+          // Remove optional fields that might not exist in the database
           const basicProperties = { ...properties };
+          // Enhanced date extraction fields
           delete basicProperties['Date Confidence'];
           delete basicProperties['Date Extraction Method'];
           delete basicProperties['Needs Review'];
@@ -348,12 +349,19 @@ export class EnhancedNotionClient {
           delete basicProperties['Review Priority'];
           delete basicProperties['Reviewed By'];
           delete basicProperties['Reviewed At'];
+          // Website validation fields
+          delete basicProperties['Website Validated'];
+          delete basicProperties['Website Status'];
+          // Processing status fields
+          delete basicProperties['Processing Status'];
+          delete basicProperties['Processing Error'];
+          delete basicProperties['Last Processed'];
 
           await this.client.pages.update({
             page_id: recordId,
             properties: basicProperties
           });
-          console.log(`✅ Updated Notion record (without enhanced fields): ${recordId}`);
+          console.log(`✅ Updated Notion record (without optional fields): ${recordId}`);
         } else {
           throw updateError;
         }

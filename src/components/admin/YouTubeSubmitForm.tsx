@@ -76,6 +76,7 @@ export default function YouTubeSubmitForm({ categories = [] }: YouTubeSubmitForm
   
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-md border border-gray-800">
+      {/* Enhanced UI v2.0 - Updated with visual feedback */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">Add YouTube Video</h2>
         {isSubmitting && (

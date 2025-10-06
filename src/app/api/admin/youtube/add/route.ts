@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import GitHubService from '../../../../../../lib/github-service';
 
 // Function to extract video ID from YouTube URL (copied from youtube-utils to avoid import issues)
 function extractVideoId(url: string): string | null {
@@ -30,46 +31,149 @@ export async function POST(request: Request) {
   });
   
   try {
-    // For production (Vercel), return a different response since file system is read-only
+    // Parse the request body early for both production and development
+    const body = await request.json();
+    const { url, category = 'Interview', featured = false } = body;
+
+    if (!url) {
+      return NextResponse.json(
+        { error: 'YouTube URL is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate YouTube URL
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      return NextResponse.json(
+        { error: 'Invalid YouTube URL' },
+        { status: 400 }
+      );
+    }
+
+    // For production (Vercel), use GitHub API to commit files
     if (process.env.NODE_ENV === 'production') {
-      console.log('🚨 [YouTube Add API] Production environment - file operations not supported');
-      
-      // Parse the request body for validation
-      const body = await request.json();
-      const { url, category = 'Interview', featured = false } = body;
+      console.log('🚀 [YouTube Add API] Production environment - using GitHub API');
 
-      if (!url) {
-        return NextResponse.json(
-          { error: 'YouTube URL is required' },
-          { status: 400 }
-        );
+      const githubService = new GitHubService();
+
+      if (!githubService.isConfigured()) {
+        console.error('❌ [YouTube Add API] GitHub service not configured');
+        return NextResponse.json({
+          error: 'GitHub integration not configured. Please set GITHUB_TOKEN and GITHUB_REPO environment variables.',
+        }, { status: 500 });
       }
 
-      // Validate YouTube URL
-      const videoId = extractVideoId(url);
-      if (!videoId) {
-        return NextResponse.json(
-          { error: 'Invalid YouTube URL' },
-          { status: 400 }
-        );
-      }
+      // Generate slug for the video
+      const slug = `video-${videoId}`;
 
-      // In production, we'll need to use a database or external storage
-      // For now, return success but log the video details
-      console.log('📝 [YouTube Add API] Video to be added (production):', {
+      // Create video file content
+      const videoData = {
         url,
-        videoId,
+        title: "[Pending YouTube API]",
+        description: "[Will be filled by API]",
         category,
-        featured,
-        timestamp: new Date().toISOString()
-      });
+        featured
+      };
 
-      return NextResponse.json({
-        success: true,
-        message: 'Video submission received. Manual processing required in production.',
-        videoId,
-        note: 'In production environment, videos must be added manually to the content files.'
-      });
+      const videoContent = matter.stringify('', videoData);
+      const videoFilePath = `content/youtube/videos/${slug}.md`;
+
+      // Read current index file from GitHub to check for duplicates and update
+      try {
+        const { owner, repo, branch } = githubService.getRepoInfo();
+        const indexPath = 'content/youtube/index.md';
+
+        // Fetch current index file
+        const indexResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/${indexPath}?ref=${branch}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+              'Accept': 'application/vnd.github.v3+json',
+            },
+          }
+        );
+
+        let indexData: any = { videos: [] };
+        let indexContentText = '';
+
+        if (indexResponse.ok) {
+          const indexFileData = await indexResponse.json();
+          const indexContent = Buffer.from(indexFileData.content, 'base64').toString('utf-8');
+          const parsed = matter(indexContent);
+          indexData = parsed.data;
+          indexContentText = parsed.content;
+
+          if (!Array.isArray(indexData.videos)) {
+            indexData.videos = [];
+          }
+
+          // Check if video already exists
+          const videoExists = indexData.videos.some((video: { slug?: string }) => video.slug === slug);
+          if (videoExists) {
+            return NextResponse.json(
+              { error: 'Video already exists', videoId },
+              { status: 409 }
+            );
+          }
+        }
+
+        // Add new video to index
+        indexData.videos.push({
+          slug,
+          category,
+          featured
+        });
+
+        const updatedIndexContent = matter.stringify(indexContentText, indexData);
+
+        // Commit both files to GitHub
+        const commitResult = await githubService.commitMultipleFiles(
+          [
+            { path: videoFilePath, content: videoContent },
+            { path: indexPath, content: updatedIndexContent }
+          ],
+          `Add YouTube video: ${slug}\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>`
+        );
+
+        if (!commitResult.success) {
+          throw new Error(commitResult.error || 'Failed to commit to GitHub');
+        }
+
+        console.log(`✅ [YouTube Add API] Video added successfully via GitHub: ${slug}`);
+
+        // Trigger cache refresh
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : 'https://future-fast-1-3.vercel.app';
+          console.log('🔄 [YouTube Add API] Triggering cache refresh:', `${baseUrl}/api/youtube?refresh=true`);
+          await fetch(`${baseUrl}/api/youtube?refresh=true`, {
+            method: 'GET',
+            cache: 'no-store'
+          });
+          console.log('✅ [YouTube Add API] Cache refresh completed');
+        } catch (error) {
+          console.error('⚠️ [YouTube Add API] Error refreshing YouTube API cache:', error);
+        }
+
+        return NextResponse.json({
+          success: true,
+          message: 'Video added successfully and committed to GitHub. Deployment will start automatically.',
+          videoId,
+          slug,
+          commitSha: commitResult.commitSha,
+          note: 'The video will appear on the live site after Vercel deployment completes (~1-2 minutes).'
+        });
+
+      } catch (githubError) {
+        console.error('❌ [YouTube Add API] GitHub operation failed:', githubError);
+        return NextResponse.json({
+          error: 'Failed to commit to GitHub',
+          details: githubError instanceof Error ? githubError.message : 'Unknown error'
+        }, { status: 500 });
+      }
     }
     
     // Log all request headers for debugging (development only)

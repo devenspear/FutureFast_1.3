@@ -3,7 +3,7 @@ import { getOpenAIClient } from './openai-utils';
 export interface DateExtractionResult {
   publishedDate: string;
   confidence: number;
-  method: 'meta-tags' | 'json-ld' | 'url-pattern' | 'ai-content' | 'ai-fallback' | 'current-date';
+  method: 'meta-tags' | 'json-ld' | 'url-pattern' | 'ai-content' | 'ai-fallback' | 'current-date' | 'no-date-found' | 'extraction-error';
   needsReview: boolean;
   extractionNotes?: string;
   rawData?: any;
@@ -85,23 +85,24 @@ export class EnhancedDateExtractor {
         };
       }
 
-      // Strategy 5: Fallback to current date with mandatory review
+      // Strategy 5: Fallback to placeholder date (1970-01-01) with mandatory review
+      // DO NOT use current date as fallback - it creates incorrect future/present dates
       return {
-        publishedDate: new Date().toISOString(),
+        publishedDate: '1970-01-01T00:00:00.000Z',
         confidence: 0,
-        method: 'current-date',
+        method: 'no-date-found',
         needsReview: true,
-        extractionNotes: 'Could not extract date - using current date as fallback'
+        extractionNotes: 'Could not extract date - MANUAL DATE ENTRY REQUIRED'
       };
 
     } catch (error) {
       console.error('Enhanced date extraction failed:', error);
       return {
-        publishedDate: new Date().toISOString(),
+        publishedDate: '1970-01-01T00:00:00.000Z',
         confidence: 0,
-        method: 'current-date',
+        method: 'extraction-error',
         needsReview: true,
-        extractionNotes: `Extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        extractionNotes: `Extraction failed: ${error instanceof Error ? error.message : 'Unknown error'} - MANUAL DATE ENTRY REQUIRED`
       };
     }
   }

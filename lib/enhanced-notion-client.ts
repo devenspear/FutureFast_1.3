@@ -372,7 +372,7 @@ export class EnhancedNotionClient {
       const updateData: any = {
         'Processing Status': {
           select: {
-            name: status === 'processing' ? 'Processing' : 
+            name: status === 'processing' ? 'Processing' :
                   status === 'completed' ? 'Completed' : 'Error'
           }
         }
@@ -403,12 +403,21 @@ export class EnhancedNotionClient {
         };
       }
 
-      await this.client.pages.update({
-        page_id: pageId,
-        properties: updateData
-      });
+      try {
+        await this.client.pages.update({
+          page_id: pageId,
+          properties: updateData
+        });
 
-      console.log(`✅ Updated processing status for ${pageId}: ${status}`);
+        console.log(`✅ Updated processing status for ${pageId}: ${status}`);
+      } catch (updateError: any) {
+        // If properties don't exist in the database, skip updating processing status
+        if (updateError?.message?.includes('is not a property that exists')) {
+          console.warn(`⚠️ Processing status properties don't exist in Notion database, skipping status update for ${pageId}`);
+        } else {
+          throw updateError;
+        }
+      }
     } catch (error) {
       console.error(`❌ Failed to update processing status for ${pageId}:`, error);
     }

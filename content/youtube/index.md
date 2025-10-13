@@ -75,5 +75,8 @@ videos:
   - slug: video-shyRdBz2coI
     category: AI & Future of Work
     featured: false
+  - slug: video-bXT0PBasDc0
+    category: Interview
+    featured: false
 ---
 

@@ -1,0 +1,9 @@
+---
+url: 'https://youtu.be/2GPv8AlL0G8?si=-RetPcg5-UkeoUc-'
+title: 'Humanoid Robots and AI: Driving the New Industrial Future | Dreamforce 2025'
+description: "Marc Benioff and Brett Adcock, founder of Figure AI, explore how AI-powered humanoid robots will transform the workforce, reshape industries, & redefine what’s possible in the age of intelligent tech.\n\nThis video comes to you from Dreamforce, the conference that helps you unlock unprecedented success with the power of trusted AI Agents, real-time data, and CRM. This is where you become an Agentic Enterprise.\n\nWatch Marc Benioff's opening keynote here: https://www.salesforce.com/plus/experience/dreamforce_2025/dreamforce-main-keynote-2025\nWatch all of our content from Dreamforce 2025 here: https://www.salesforce.com/plus/experience/dreamforce_2025\nContinue your learning journey on Salesforce+:\_https://www.salesforce.com/plus\n\nSubscribe to Salesforce’s YouTube Channel:\_http://bit.ly/SalesforceSubscribe\n\n#Salesforce #Dreamforce\n\nLearn more about Salesforce: https://www.salesforce.com\nFacebook: https://www.facebook.com/salesforce\nTwitter:\_https://www.twitter.com/salesforce\nInstagram: https://www.instagram.com/salesforce\nLinkedIn:\_https://www.linkedin.com/company/salesforce\n\nAbout Salesforce:\nImprove customer relationships with Salesforce, the #1 AI CRM where humans with agents drive customer success together. Our integrated platform pairs your unified customer data with trusted agents that can assist, take action autonomously, and hand off seamlessly to your employees in sales, service, marketing, commerce, and more.\n\nDisclaimer: This video is for demonstration purposes only. All account data depicted is fictional and does not contain personally identifiable information (PII). This content is intended solely to illustrate product functionality in a simulated environment."
+publishedDate: '2025-10-16'
+category: Interview
+featured: false
+---
+

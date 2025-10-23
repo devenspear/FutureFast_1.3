@@ -1,9 +1,14 @@
-import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
+/**
+ * Public News API
+ * Returns all published news articles from the database
+ *
+ * This replaces the old file-based system and reads directly from Postgres
+ */
 
-// Define the NewsItem interface
+import { NextResponse } from 'next/server';
+import { NewsModel } from '@/lib/db/models';
+
+// Define the NewsItem interface (kept for backwards compatibility)
 interface NewsItem {
   title: string;
   source: string;
@@ -11,47 +16,45 @@ interface NewsItem {
   url: string;
   icon: string;
   featured: boolean;
+  summary?: string;
+  category?: string;
 }
 
-// News articles are sourced from individual .md files in the 'content/news' directory.
-// Each file should contain frontmatter with fields like: title, source, date (e.g., "April 30, 2025" or ISO format), url, icon, featured (boolean).
 export async function GET() {
   try {
-    const newsDir = path.join(process.cwd(), 'content/news');
-    let newsItems: NewsItem[] = [];
-    
-    if (fs.existsSync(newsDir)) {
-      newsItems = fs.readdirSync(newsDir)
-        .filter((file) => file.endsWith('.md') && !file.startsWith('_'))
-        .map((file) => {
-          const filePath = path.join(newsDir, file);
-          const fileContents = fs.readFileSync(filePath, 'utf8');
-          const { data } = matter(fileContents);
-          
-          // Standardize date field (some files use date, others use publishedDate)
-          const dateValue = data.date || data.publishedDate || '';
-          
-          return {
-            title: data.title || '',
-            source: data.source || '',
-            date: dateValue,
-            url: data.url || '#',
-            icon: data.icon || '🔍',
-            featured: data.featured || false,
-          } as NewsItem;
-        })
-        // Sort by date (newest first) - parse the date strings
-        .sort((a, b) => {
-          // Parse dates like "April 30, 2025" or ISO format
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return dateB.getTime() - dateA.getTime();
-        });
-    }
-    
+    // Fetch all published articles from database
+    const articles = await NewsModel.findAll({
+      status: 'published',
+      limit: 1000, // Get all published articles
+    });
+
+    // Transform to match the expected interface
+    const newsItems: NewsItem[] = articles.map((article) => ({
+      title: article.title,
+      source: article.source,
+      date: article.published_date.toISOString(),
+      url: article.url,
+      icon: article.icon || '📰',
+      featured: article.featured,
+      summary: article.summary || undefined,
+      category: article.category || undefined,
+    }));
+
     return NextResponse.json(newsItems);
+
   } catch (error) {
     console.error('Error fetching news items:', error);
-    return NextResponse.json({ error: 'Failed to fetch news items' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch news items' },
+      { status: 500 }
+    );
   }
+}
+
+// Optional: Add POST endpoint for future use (e.g., webhooks)
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  );
 }

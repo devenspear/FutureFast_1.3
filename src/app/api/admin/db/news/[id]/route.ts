@@ -34,7 +34,7 @@ async function verifyAuth() {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth();
@@ -42,7 +42,8 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    const article = await NewsModel.findById(params.id);
+    const { id } = await params;
+    const article = await NewsModel.findById(id);
 
     if (!article) {
       return NextResponse.json(
@@ -70,7 +71,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth();
@@ -78,10 +79,11 @@ export async function PATCH(
       return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
+    const { id } = await params;
     const body = await request.json();
 
     // Validate article exists
-    const existing = await NewsModel.findById(params.id);
+    const existing = await NewsModel.findById(id);
     if (!existing) {
       return NextResponse.json(
         { error: 'Article not found' },
@@ -90,7 +92,7 @@ export async function PATCH(
     }
 
     // Update article
-    const updated = await NewsModel.update(params.id, body);
+    const updated = await NewsModel.update(id, body);
 
     return NextResponse.json({
       success: true,
@@ -112,7 +114,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth();
@@ -120,8 +122,10 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
+    const { id } = await params;
+
     // Check if article exists
-    const existing = await NewsModel.findById(params.id);
+    const existing = await NewsModel.findById(id);
     if (!existing) {
       return NextResponse.json(
         { error: 'Article not found' },
@@ -130,7 +134,7 @@ export async function DELETE(
     }
 
     // Soft delete (archive)
-    const success = await NewsModel.delete(params.id);
+    const success = await NewsModel.delete(id);
 
     if (!success) {
       throw new Error('Delete operation failed');

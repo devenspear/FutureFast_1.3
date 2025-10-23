@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateNewsMetadata } from '../../../../lib/openai-utils';
-import { EnhancedDateExtractor } from '../../../../lib/enhanced-date-extractor';
+import { generateNewsMetadata } from '@/lib/openai-utils';
+import { EnhancedDateExtractor } from '@/lib/enhanced-date-extractor';
 
 export async function POST(request: NextRequest) {
   try {

@@ -5,7 +5,7 @@
  * Usage: npx tsx scripts/migrate-notion-to-postgres.ts
  */
 
-import { NewsModel, YouTubeModel } from '../lib/db/models';
+import { NewsModel, YouTubeModel } from '../src/lib/db/models';
 import EnhancedNotionClient from '../lib/enhanced-notion-client';
 
 interface MigrationStats {

@@ -34,7 +34,7 @@ async function verifyAuth() {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth();
@@ -42,7 +42,8 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    const resource = await ResourceModel.findById(params.id);
+    const { id } = await params;
+    const resource = await ResourceModel.findById(id);
 
     if (!resource) {
       return NextResponse.json(
@@ -70,7 +71,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth();
@@ -81,7 +82,8 @@ export async function PATCH(
     const body = await request.json();
 
     // Validate resource exists
-    const existing = await ResourceModel.findById(params.id);
+    const { id } = await params;
+    const existing = await ResourceModel.findById(id);
     if (!existing) {
       return NextResponse.json(
         { error: 'Resource not found' },
@@ -90,7 +92,7 @@ export async function PATCH(
     }
 
     // Update resource
-    const updated = await ResourceModel.update(params.id, body);
+    const updated = await ResourceModel.update(id, body);
 
     return NextResponse.json({
       success: true,
@@ -112,7 +114,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth();
@@ -121,7 +123,8 @@ export async function DELETE(
     }
 
     // Check if resource exists
-    const existing = await ResourceModel.findById(params.id);
+    const { id } = await params;
+    const existing = await ResourceModel.findById(id);
     if (!existing) {
       return NextResponse.json(
         { error: 'Resource not found' },
@@ -130,7 +133,7 @@ export async function DELETE(
     }
 
     // Soft delete (archive)
-    const success = await ResourceModel.delete(params.id);
+    const success = await ResourceModel.delete(id);
 
     if (!success) {
       throw new Error('Delete operation failed');

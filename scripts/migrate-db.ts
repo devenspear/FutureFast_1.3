@@ -14,7 +14,7 @@ async function runMigration() {
 
   try {
     // Read the schema file
-    const schemaPath = join(process.cwd(), 'lib/db/content-schema.sql');
+    const schemaPath = join(process.cwd(), 'src/lib/db/content-schema.sql');
     const schema = readFileSync(schemaPath, 'utf-8');
 
     // Split by semicolons to get individual statements

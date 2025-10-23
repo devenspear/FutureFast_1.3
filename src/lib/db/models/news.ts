@@ -16,6 +16,14 @@ export class NewsModel {
    * Create a new news article
    */
   static async create(data: CreateNewsArticle): Promise<NewsArticle> {
+    // Convert dates to ISO strings for PostgreSQL
+    const publishedDate = data.published_date instanceof Date
+      ? data.published_date.toISOString()
+      : data.published_date;
+
+    // Convert tags array to PostgreSQL array format
+    const tags = data.tags ? JSON.stringify(data.tags) : null;
+
     const result = await sql`
       INSERT INTO news_articles (
         title,
@@ -41,12 +49,12 @@ export class NewsModel {
         ${data.url},
         ${data.source},
         ${data.summary || null},
-        ${data.published_date},
+        ${publishedDate},
         ${data.date_confidence || null},
         ${data.date_extraction_method || null},
         ${data.date_extraction_notes || null},
         ${data.category || null},
-        ${data.tags || null},
+        ${tags},
         ${data.icon || '📰'},
         ${data.featured || false},
         ${data.status || 'published'},

@@ -16,6 +16,14 @@ export class ResourceModel {
    * Create a new resource
    */
   static async create(data: CreateResource): Promise<Resource> {
+    // Convert dates to ISO strings for PostgreSQL
+    const publishedDate = data.published_date instanceof Date
+      ? data.published_date.toISOString()
+      : data.published_date;
+
+    // Convert tags array to PostgreSQL array format
+    const tags = data.tags ? JSON.stringify(data.tags) : null;
+
     const result = await sql`
       INSERT INTO resources (
         title,
@@ -42,10 +50,10 @@ export class ResourceModel {
         ${data.thumbnail_url || null},
         ${data.cover_image_url || null},
         ${data.category || null},
-        ${data.tags || null},
+        ${tags},
         ${data.author || null},
         ${data.source || null},
-        ${data.published_date || null},
+        ${publishedDate || null},
         ${data.featured || false},
         ${data.status || 'published'},
         ${data.created_by || 'admin'}
@@ -70,39 +78,52 @@ export class ResourceModel {
       search,
     } = filters;
 
-    let query = sql`
-      SELECT * FROM resources
-      WHERE status = ${status}
-    `;
+    const conditions: string[] = ['status = $1'];
+    const values: any[] = [status];
+    let paramCount = 1;
 
     if (featured !== undefined) {
-      query = sql`${query} AND featured = ${featured}`;
+      paramCount++;
+      conditions.push(`featured = $${paramCount}`);
+      values.push(featured);
     }
 
     if (category) {
-      query = sql`${query} AND category = ${category}`;
+      paramCount++;
+      conditions.push(`category = $${paramCount}`);
+      values.push(category);
     }
 
     if (file_type) {
-      query = sql`${query} AND file_type = ${file_type}`;
+      paramCount++;
+      conditions.push(`file_type = $${paramCount}`);
+      values.push(file_type);
     }
 
     if (search) {
-      query = sql`${query} AND (
-        title ILIKE ${`%${search}%`} OR
-        author ILIKE ${`%${search}%`} OR
-        description ILIKE ${`%${search}%`}
-      )`;
+      paramCount++;
+      conditions.push(`(title ILIKE $${paramCount} OR author ILIKE $${paramCount} OR description ILIKE $${paramCount})`);
+      values.push(`%${search}%`);
     }
 
-    query = sql`${query}
+    paramCount++;
+    values.push(limit);
+    const limitParam = paramCount;
+
+    paramCount++;
+    values.push(offset);
+    const offsetParam = paramCount;
+
+    const queryText = `
+      SELECT * FROM resources
+      WHERE ${conditions.join(' AND ')}
       ORDER BY
         CASE WHEN published_date IS NOT NULL THEN published_date ELSE created_at END DESC
-      LIMIT ${limit}
-      OFFSET ${offset}
+      LIMIT $${limitParam}
+      OFFSET $${offsetParam}
     `;
 
-    const result = await query;
+    const result = await sql.query(queryText, values);
     return result.rows as Resource[];
   }
 
@@ -238,24 +259,34 @@ export class ResourceModel {
       file_type,
     } = filters;
 
-    let query = sql`
-      SELECT COUNT(*) as count FROM resources
-      WHERE status = ${status}
-    `;
+    const conditions: string[] = ['status = $1'];
+    const values: any[] = [status];
+    let paramCount = 1;
 
     if (featured !== undefined) {
-      query = sql`${query} AND featured = ${featured}`;
+      paramCount++;
+      conditions.push(`featured = $${paramCount}`);
+      values.push(featured);
     }
 
     if (category) {
-      query = sql`${query} AND category = ${category}`;
+      paramCount++;
+      conditions.push(`category = $${paramCount}`);
+      values.push(category);
     }
 
     if (file_type) {
-      query = sql`${query} AND file_type = ${file_type}`;
+      paramCount++;
+      conditions.push(`file_type = $${paramCount}`);
+      values.push(file_type);
     }
 
-    const result = await query;
+    const queryText = `
+      SELECT COUNT(*) as count FROM resources
+      WHERE ${conditions.join(' AND ')}
+    `;
+
+    const result = await sql.query(queryText, values);
     return parseInt(result.rows[0].count);
   }
 

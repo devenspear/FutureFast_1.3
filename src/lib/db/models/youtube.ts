@@ -16,6 +16,14 @@ export class YouTubeModel {
    * Create a new YouTube video
    */
   static async create(data: CreateYouTubeVideo): Promise<YouTubeVideo> {
+    // Convert dates to ISO strings for PostgreSQL
+    const publishedDate = data.published_date instanceof Date
+      ? data.published_date.toISOString()
+      : data.published_date;
+
+    // Convert tags array to PostgreSQL array format
+    const tags = data.tags ? JSON.stringify(data.tags) : null;
+
     const result = await sql`
       INSERT INTO youtube_videos (
         video_id,
@@ -39,9 +47,9 @@ export class YouTubeModel {
         ${data.channel || null},
         ${data.thumbnail_url || null},
         ${data.duration || null},
-        ${data.published_date || null},
+        ${publishedDate || null},
         ${data.category || null},
-        ${data.tags || null},
+        ${tags},
         ${data.featured || false},
         ${data.status || 'published'},
         ${data.created_by || 'admin'}
@@ -65,35 +73,46 @@ export class YouTubeModel {
       search,
     } = filters;
 
-    let query = sql`
-      SELECT * FROM youtube_videos
-      WHERE status = ${status}
-    `;
+    const conditions: string[] = ['status = $1'];
+    const values: any[] = [status];
+    let paramCount = 1;
 
     if (featured !== undefined) {
-      query = sql`${query} AND featured = ${featured}`;
+      paramCount++;
+      conditions.push(`featured = $${paramCount}`);
+      values.push(featured);
     }
 
     if (category) {
-      query = sql`${query} AND category = ${category}`;
+      paramCount++;
+      conditions.push(`category = $${paramCount}`);
+      values.push(category);
     }
 
     if (search) {
-      query = sql`${query} AND (
-        title ILIKE ${`%${search}%`} OR
-        channel ILIKE ${`%${search}%`} OR
-        description ILIKE ${`%${search}%`}
-      )`;
+      paramCount++;
+      conditions.push(`(title ILIKE $${paramCount} OR channel ILIKE $${paramCount} OR description ILIKE $${paramCount})`);
+      values.push(`%${search}%`);
     }
 
-    query = sql`${query}
+    paramCount++;
+    values.push(limit);
+    const limitParam = paramCount;
+
+    paramCount++;
+    values.push(offset);
+    const offsetParam = paramCount;
+
+    const queryText = `
+      SELECT * FROM youtube_videos
+      WHERE ${conditions.join(' AND ')}
       ORDER BY
         CASE WHEN published_date IS NOT NULL THEN published_date ELSE created_at END DESC
-      LIMIT ${limit}
-      OFFSET ${offset}
+      LIMIT $${limitParam}
+      OFFSET $${offsetParam}
     `;
 
-    const result = await query;
+    const result = await sql.query(queryText, values);
     return result.rows as YouTubeVideo[];
   }
 
@@ -233,20 +252,28 @@ export class YouTubeModel {
       category,
     } = filters;
 
-    let query = sql`
-      SELECT COUNT(*) as count FROM youtube_videos
-      WHERE status = ${status}
-    `;
+    const conditions: string[] = ['status = $1'];
+    const values: any[] = [status];
+    let paramCount = 1;
 
     if (featured !== undefined) {
-      query = sql`${query} AND featured = ${featured}`;
+      paramCount++;
+      conditions.push(`featured = $${paramCount}`);
+      values.push(featured);
     }
 
     if (category) {
-      query = sql`${query} AND category = ${category}`;
+      paramCount++;
+      conditions.push(`category = $${paramCount}`);
+      values.push(category);
     }
 
-    const result = await query;
+    const queryText = `
+      SELECT COUNT(*) as count FROM youtube_videos
+      WHERE ${conditions.join(' AND ')}
+    `;
+
+    const result = await sql.query(queryText, values);
     return parseInt(result.rows[0].count);
   }
 

@@ -84,38 +84,51 @@ export class NewsModel {
       search,
     } = filters;
 
-    let query = sql`
-      SELECT * FROM news_articles
-      WHERE status = ${status}
-    `;
+    const conditions: string[] = ['status = $1'];
+    const values: any[] = [status];
+    let paramCount = 1;
 
     if (featured !== undefined) {
-      query = sql`${query} AND featured = ${featured}`;
+      paramCount++;
+      conditions.push(`featured = $${paramCount}`);
+      values.push(featured);
     }
 
     if (category) {
-      query = sql`${query} AND category = ${category}`;
+      paramCount++;
+      conditions.push(`category = $${paramCount}`);
+      values.push(category);
     }
 
     if (needs_review !== undefined) {
-      query = sql`${query} AND needs_review = ${needs_review}`;
+      paramCount++;
+      conditions.push(`needs_review = $${paramCount}`);
+      values.push(needs_review);
     }
 
     if (search) {
-      query = sql`${query} AND (
-        title ILIKE ${`%${search}%`} OR
-        source ILIKE ${`%${search}%`} OR
-        summary ILIKE ${`%${search}%`}
-      )`;
+      paramCount++;
+      conditions.push(`(title ILIKE $${paramCount} OR source ILIKE $${paramCount} OR summary ILIKE $${paramCount})`);
+      values.push(`%${search}%`);
     }
 
-    query = sql`${query}
+    paramCount++;
+    values.push(limit);
+    const limitParam = paramCount;
+
+    paramCount++;
+    values.push(offset);
+    const offsetParam = paramCount;
+
+    const queryText = `
+      SELECT * FROM news_articles
+      WHERE ${conditions.join(' AND ')}
       ORDER BY published_date DESC
-      LIMIT ${limit}
-      OFFSET ${offset}
+      LIMIT $${limitParam}
+      OFFSET $${offsetParam}
     `;
 
-    const result = await query;
+    const result = await sql.query(queryText, values);
     return result.rows as NewsArticle[];
   }
 
@@ -267,24 +280,34 @@ export class NewsModel {
       needs_review,
     } = filters;
 
-    let query = sql`
-      SELECT COUNT(*) as count FROM news_articles
-      WHERE status = ${status}
-    `;
+    const conditions: string[] = ['status = $1'];
+    const values: any[] = [status];
+    let paramCount = 1;
 
     if (featured !== undefined) {
-      query = sql`${query} AND featured = ${featured}`;
+      paramCount++;
+      conditions.push(`featured = $${paramCount}`);
+      values.push(featured);
     }
 
     if (category) {
-      query = sql`${query} AND category = ${category}`;
+      paramCount++;
+      conditions.push(`category = $${paramCount}`);
+      values.push(category);
     }
 
     if (needs_review !== undefined) {
-      query = sql`${query} AND needs_review = ${needs_review}`;
+      paramCount++;
+      conditions.push(`needs_review = $${paramCount}`);
+      values.push(needs_review);
     }
 
-    const result = await query;
+    const queryText = `
+      SELECT COUNT(*) as count FROM news_articles
+      WHERE ${conditions.join(' AND ')}
+    `;
+
+    const result = await sql.query(queryText, values);
     return parseInt(result.rows[0].count);
   }
 

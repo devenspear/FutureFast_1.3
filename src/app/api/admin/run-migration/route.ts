@@ -34,10 +34,12 @@ export async function POST(request: NextRequest) {
     const schema = readFileSync(schemaPath, 'utf-8');
 
     // Split into individual statements
+    // Note: Don't filter out statements starting with -- because CREATE TABLE statements
+    // have header comments. Postgres will ignore SQL comments automatically.
     const statements = schema
       .split(';')
       .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+      .filter(s => s.length > 0);
 
     console.log(`📝 Found ${statements.length} SQL statements to execute`);
 

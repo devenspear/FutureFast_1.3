@@ -176,10 +176,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           ]) }}
         />
 
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var script = document.createElement('script');script.src='https://analytics.ahrefs.com/analytics.js';script.setAttribute('data-key','SlfmGp5buoGyJwIAkH5BJQ');script.async=true;document.head.appendChild(script);})();` }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased overflow-x-hidden max-w-[100vw]`}>
         {children}
-        <Script src="https://analytics.ahrefs.com/analytics.js" data-key="SlfmGp5buoGyJwIAkH5BJQ" strategy="afterInteractive" />
       </body>
     </html>
   );

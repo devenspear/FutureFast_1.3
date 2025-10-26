@@ -2,8 +2,8 @@ import EnhancedNotionClient, { EnhancedNotionItem } from './enhanced-notion-clie
 import { ContentExtractor } from './content-extractor';
 import NotionYouTubeService from './notion-youtube-service';
 import WebsiteValidationService from './website-validation-service';
-import { generateNewsMetadata } from './openai-utils';
-import { EnhancedDateExtractor, DateExtractionResult } from './enhanced-date-extractor';
+import { generateNewsMetadata } from '../src/lib/openai-utils';
+import { EnhancedDateExtractor, DateExtractionResult } from '../src/lib/enhanced-date-extractor';
 import { DateExtractionNotificationService } from './date-extraction-notifications';
 import fs from 'fs/promises';
 import path from 'path';

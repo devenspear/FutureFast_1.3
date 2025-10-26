@@ -1,31 +1,54 @@
-import { NextResponse } from 'next/server';
-import { getYouTubeVideos, refreshYouTubeCacheInBackground } from '../../../../lib/youtube-cache';
+/**
+ * Public YouTube API
+ * Returns all published YouTube videos from the database
+ *
+ * This replaces the old cache-based system and reads directly from Postgres
+ */
 
-// This route handler will use the cached YouTube video data
-// and trigger a background refresh of the cache if needed
+import { NextResponse } from 'next/server';
+import { YouTubeModel } from '@/lib/db/models';
 
 export async function GET(request: Request) {
   console.log('YouTube API endpoint called');
-  
+
   try {
-    // Check if we should force a refresh
-    const { searchParams } = new URL(request.url);
-    const forceRefresh = searchParams.get('refresh') === 'true';
-    
-    // Get videos from cache or API with fallback mechanism
-    const videos = await getYouTubeVideos(forceRefresh);
-    
-    // If not already forcing a refresh, trigger a background refresh of the cache if it's older than 1 hour
-    // This won't block the response and will update the cache for future requests
-    if (!forceRefresh) {
-      refreshYouTubeCacheInBackground().catch(console.error);
-    }
-    
-    return NextResponse.json(videos);
+    // Fetch all published videos from database
+    const videos = await YouTubeModel.findAll({
+      status: 'published',
+      limit: 1000, // Get all published videos
+    });
+
+    // Transform to match expected format (for backwards compatibility)
+    const videoItems = videos.map((video) => ({
+      id: video.video_id,
+      videoId: video.video_id,
+      title: video.title,
+      description: video.description || '',
+      url: video.url,
+      thumbnailUrl: video.thumbnail_url || `https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`,
+      channel: video.channel || 'YouTube',
+      publishedAt: video.published_date?.toISOString() || video.created_at.toISOString(),
+      category: video.category || 'Interview',
+      featured: video.featured,
+      duration: video.duration || 0,
+      tags: video.tags || [],
+    }));
+
+    return NextResponse.json(videoItems);
+
   } catch (error) {
-    console.error('Unhandled error in YouTube API route:', error);
-    
-    // Last resort fallback - return empty array with error status
-    return NextResponse.json([], { status: 500 });
+    console.error('Error fetching YouTube videos:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch videos' },
+      { status: 500 }
+    );
   }
+}
+
+// Optional: Add POST endpoint for future use (e.g., webhooks)
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Method not allowed' },
+    { status: 405 }
+  );
 }

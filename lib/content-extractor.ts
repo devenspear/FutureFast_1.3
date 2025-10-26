@@ -1,4 +1,4 @@
-import { generateNewsMetadata } from './openai-utils';
+import { generateNewsMetadata } from '../src/lib/openai-utils';
 
 interface LocalExtractedContent {
   title: string;

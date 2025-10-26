@@ -53,3 +53,4 @@ When making changes that need to be deployed to production:
 - If Vercel shows "● Building" status, wait and check again before confirming deployment
 - This project requires proper Notion API credentials to run cron job locally
 - Use TodoWrite tool for multi-step deployment processes
+- **🚨 NEVER provide time estimates in hours or days** - User is not doing the work, Claude is vibe coding 100% of implementations. Time estimates are irrelevant and distracting. Just build it.

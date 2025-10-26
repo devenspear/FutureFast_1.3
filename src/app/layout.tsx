@@ -9,17 +9,20 @@ import "../../styles/exponential-chart.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const orbitron = Orbitron({
   variable: "--font-orbitron",
   subsets: ["latin"],
   weight: ["400", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -62,8 +65,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1.0,
-  maximumScale: 1.0,
-  userScalable: false
+  maximumScale: 5.0,
+  userScalable: true
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

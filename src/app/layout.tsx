@@ -80,7 +80,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Script id="gtag-init" strategy="afterInteractive">
           {`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-F4CGW7GF6P', { page_path: window.location.pathname });`}
         </Script>
-        <script src="https://analytics.ahrefs.com/analytics.js" data-key="SlfmGp5buoGyJwIAkH5BJQ" async></script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([
@@ -178,7 +177,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
 
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased overflow-x-hidden max-w-[100vw]`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased overflow-x-hidden max-w-[100vw]`}>
+        {children}
+        <Script src="https://analytics.ahrefs.com/analytics.js" data-key="SlfmGp5buoGyJwIAkH5BJQ" strategy="afterInteractive" />
+      </body>
     </html>
   );
 }

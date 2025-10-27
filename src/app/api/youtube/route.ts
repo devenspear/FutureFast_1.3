@@ -25,7 +25,9 @@ export async function GET(request: Request) {
       title: video.title,
       description: video.description || '',
       url: video.url,
+      thumbnail: video.thumbnail_url || `https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`,
       thumbnailUrl: video.thumbnail_url || `https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`,
+      channelTitle: video.channel || 'YouTube',
       channel: video.channel || 'YouTube',
       publishedAt: video.published_date?.toISOString() || video.created_at.toISOString(),
       category: video.category || 'Interview',
@@ -33,6 +35,30 @@ export async function GET(request: Request) {
       duration: video.duration || 0,
       tags: video.tags || [],
     }));
+
+    // If no videos found, return default fallback videos
+    if (videoItems.length === 0) {
+      console.log('No videos in database, returning fallback videos');
+      const fallbackVideos = [
+        {
+          id: 'dQw4w9WgXcQ',
+          videoId: 'dQw4w9WgXcQ',
+          title: 'Sample Video: The Future of AI',
+          description: 'Exploring the latest developments in artificial intelligence',
+          url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+          thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+          thumbnailUrl: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+          channelTitle: 'FutureFast',
+          channel: 'FutureFast',
+          publishedAt: new Date().toISOString(),
+          category: 'Interview',
+          featured: true,
+          duration: 0,
+          tags: [],
+        }
+      ];
+      return NextResponse.json(fallbackVideos);
+    }
 
     return NextResponse.json(videoItems);
 

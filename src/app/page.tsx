@@ -1,35 +1,12 @@
-import dynamic from 'next/dynamic';
 import HeroSection from "../../components/HeroSection";
 import FastLaneSection from "../../components/FastLaneSection";
-
-// Lazy load below-the-fold components to reduce initial bundle size
-const NewsAndDisruptionSection = dynamic(() => import("../../components/NewsAndDisruptionSection"), {
-  loading: () => <div className="h-96 bg-black" />,
-});
-
-const VideoInterviewsSection = dynamic(() => import("../../components/VideoInterviewsSection"), {
-  loading: () => <div className="h-96 bg-black" />,
-});
-
-const ResourceLibrarySection = dynamic(() => import("../../components/ResourceLibrarySection"), {
-  loading: () => <div className="h-96 bg-black" />,
-});
-
-const ThoughtLeadersSection = dynamic(() => import("../../components/ThoughtLeadersSection"), {
-  loading: () => <div className="h-96 bg-black" />,
-});
-
-const LearningResourcesSection = dynamic(() => import("../../components/LearningResourcesSection"), {
-  loading: () => <div className="h-96 bg-black" />,
-});
-
-const AboutWithSubscription = dynamic(() => import("../../components/AboutWithSubscription"), {
-  loading: () => <div className="h-96 bg-black" />,
-});
-
-const Footer = dynamic(() => import("../../components/Footer"), {
-  loading: () => <div className="h-48 bg-black" />,
-});
+import NewsAndDisruptionSection from "../../components/NewsAndDisruptionSection";
+import VideoInterviewsSection from "../../components/VideoInterviewsSection";
+import ResourceLibrarySection from "../../components/ResourceLibrarySection";
+import ThoughtLeadersSection from "../../components/ThoughtLeadersSection";
+import LearningResourcesSection from "../../components/LearningResourcesSection";
+import AboutWithSubscription from "../../components/AboutWithSubscription";
+import Footer from "../../components/Footer";
 
 export default function Home() {
 

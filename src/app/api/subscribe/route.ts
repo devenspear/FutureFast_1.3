@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { saveSubscriber, checkEmailExists } from '../../../../lib/blob';
+import NotificationService from '../../../../lib/notification-service';
 
 // NOTE: Previous attempts to implement Cloudflare Turnstile for form security were made
 // but encountered integration issues. This is a simplified version without Turnstile for now.
@@ -49,6 +50,25 @@ export async function POST(request: NextRequest) {
     console.log('Saving subscriber data to Blob Storage');
     const result = await saveSubscriber(firstName, lastName, email, company || '');
     console.log('Save result:', result);
+
+    // Send notifications (email + SMS) if subscriber was successfully saved
+    if (result.success) {
+      try {
+        console.log('Sending form submission notifications');
+        const notificationService = new NotificationService();
+        await notificationService.sendFormSubmissionNotification({
+          firstName,
+          lastName,
+          email,
+          company: company || undefined,
+          timestamp: new Date().toISOString()
+        });
+        console.log('Notifications sent successfully');
+      } catch (notificationError) {
+        // Log the error but don't fail the request
+        console.error('Failed to send notifications:', notificationError);
+      }
+    }
 
     // Return the result
     return NextResponse.json(result, { status: result.success ? 200 : 400 });

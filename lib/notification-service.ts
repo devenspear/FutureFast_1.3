@@ -5,13 +5,29 @@ interface NotificationOptions {
   details?: any;
 }
 
+interface FormSubmissionData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  company?: string;
+  timestamp?: string;
+}
+
 class NotificationService {
   private adminEmail: string;
+  private adminPhone: string;
   private mailerLiteApiKey: string;
+  private twilioAccountSid: string;
+  private twilioAuthToken: string;
+  private twilioPhoneNumber: string;
 
   constructor() {
     this.adminEmail = process.env.ADMIN_EMAIL || 'admin@futurefast.ai';
+    this.adminPhone = process.env.ADMIN_PHONE || '';
     this.mailerLiteApiKey = process.env.MAILERLITE_API_KEY || '';
+    this.twilioAccountSid = process.env.TWILIO_ACCOUNT_SID || '';
+    this.twilioAuthToken = process.env.TWILIO_AUTH_TOKEN || '';
+    this.twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER || '';
   }
 
   /**
@@ -201,13 +217,80 @@ Dashboard: https://futurefast.ai/admin
       subject: 'New Content Added to Notion - Processing Started',
       message: `New content "${title}" has been added to Notion and will be processed in the next cron cycle.`,
       severity: 'info',
-      details: { 
-        title, 
-        sourceUrl, 
+      details: {
+        title,
+        sourceUrl,
         nextCronCycle: 'Every 2 hours at: 01:00, 03:00, 13:00, 15:00, 17:00, 19:00, 21:00, 23:00 UTC',
         notionDashboard: 'https://notion.so'
       }
     });
+  }
+
+  /**
+   * Send SMS notification using Twilio
+   */
+  async sendSMS(message: string): Promise<void> {
+    try {
+      if (!this.twilioAccountSid || !this.twilioAuthToken || !this.twilioPhoneNumber || !this.adminPhone) {
+        console.log('📱 SMS notification skipped: Twilio credentials or admin phone not configured');
+        console.log(`📱 SMS MESSAGE: ${message}`);
+        return;
+      }
+
+      console.log(`📱 Sending SMS to ${this.adminPhone}`);
+
+      const response = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${this.twilioAccountSid}/Messages.json`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Basic ' + Buffer.from(`${this.twilioAccountSid}:${this.twilioAuthToken}`).toString('base64'),
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            To: this.adminPhone,
+            From: this.twilioPhoneNumber,
+            Body: message,
+          }).toString(),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Twilio API error: ${response.status} - ${errorData}`);
+      }
+
+      console.log('✅ SMS sent via Twilio');
+    } catch (error) {
+      console.error('❌ Failed to send SMS:', error);
+    }
+  }
+
+  /**
+   * Send notification when a new form submission is received
+   */
+  async sendFormSubmissionNotification(data: FormSubmissionData): Promise<void> {
+    const timestamp = data.timestamp || new Date().toISOString();
+
+    // Send email notification
+    await this.sendEmail({
+      subject: '🎉 New Form Submission on FutureFast.AI',
+      message: `New subscription form submitted by ${data.firstName} ${data.lastName}`,
+      severity: 'info',
+      details: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        company: data.company || 'Not provided',
+        timestamp,
+        dashboard: 'https://futurefast.ai/admin'
+      }
+    });
+
+    // Send SMS notification (if configured)
+    const smsMessage = `🎉 New FutureFast.AI form submission!\n\nName: ${data.firstName} ${data.lastName}\nEmail: ${data.email}${data.company ? `\nCompany: ${data.company}` : ''}\n\nView dashboard: https://futurefast.ai/admin`;
+
+    await this.sendSMS(smsMessage);
   }
 }
 

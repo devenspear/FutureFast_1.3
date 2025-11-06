@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import NotificationService from '@/lib/notification-service';
+import NotificationService from '@/root/lib/notification-service';
 
 /**
  * MailerLite Webhook Handler

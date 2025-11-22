@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useFormSubmit } from '../../../hooks/useFormSubmit';
+import { useDeploymentStatus } from '../../../hooks/useDeploymentStatus';
 import { YouTubeVideoItem } from '../../../types/youtube';
 
 interface YouTubeSectionProps {
@@ -17,6 +18,8 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
   const [editingVideo, setEditingVideo] = useState<YouTubeVideoItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [lastCommitSha, setLastCommitSha] = useState<string | null>(null);
+  const { deploymentStatus, isPolling, startPolling } = useDeploymentStatus();
   
   // Default categories if none provided
   const availableCategories = categories.length > 0 ? categories : [
@@ -107,12 +110,19 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       
       const responseData = await response.json();
       console.log('✅ [YouTubeSection] Success response:', responseData);
-      
+
       // Handle production response differently
       if (responseData.note) {
         console.log('ℹ️ [YouTubeSection] Production note:', responseData.note);
       }
-      
+
+      // If we got a commit SHA, start polling for deployment status
+      if (responseData.commitSha && responseData.deploymentTracking) {
+        console.log('🔄 [YouTubeSection] Starting deployment tracking for commit:', responseData.commitSha);
+        setLastCommitSha(responseData.commitSha);
+        startPolling(responseData.commitSha);
+      }
+
       return responseData;
     },
     () => {
@@ -264,7 +274,52 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
             
             {successMessage && (
               <div className="bg-green-900/50 border border-green-500 text-green-100 px-4 py-3 rounded">
-                {successMessage}
+                <div className="font-medium">{successMessage}</div>
+                {lastCommitSha && (
+                  <div className="text-sm mt-2 font-mono">
+                    Commit: {lastCommitSha.substring(0, 7)}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Deployment Status Tracking */}
+            {isPolling && deploymentStatus && (
+              <div className={`px-4 py-3 rounded border ${
+                deploymentStatus.status === 'ready'
+                  ? 'bg-green-900/50 border-green-500 text-green-100'
+                  : deploymentStatus.status === 'error'
+                  ? 'bg-red-900/50 border-red-500 text-red-100'
+                  : 'bg-blue-900/50 border-blue-500 text-blue-100'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium flex items-center gap-2">
+                      {deploymentStatus.status === 'building' || deploymentStatus.status === 'queued' ? (
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                      ) : deploymentStatus.status === 'ready' ? (
+                        <span>✅</span>
+                      ) : deploymentStatus.status === 'error' ? (
+                        <span>❌</span>
+                      ) : null}
+                      Deployment Status: {deploymentStatus.status}
+                    </div>
+                    <div className="text-sm mt-1">{deploymentStatus.message}</div>
+                    {deploymentStatus.deploymentUrl && (
+                      <a
+                        href={deploymentStatus.deploymentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm underline mt-1 inline-block"
+                      >
+                        View deployment →
+                      </a>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
             

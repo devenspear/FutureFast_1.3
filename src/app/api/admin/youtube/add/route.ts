@@ -4,6 +4,7 @@ import { existsSync } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import GitHubService from '../../../../../../lib/github-service';
+import { adminMonitor } from '../../../../../../lib/admin-monitoring-service';
 
 // Function to extract video ID from YouTube URL (copied from youtube-utils to avoid import issues)
 function extractVideoId(url: string): string | null {
@@ -22,6 +23,7 @@ function extractVideoId(url: string): string | null {
 }
 
 export async function POST(request: Request) {
+  const startTime = adminMonitor.startTimer();
   console.log('🎯 [YouTube Add API] Request received');
   console.log('🌍 [YouTube Add API] Environment check:', {
     NODE_ENV: process.env.NODE_ENV,
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
     hasYouTubeKey: !!process.env.YOUTUBE_API_KEY,
     isProduction: process.env.NODE_ENV === 'production'
   });
-  
+
   try {
     // Parse the request body early for both production and development
     const body = await request.json();
@@ -172,6 +174,21 @@ export async function POST(request: Request) {
 
         console.log(`✅ [YouTube Add API] Video added successfully via GitHub: ${slug}`);
 
+        // Log successful operation
+        adminMonitor.log({
+          operation: 'video_add',
+          status: 'success',
+          metadata: {
+            videoId,
+            slug,
+            category,
+            featured,
+            commitSha: commitResult.commitSha,
+            environment: 'production'
+          },
+          duration: startTime()
+        });
+
         // Trigger cache refresh
         try {
           const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL
@@ -193,11 +210,22 @@ export async function POST(request: Request) {
           videoId,
           slug,
           commitSha: commitResult.commitSha,
+          deploymentTracking: true,
           note: 'The video will appear on the live site after Vercel deployment completes (~1-2 minutes).'
         });
 
       } catch (githubError) {
         console.error('❌ [YouTube Add API] GitHub operation failed:', githubError);
+
+        // Log error
+        adminMonitor.log({
+          operation: 'video_add',
+          status: 'error',
+          error: githubError instanceof Error ? githubError.message : 'Unknown GitHub error',
+          metadata: { videoId, environment: 'production' },
+          duration: startTime()
+        });
+
         return NextResponse.json({
           error: 'Failed to commit to GitHub',
           details: githubError instanceof Error ? githubError.message : 'Unknown error'
@@ -464,8 +492,21 @@ export async function POST(request: Request) {
       // Continue anyway, as this is not critical
     }
     
-    const successResponse = { 
-      success: true, 
+    // Log successful operation (development)
+    adminMonitor.log({
+      operation: 'video_add',
+      status: 'success',
+      metadata: {
+        videoId,
+        category,
+        featured,
+        environment: 'development'
+      },
+      duration: startTime()
+    });
+
+    const successResponse = {
+      success: true,
       message: 'Video added successfully',
       videoId
     };
@@ -474,7 +515,16 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('💥 [YouTube Add API] Unexpected error:', error);
     console.error('💥 [YouTube Add API] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-    
+
+    // Log error
+    adminMonitor.log({
+      operation: 'video_add',
+      status: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      metadata: { environment: process.env.NODE_ENV },
+      duration: startTime()
+    });
+
     // Return more detailed error message for debugging
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     const errorDetails = {
@@ -482,7 +532,7 @@ export async function POST(request: Request) {
       message: errorMessage,
       details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
     };
-    
+
     return NextResponse.json(errorDetails, { status: 500 });
   }
 }

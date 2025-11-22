@@ -281,14 +281,13 @@ async function fetchFromYouTubeAPI(videoConfigs: YouTubeVideoItem[]): Promise<Yo
     
     const data = await response.json();
     console.log('YouTube API response items:', data.items?.length || 0);
-    
-    if (!data.items || data.items.length === 0) {
-      console.error('No video data in YouTube API response');
-      return null;
-    }
-    
-    // Transform the data to match our interface
-    const videos: YouTubeVideoData[] = data.items.map((item: { id: string; snippet: { title: string; description: string; publishedAt: string; channelTitle: string; thumbnails: { maxres?: { url: string }; high?: { url: string }; medium?: { url: string } } } }) => {
+    console.log('Total videos requested:', videoData.length);
+
+    // Transform the data from API
+    const videos: YouTubeVideoData[] = [];
+
+    if (data.items && data.items.length > 0) {
+      const apiVideos = data.items.map((item: { id: string; snippet: { title: string; description: string; publishedAt: string; channelTitle: string; thumbnails: { maxres?: { url: string }; high?: { url: string }; medium?: { url: string } } } }) => {
       const config = videoData.find(v => v.id === item.id);
       
       // Also update the original video config with channel name and published date
@@ -324,10 +323,31 @@ async function fetchFromYouTubeAPI(videoConfigs: YouTubeVideoItem[]): Promise<Yo
         category: config?.category || 'Technology',
         featured: config?.featured || false
       };
-    });
+      });
+
+      videos.push(...apiVideos);
+    }
+
+    // Find videos that weren't returned by the API (restricted/unavailable)
+    const fetchedIds = new Set(videos.map(v => v.id));
+    const missingConfigs = videoData.filter(v => v.id && !fetchedIds.has(v.id));
+
+    if (missingConfigs.length > 0) {
+      console.log(`⚠️ ${missingConfigs.length} videos not returned by YouTube API - using fallback data`);
+      console.log('Missing video IDs:', missingConfigs.map(v => v.id).join(', '));
+
+      // Generate fallback data for missing videos
+      const fallbackVideos = await generateFallbackData(videoConfigs.filter(vc => {
+        const id = extractVideoId(vc.url);
+        return id && !fetchedIds.has(id);
+      }));
+
+      videos.push(...fallbackVideos);
+      console.log(`✅ Added ${fallbackVideos.length} videos with fallback data`);
+    }
 
     // Sort videos by published date (newest first)
-    return [...videos].sort((a, b) => 
+    return [...videos].sort((a, b) =>
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
   } catch (error) {

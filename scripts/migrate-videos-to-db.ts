@@ -17,7 +17,8 @@ interface VideoFrontmatter {
   url: string;
   title: string;
   description: string;
-  publishedDate: string;
+  publishedDate?: string;
+  publishedAt?: string;  // Support both field names
   category: string;
   featured: boolean;
 }
@@ -80,8 +81,9 @@ async function migrateVideos() {
 
       // Parse published date, use current date if not available
       let publishedDate: Date;
-      if (frontmatter.publishedDate) {
-        publishedDate = new Date(frontmatter.publishedDate);
+      const dateString = frontmatter.publishedAt || frontmatter.publishedDate;
+      if (dateString) {
+        publishedDate = new Date(dateString);
         // Check if date is valid
         if (isNaN(publishedDate.getTime())) {
           console.log(`⚠️  Invalid date for ${videoId}, using current date`);

@@ -287,6 +287,7 @@ async function fetchFromYouTubeAPI(videoConfigs: YouTubeVideoItem[]): Promise<Yo
     const videos: YouTubeVideoData[] = [];
 
     if (data.items && data.items.length > 0) {
+      console.log(`✅ YouTube API returned ${data.items.length} videos`);
       const apiVideos = data.items.map((item: { id: string; snippet: { title: string; description: string; publishedAt: string; channelTitle: string; thumbnails: { maxres?: { url: string }; high?: { url: string }; medium?: { url: string } } } }) => {
       const config = videoData.find(v => v.id === item.id);
       
@@ -331,6 +332,10 @@ async function fetchFromYouTubeAPI(videoConfigs: YouTubeVideoItem[]): Promise<Yo
     // Find videos that weren't returned by the API (restricted/unavailable)
     const fetchedIds = new Set(videos.map(v => v.id));
     const missingConfigs = videoData.filter(v => v.id && !fetchedIds.has(v.id));
+
+    console.log(`📊 Total video configs: ${videoData.length}`);
+    console.log(`📊 Videos fetched from API: ${fetchedIds.size}`);
+    console.log(`📊 Missing videos: ${missingConfigs.length}`);
 
     if (missingConfigs.length > 0) {
       console.log(`⚠️ ${missingConfigs.length} videos not returned by YouTube API - using fallback data`);

@@ -43,7 +43,7 @@ description: >-
 
   To enquire about licensing Sky News content, you can find more information
   here: https://news.sky.com/info/library-sales
-publishedDate: '2025-11-19'
+publishedAt: '2025-11-19'
 category: Interview
 featured: false
 ---

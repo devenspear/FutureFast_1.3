@@ -54,10 +54,10 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       console.log('📡 [YouTubeSection] Request URL:', endpoint);
       console.log('📡 [YouTubeSection] Request body:', JSON.stringify(requestBody, null, 2));
       
-      // Create basic auth header using environment-specific credentials
-      // These should match your Vercel environment variables
-      const username = process.env.NODE_ENV === 'production' ? 'admin' : 'admin';
-      const password = process.env.NODE_ENV === 'production' ? 'futurefast2025' : 'futurefast2025';
+      // Create basic auth header using credentials from environment or defaults
+      // These should match your Vercel ADMIN_USERNAME and ADMIN_PASSWORD environment variables
+      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
+      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
       const authString = btoa(`${username}:${password}`);
       
       const response = await fetch(endpoint, {
@@ -142,8 +142,8 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       setDeleteId(videoId);
       
       // Use same auth approach for delete
-      const username = 'admin';
-      const password = 'futurefast2025';
+      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
+      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
       const authString = btoa(`${username}:${password}`);
       
       const response = await fetch('/api/admin/youtube/delete', {

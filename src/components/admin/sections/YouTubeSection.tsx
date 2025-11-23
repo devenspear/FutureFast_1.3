@@ -22,6 +22,8 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
   const { deploymentStatus, isPolling, startPolling } = useDeploymentStatus();
   const [isMigrating, setIsMigrating] = useState(false);
   const [migrationResult, setMigrationResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [isFixingThumbnails, setIsFixingThumbnails] = useState(false);
+  const [thumbnailFixResult, setThumbnailFixResult] = useState<{ success: boolean; message: string } | null>(null);
   
   // Default categories if none provided
   const availableCategories = categories.length > 0 ? categories : [
@@ -185,6 +187,59 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     }
   };
   
+  // Function to handle thumbnail fix
+  const handleFixThumbnails = async () => {
+    if (!confirm('This will update all video thumbnails to use the correct URL format. Continue?')) {
+      return;
+    }
+
+    try {
+      setIsFixingThumbnails(true);
+      setThumbnailFixResult(null);
+
+      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
+      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
+      const authString = btoa(`${username}:${password}`);
+
+      const response = await fetch('/api/admin/fix-thumbnails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${authString}`,
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Thumbnail fix failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Thumbnail fix result:', result);
+
+      const { fixedCount, skippedCount, totalVideos } = result.summary;
+      const message = `Thumbnails fixed! ✅ Updated: ${fixedCount} | ⏭️ Already correct: ${skippedCount} | 📁 Total: ${totalVideos}`;
+
+      setThumbnailFixResult({
+        success: true,
+        message,
+      });
+
+      // Refresh the page after 3 seconds to show updated thumbnails
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+
+    } catch (error) {
+      console.error('Thumbnail fix error:', error);
+      setThumbnailFixResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Thumbnail fix failed',
+      });
+    } finally {
+      setIsFixingThumbnails(false);
+    }
+  };
+
   // Function to handle database migration
   const handleMigration = async () => {
     if (!confirm('This will sync all videos from markdown files to the database. Continue?')) {
@@ -289,6 +344,23 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
         <h2 className="text-2xl font-bold text-white">YouTube Video Management</h2>
         <div className="flex gap-2">
           <button
+            onClick={handleFixThumbnails}
+            disabled={isFixingThumbnails}
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-md text-sm transition-colors flex items-center gap-2"
+          >
+            {isFixingThumbnails ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Fixing...
+              </>
+            ) : (
+              <>🖼️ Fix Thumbnails</>
+            )}
+          </button>
+          <button
             onClick={handleMigration}
             disabled={isMigrating}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-md text-sm transition-colors flex items-center gap-2"
@@ -332,6 +404,20 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
           </button>
         </div>
       </div>
+
+      {/* Thumbnail Fix Result Message */}
+      {thumbnailFixResult && (
+        <div className={`mb-6 px-4 py-3 rounded border ${
+          thumbnailFixResult.success
+            ? 'bg-green-900/50 border-green-500 text-green-100'
+            : 'bg-red-900/50 border-red-500 text-red-100'
+        }`}>
+          <div className="font-medium">{thumbnailFixResult.message}</div>
+          {thumbnailFixResult.success && (
+            <div className="text-sm mt-1">Refreshing in 3 seconds...</div>
+          )}
+        </div>
+      )}
 
       {/* Migration Result Message */}
       {migrationResult && (

@@ -103,6 +103,7 @@ export async function POST(request: Request) {
               featured: frontmatter.featured || false,
               status: 'published',
               published_date: publishedDate.toISOString(),
+              thumbnail_url: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
             });
 
             updatedCount++;
@@ -118,12 +119,13 @@ export async function POST(request: Request) {
         const publishedDate = dateString ? new Date(dateString) : new Date();
 
         // Create video record
+        // Use i.ytimg.com domain with hqdefault for better compatibility
         const videoData = {
           video_id: videoId,
           title: frontmatter.title,
           description: frontmatter.description || '',
           url: `https://www.youtube.com/watch?v=${videoId}`,
-          thumbnail_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+          thumbnail_url: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
           channel: 'YouTube',
           published_date: publishedDate,
           category: frontmatter.category || 'Interview',

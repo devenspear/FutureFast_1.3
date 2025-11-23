@@ -95,12 +95,13 @@ async function migrateVideos() {
       }
 
       // Create video record
+      // Use i.ytimg.com domain with hqdefault for better compatibility
       const videoData = {
         video_id: videoId,
         title: frontmatter.title,
         description: frontmatter.description || '',
         url: `https://www.youtube.com/watch?v=${videoId}`,
-        thumbnail_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+        thumbnail_url: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
         channel: 'YouTube', // Default channel, update manually if needed
         published_date: publishedDate,
         category: frontmatter.category || 'Interview',

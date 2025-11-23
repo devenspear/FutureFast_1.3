@@ -132,7 +132,7 @@ export async function POST(request: Request) {
           featured: frontmatter.featured || false,
           status: 'published' as const,
           duration: 0,
-          tags: null,
+          tags: undefined,
         };
 
         await YouTubeModel.create(videoData);

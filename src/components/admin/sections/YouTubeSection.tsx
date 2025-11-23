@@ -20,6 +20,8 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [lastCommitSha, setLastCommitSha] = useState<string | null>(null);
   const { deploymentStatus, isPolling, startPolling } = useDeploymentStatus();
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationResult, setMigrationResult] = useState<{ success: boolean; message: string } | null>(null);
   
   // Default categories if none provided
   const availableCategories = categories.length > 0 ? categories : [
@@ -183,6 +185,59 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     }
   };
   
+  // Function to handle database migration
+  const handleMigration = async () => {
+    if (!confirm('This will sync all videos from markdown files to the database. Continue?')) {
+      return;
+    }
+
+    try {
+      setIsMigrating(true);
+      setMigrationResult(null);
+
+      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
+      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
+      const authString = btoa(`${username}:${password}`);
+
+      const response = await fetch('/api/admin/migrate-videos', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${authString}`,
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Migration failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Migration result:', result);
+
+      const { successCount, updatedCount, skippedCount, errorCount } = result.summary;
+      const message = `Migration complete! ✅ Created: ${successCount} | 🔄 Updated: ${updatedCount} | ⏭️ Skipped: ${skippedCount} | ❌ Errors: ${errorCount}`;
+
+      setMigrationResult({
+        success: true,
+        message,
+      });
+
+      // Refresh the page after 3 seconds to show updated videos
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+
+    } catch (error) {
+      console.error('Migration error:', error);
+      setMigrationResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Migration failed',
+      });
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
   // Function to set up editing a video
   const startEditing = (video: YouTubeVideoItem) => {
     setEditingVideo(video);
@@ -190,7 +245,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     setCategory(video.category || availableCategories[0]);
     setFeatured(video.featured || false);
     setShowForm(true);
-    
+
     // Scroll to the form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -234,6 +289,23 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
         <h2 className="text-2xl font-bold text-white">YouTube Video Management</h2>
         <div className="flex gap-2">
           <button
+            onClick={handleMigration}
+            disabled={isMigrating}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-md text-sm transition-colors flex items-center gap-2"
+          >
+            {isMigrating ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Syncing...
+              </>
+            ) : (
+              <>🔄 Sync Videos</>
+            )}
+          </button>
+          <button
             onClick={async () => {
               console.log('🔍 [Debug] Testing auth debug endpoint');
               try {
@@ -260,6 +332,20 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
           </button>
         </div>
       </div>
+
+      {/* Migration Result Message */}
+      {migrationResult && (
+        <div className={`mb-6 px-4 py-3 rounded border ${
+          migrationResult.success
+            ? 'bg-green-900/50 border-green-500 text-green-100'
+            : 'bg-red-900/50 border-red-500 text-red-100'
+        }`}>
+          <div className="font-medium">{migrationResult.message}</div>
+          {migrationResult.success && (
+            <div className="text-sm mt-1">Refreshing in 3 seconds...</div>
+          )}
+        </div>
+      )}
       
       {showForm && (
         <div className="bg-gray-800 p-6 rounded-lg mb-8">

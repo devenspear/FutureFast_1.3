@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight, FaPlay, FaCalendarAlt, FaYoutube } from 'react-icons/fa';
 
 export interface YouTubeVideo {
@@ -22,6 +21,7 @@ export default function VideoInterviewsSection() {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [failedThumbnails, setFailedThumbnails] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   
   // Client-side cache key and duration (5 minutes for development, 30 minutes for production)
@@ -146,9 +146,9 @@ export default function VideoInterviewsSection() {
         console.warn('Invalid date string:', dateString);
         return '';
       }
-      return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
         day: 'numeric',
         timeZone: 'UTC' // Force UTC to prevent date shifts
       });
@@ -156,6 +156,11 @@ export default function VideoInterviewsSection() {
       console.error('Error formatting date:', err, 'Date string:', dateString);
       return '';
     }
+  };
+
+  const handleThumbnailError = (videoId: string) => {
+    console.log('Thumbnail failed to load for video:', videoId);
+    setFailedThumbnails(prev => new Set(prev).add(videoId));
   };
 
   if (error) {
@@ -300,16 +305,25 @@ export default function VideoInterviewsSection() {
                   }}
                 >
                   {/* Thumbnail Section */}
-                  <div className="relative h-36 md:h-44 w-full overflow-hidden">
-                    <Image
-                      src={video.thumbnail}
-                      alt={video.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      sizes="320px"
-                      unoptimized
-                    />
-                    
+                  <div className="relative h-36 md:h-44 w-full overflow-hidden bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900">
+                    {failedThumbnails.has(video.id) ? (
+                      // Fallback placeholder for failed thumbnails
+                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900">
+                        <div className="text-center">
+                          <FaYoutube className="text-red-500 text-6xl mx-auto mb-2 opacity-50" />
+                          <p className="text-gray-400 text-sm">Thumbnail Unavailable</p>
+                        </div>
+                      </div>
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={() => handleThumbnailError(video.id)}
+                      />
+                    )}
+
                     {/* Play button overlay */}
                     <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center">
                       <div className="w-16 h-16 bg-red-600 hover:bg-red-500 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-lg">

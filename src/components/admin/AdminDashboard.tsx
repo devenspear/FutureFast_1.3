@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import YouTubeSubmitForm from './YouTubeSubmitForm';
+import YouTubeSection from './sections/YouTubeSection';
 import NewsSection from './sections/NewsSection';
 import ResourceSection from './sections/ResourceSection';
 import AlertNotificationCenter from './AlertNotificationCenter';
@@ -153,40 +153,7 @@ export default function AdminDashboard({
       
       {/* YouTube Videos Section */}
       {activeSection === 'youtube' && (
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-white mb-2">YouTube Video Management</h2>
-          <p className="font-sans text-lg text-cyan-100 mb-8">
-            Add new video interviews and manage existing content
-          </p>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <YouTubeSubmitForm categories={videoCategories} />
-            </div>
-
-            <div className="bg-gray-900 p-6 rounded-lg shadow-md border border-gray-800">
-              <h3 className="text-xl font-bold text-white mb-4">Existing Videos ({videos.length})</h3>
-              <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                {videos.slice(0, 10).map((video) => (
-                  <div key={video.id} className="bg-gray-800 p-4 rounded-lg">
-                    <h4 className="text-sm font-medium text-white mb-1">{video.title}</h4>
-                    <p className="text-xs text-gray-400">Category: {video.category}</p>
-                    {video.featured && (
-                      <span className="inline-block mt-2 px-2 py-1 bg-cyan-600 text-white text-xs rounded">
-                        Featured
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {videos.length > 10 && (
-                <p className="text-xs text-gray-400 mt-4 text-center">
-                  Showing 10 of {videos.length} videos
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+        <YouTubeSection videos={videos} categories={videoCategories} />
       )}
       
       {/* News Articles Section */}

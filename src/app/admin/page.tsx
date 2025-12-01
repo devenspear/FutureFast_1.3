@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { loadYouTubeVideos, loadNewsItems, loadCatalogItems } from '../../../lib/content-loader';
+import { loadNewsItems, loadCatalogItems } from '../../../lib/content-loader';
+import { YouTubeModel } from '@/lib/db/models';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 
 export const metadata: Metadata = {
@@ -12,8 +13,24 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function AdminPage() {
-  // Load all content data
-  const videos = await loadYouTubeVideos();
+  // Load videos from database
+  const dbVideos = await YouTubeModel.findAll({ status: 'published', limit: 1000 });
+  const videos = dbVideos.map((video) => ({
+    id: video.video_id,
+    videoId: video.video_id,
+    title: video.title,
+    description: video.description || '',
+    url: video.url,
+    thumbnail: video.thumbnail_url || `https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`,
+    thumbnailUrl: video.thumbnail_url || `https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`,
+    channelTitle: video.channel || 'YouTube',
+    channelName: video.channel || 'YouTube',
+    publishedAt: video.published_date?.toISOString() || video.created_at.toISOString(),
+    category: video.category || 'Interview',
+    featured: video.featured,
+  }));
+
+  // Load other content from markdown
   const newsItems = await loadNewsItems();
   const catalogItems = await loadCatalogItems();
   

@@ -2,8 +2,14 @@
 
 import { useState } from 'react';
 import { useFormSubmit } from '../../../hooks/useFormSubmit';
-import { useDeploymentStatus } from '../../../hooks/useDeploymentStatus';
 import { YouTubeVideoItem } from '../../../types/youtube';
+
+interface WorkflowStep {
+  step: string;
+  status: 'success' | 'error' | 'skipped';
+  message: string;
+  timestamp: string;
+}
 
 interface YouTubeSectionProps {
   videos: YouTubeVideoItem[];
@@ -18,13 +24,13 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
   const [editingVideo, setEditingVideo] = useState<YouTubeVideoItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [lastCommitSha, setLastCommitSha] = useState<string | null>(null);
-  const { deploymentStatus, isPolling, startPolling } = useDeploymentStatus();
+  const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
+  const [showWorkflowDetails, setShowWorkflowDetails] = useState(false);
   const [isMigrating, setIsMigrating] = useState(false);
   const [migrationResult, setMigrationResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isFixingThumbnails, setIsFixingThumbnails] = useState(false);
   const [thumbnailFixResult, setThumbnailFixResult] = useState<{ success: boolean; message: string } | null>(null);
-  
+
   // Default categories if none provided
   const availableCategories = categories.length > 0 ? categories : [
     'Interview',
@@ -35,96 +41,40 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     'VR & Metaverse',
     'Tech Innovation',
     'Digital Strategy',
-    'Emerging Tech'
+    'Emerging Tech',
+    'Tech Conferences'
   ];
-  
+
   const { handleSubmit, isSubmitting, error, successMessage } = useFormSubmit(
     async (formData: { url: string; category: string; featured: boolean; id?: string }) => {
       console.log('🚀 [YouTubeSection] Starting video submission:', formData);
-      
+      setWorkflowSteps([]);
+
       const endpoint = editingVideo ? '/api/admin/youtube/update' : '/api/admin/youtube/add';
       console.log('🔗 [YouTubeSection] API endpoint:', endpoint);
-      
-      // Check if we have auth cookies before making the request
-      const allCookies = document.cookie;
-      console.log('🍪 [YouTubeSection] All cookies:', allCookies);
-      const authToken = document.cookie.split(';').find(c => c.trim().startsWith('auth-token='));
-      console.log('🔑 [YouTubeSection] Auth token found:', !!authToken);
-      if (authToken) {
-        console.log('🔑 [YouTubeSection] Auth token preview:', authToken.substring(0, 50) + '...');
-      }
-      
+
       const requestBody = editingVideo ? {...formData, id: editingVideo.id} : formData;
-      console.log('📦 [YouTubeSection] Request body:', requestBody);
-      
-      console.log('📡 [YouTubeSection] Making fetch request with credentials: include');
-      console.log('📡 [YouTubeSection] Request URL:', endpoint);
-      console.log('📡 [YouTubeSection] Request body:', JSON.stringify(requestBody, null, 2));
-      
-      // Create basic auth header using credentials from environment or defaults
-      // These should match your Vercel ADMIN_USERNAME and ADMIN_PASSWORD environment variables
-      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
-      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
-      const authString = btoa(`${username}:${password}`);
-      
+
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${authString}`,
         },
         body: JSON.stringify(requestBody),
         credentials: 'include',
       });
-      
-      console.log('📬 [YouTubeSection] Response status:', response.status);
-      console.log('📬 [YouTubeSection] Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (!response.ok) {
-        let errorData;
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        
-        try {
-          const responseText = await response.text();
-          console.log('📄 [YouTubeSection] Raw response text:', responseText);
-          
-          // Try to parse as JSON
-          if (responseText.trim().startsWith('{')) {
-            errorData = JSON.parse(responseText);
-            errorMessage = errorData.error || errorMessage;
-          } else {
-            // If not JSON, use the raw text
-            errorMessage = responseText || errorMessage;
-          }
-        } catch (parseError) {
-          console.error('🔧 [YouTubeSection] Error parsing response:', parseError);
-          errorMessage = `Server error (${response.status}): Unable to parse response`;
-        }
-        
-        console.error('❌ [YouTubeSection] API error response:', errorData || errorMessage);
-        console.error('❌ [YouTubeSection] Full response:', {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
-          data: errorData || errorMessage
-        });
-        
-        throw new Error(errorMessage);
-      }
-      
+
       const responseData = await response.json();
-      console.log('✅ [YouTubeSection] Success response:', responseData);
+      console.log('📬 [YouTubeSection] Response:', responseData);
 
-      // Handle production response differently
-      if (responseData.note) {
-        console.log('ℹ️ [YouTubeSection] Production note:', responseData.note);
+      // Store workflow steps for display
+      if (responseData.workflowSteps) {
+        setWorkflowSteps(responseData.workflowSteps);
+        setShowWorkflowDetails(true);
       }
 
-      // If we got a commit SHA, start polling for deployment status
-      if (responseData.commitSha && responseData.deploymentTracking) {
-        console.log('🔄 [YouTubeSection] Starting deployment tracking for commit:', responseData.commitSha);
-        setLastCommitSha(responseData.commitSha);
-        startPolling(responseData.commitSha);
+      if (!response.ok) {
+        throw new Error(responseData.error || `HTTP ${response.status}`);
       }
 
       return responseData;
@@ -135,49 +85,42 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       setCategory(availableCategories[0]);
       setFeatured(false);
       setEditingVideo(null);
-      setShowForm(false);
+      // Don't hide form immediately so user can see success status
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     },
     (error) => {
       console.error(`Error ${editingVideo ? 'updating' : 'adding'} YouTube video:`, error);
     },
-    editingVideo 
-      ? 'YouTube video updated successfully!'
-      : process.env.NODE_ENV === 'production' 
-        ? 'Video submission received! Manual processing required in production environment.'
-        : 'YouTube video added successfully! Metadata will be fetched automatically.'
+    'Video added successfully! It is now live on the website.'
   );
-  
+
   // Function to handle video deletion
   const handleDelete = async (videoId: string) => {
     if (!videoId) return;
-    
+
     try {
       setIsDeleting(true);
       setDeleteId(videoId);
-      
-      // Use same auth approach for delete
-      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
-      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
-      const authString = btoa(`${username}:${password}`);
-      
+
       const response = await fetch('/api/admin/youtube/delete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${authString}`,
         },
         body: JSON.stringify({ id: videoId }),
         credentials: 'include',
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete YouTube video');
       }
-      
+
       // Reload the page to refresh the video list
       window.location.reload();
-      
+
     } catch (error) {
       console.error('Error deleting YouTube video:', error);
       alert('Failed to delete video. Please try again.');
@@ -186,7 +129,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       setDeleteId(null);
     }
   };
-  
+
   // Function to handle thumbnail fix
   const handleFixThumbnails = async () => {
     if (!confirm('This will update all video thumbnails to use the correct URL format. Continue?')) {
@@ -197,15 +140,8 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       setIsFixingThumbnails(true);
       setThumbnailFixResult(null);
 
-      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
-      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
-      const authString = btoa(`${username}:${password}`);
-
       const response = await fetch('/api/admin/fix-thumbnails', {
         method: 'POST',
-        headers: {
-          'Authorization': `Basic ${authString}`,
-        },
         credentials: 'include',
       });
 
@@ -224,7 +160,6 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
         message,
       });
 
-      // Refresh the page after 3 seconds to show updated thumbnails
       setTimeout(() => {
         window.location.reload();
       }, 3000);
@@ -240,7 +175,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     }
   };
 
-  // Function to handle database migration
+  // Function to handle database migration (for legacy markdown files)
   const handleMigration = async () => {
     if (!confirm('This will sync all videos from markdown files to the database. Continue?')) {
       return;
@@ -250,15 +185,8 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
       setIsMigrating(true);
       setMigrationResult(null);
 
-      const username = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
-      const password = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
-      const authString = btoa(`${username}:${password}`);
-
       const response = await fetch('/api/admin/migrate-videos', {
         method: 'POST',
-        headers: {
-          'Authorization': `Basic ${authString}`,
-        },
         credentials: 'include',
       });
 
@@ -277,7 +205,6 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
         message,
       });
 
-      // Refresh the page after 3 seconds to show updated videos
       setTimeout(() => {
         window.location.reload();
       }, 3000);
@@ -300,35 +227,33 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     setCategory(video.category || availableCategories[0]);
     setFeatured(video.featured || false);
     setShowForm(true);
+    setWorkflowSteps([]);
 
-    // Scroll to the form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Client-side validation
+
     if (!url.trim()) {
       alert('Please enter a YouTube URL');
       return;
     }
-    
+
     const videoId = extractVideoId(url);
     if (!videoId) {
       alert('Please enter a valid YouTube URL. Make sure it includes the video ID (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)');
       return;
     }
-    
-    handleSubmit({ 
-      url: url.trim(), 
-      category, 
-      featured, 
+
+    handleSubmit({
+      url: url.trim(),
+      category,
+      featured,
       ...(editingVideo && editingVideo.id ? { id: editingVideo.id } : {})
     });
   };
 
-  // Helper function to extract video ID from a YouTube URL
   const extractVideoId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
@@ -337,7 +262,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
     }
     return null;
   };
-  
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -364,6 +289,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
             onClick={handleMigration}
             disabled={isMigrating}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-md text-sm transition-colors flex items-center gap-2"
+            title="Sync legacy markdown videos to database"
           >
             {isMigrating ? (
               <>
@@ -374,34 +300,27 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                 Syncing...
               </>
             ) : (
-              <>🔄 Sync Videos</>
+              <>🔄 Sync Legacy</>
             )}
           </button>
           <button
-            onClick={async () => {
-              console.log('🔍 [Debug] Testing auth debug endpoint');
-              try {
-                const response = await fetch('/api/admin/auth/debug', {
-                  credentials: 'include'
-                });
-                const data = await response.json();
-                console.log('🔍 [Debug] Auth debug response:', data);
-                alert('Debug info logged to console. Check browser dev tools.');
-              } catch (error) {
-                console.error('🔍 [Debug] Auth debug failed:', error);
-                alert('Debug failed. Check console for details.');
-              }
+            onClick={() => {
+              setShowForm(!showForm);
+              setWorkflowSteps([]);
+              setEditingVideo(null);
             }}
-            className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm transition-colors"
-          >
-            🔍 Debug Auth
-          </button>
-          <button
-            onClick={() => setShowForm(!showForm)}
             className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md text-sm transition-colors"
           >
             {showForm ? 'Hide Form' : 'Add New Video'}
           </button>
+        </div>
+      </div>
+
+      {/* System Info Banner */}
+      <div className="mb-6 px-4 py-3 rounded border bg-gray-800/50 border-gray-700 text-gray-300">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-green-400">●</span>
+          <span>Videos are saved directly to the database. Changes are instant - no deployment required.</span>
         </div>
       </div>
 
@@ -432,90 +351,85 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
           )}
         </div>
       )}
-      
+
       {showForm && (
         <div className="bg-gray-800 p-6 rounded-lg mb-8">
-          <h3 className="text-xl font-medium text-cyan-100 mb-4">Add YouTube Video</h3>
-          
+          <h3 className="text-xl font-medium text-cyan-100 mb-4">
+            {editingVideo ? 'Edit YouTube Video' : 'Add YouTube Video'}
+          </h3>
+
           <form onSubmit={onSubmit} className="space-y-4">
             {error && (
               <div className="bg-red-900/50 border border-red-500 text-red-100 px-4 py-3 rounded">
-                {error}
+                <div className="font-medium">Error</div>
+                <div className="text-sm">{error}</div>
               </div>
             )}
-            
+
             {successMessage && (
               <div className="bg-green-900/50 border border-green-500 text-green-100 px-4 py-3 rounded">
-                <div className="font-medium">{successMessage}</div>
-                {lastCommitSha && (
-                  <div className="text-sm mt-2 font-mono">
-                    Commit: {lastCommitSha.substring(0, 7)}
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400 text-xl">✓</span>
+                  <div className="font-medium">{successMessage}</div>
+                </div>
+              </div>
+            )}
+
+            {/* Workflow Steps Debug Panel */}
+            {workflowSteps.length > 0 && (
+              <div className="bg-gray-900/80 border border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setShowWorkflowDetails(!showWorkflowDetails)}
+                  className="w-full px-4 py-2 flex items-center justify-between text-left text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>🔧</span>
+                    <span>Workflow Details ({workflowSteps.length} steps)</span>
+                  </span>
+                  <span>{showWorkflowDetails ? '▼' : '▶'}</span>
+                </button>
+
+                {showWorkflowDetails && (
+                  <div className="px-4 pb-4 space-y-2">
+                    {workflowSteps.map((step, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-start gap-2 text-sm p-2 rounded ${
+                          step.status === 'success' ? 'bg-green-900/30 text-green-200' :
+                          step.status === 'error' ? 'bg-red-900/30 text-red-200' :
+                          'bg-yellow-900/30 text-yellow-200'
+                        }`}
+                      >
+                        <span className="flex-shrink-0">
+                          {step.status === 'success' ? '✅' : step.status === 'error' ? '❌' : '⏭️'}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium">{step.step}</div>
+                          <div className="text-xs opacity-80 break-all">{step.message}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
             )}
 
-            {/* Deployment Status Tracking */}
-            {isPolling && deploymentStatus && (
-              <div className={`px-4 py-3 rounded border ${
-                deploymentStatus.status === 'ready'
-                  ? 'bg-green-900/50 border-green-500 text-green-100'
-                  : deploymentStatus.status === 'error'
-                  ? 'bg-red-900/50 border-red-500 text-red-100'
-                  : 'bg-blue-900/50 border-blue-500 text-blue-100'
-              }`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium flex items-center gap-2">
-                      {deploymentStatus.status === 'building' || deploymentStatus.status === 'queued' ? (
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                      ) : deploymentStatus.status === 'ready' ? (
-                        <span>✅</span>
-                      ) : deploymentStatus.status === 'error' ? (
-                        <span>❌</span>
-                      ) : null}
-                      Deployment Status: {deploymentStatus.status}
-                    </div>
-                    <div className="text-sm mt-1">{deploymentStatus.message}</div>
-                    {deploymentStatus.deploymentUrl && (
-                      <a
-                        href={deploymentStatus.deploymentUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm underline mt-1 inline-block"
-                      >
-                        View deployment →
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-            
             <div>
               <label htmlFor="url" className="block text-sm font-medium text-cyan-100 mb-1">
-                YouTube URL
+                YouTube URL *
               </label>
               <input
                 type="url"
                 id="url"
                 value={url}
-                onChange={(e) => {
-                  setUrl(e.target.value);
-                  // Clear any previous errors when user starts typing
-                  if (error && e.target.value) {
-                    // This will be handled by the form validation
-                  }
-                }}
-                placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
                 required
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
-              <p className="mt-1 text-sm font-sans text-gray-400">
-                Paste the full YouTube URL (supports youtube.com and youtu.be formats)
+              <p className="mt-1 text-sm text-gray-400">
+                Supports youtube.com and youtu.be formats
               </p>
               {/* URL validation preview */}
               {url && (
@@ -524,14 +438,15 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                     const videoId = extractVideoId(url);
                     if (videoId) {
                       return (
-                        <div className="text-green-400">
-                          ✅ Valid YouTube URL - Video ID: {videoId}
+                        <div className="text-green-400 flex items-center gap-2">
+                          <span>✅</span>
+                          <span>Valid URL - Video ID: <code className="bg-gray-700 px-1 rounded">{videoId}</code></span>
                         </div>
                       );
                     } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
                       return (
                         <div className="text-yellow-400">
-                          ⚠️ YouTube URL detected but invalid format. Make sure it includes the video ID (v=...)
+                          ⚠️ YouTube URL detected but can&apos;t extract video ID
                         </div>
                       );
                     } else {
@@ -545,10 +460,10 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                 </div>
               )}
             </div>
-            
+
             <div>
               <label htmlFor="category" className="block text-sm font-medium text-cyan-100 mb-1">
-                Category
+                Category *
               </label>
               <select
                 id="category"
@@ -563,7 +478,7 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                 ))}
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -572,47 +487,71 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                 onChange={(e) => setFeatured(e.target.checked)}
                 className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-600 rounded bg-gray-700"
               />
-              <label htmlFor="featured" className="ml-2 block text-sm font-sans text-cyan-100">
-                Feature this video (will appear in highlighted sections)
+              <label htmlFor="featured" className="ml-2 block text-sm text-cyan-100">
+                Feature this video (appears in highlighted sections)
               </label>
             </div>
-            
-            <div className="pt-2">
+
+            <div className="pt-2 flex gap-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full font-sans px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
-                {isSubmitting ? 'Adding...' : 'Add YouTube Video'}
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>{editingVideo ? 'Updating...' : 'Adding...'}</span>
+                  </>
+                ) : (
+                  <span>{editingVideo ? 'Update Video' : 'Add Video'}</span>
+                )}
               </button>
+              {editingVideo && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingVideo(null);
+                    setUrl('');
+                    setCategory(availableCategories[0]);
+                    setFeatured(false);
+                  }}
+                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </form>
         </div>
       )}
-      
+
       <div className="space-y-6">
-        <h3 className="text-xl font-medium text-cyan-100 mb-4">Existing Videos ({videos.length})</h3>
-        
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-medium text-cyan-100">Existing Videos ({videos.length})</h3>
+          <div className="text-sm text-gray-400">
+            Sorted by publish date (newest first)
+          </div>
+        </div>
+
         {videos.length === 0 ? (
           <p className="text-gray-400">No videos found. Add your first video above.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Sort videos by publishedAt date (newest first) */}
             {[...videos]
               .sort((a, b) => {
-                // If both have publishedAt dates, compare them
                 if (a.publishedAt && b.publishedAt) {
                   return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
                 }
-                // If only one has a publishedAt date, prioritize the one with a date
                 if (a.publishedAt) return -1;
                 if (b.publishedAt) return 1;
-                // If neither has a publishedAt date, keep original order
                 return 0;
               })
               .map((video, index) => (
-              <div key={index} className="bg-gray-800 p-4 rounded-lg">
-                {/* Title with pending indicator if needed */}
+              <div key={video.id || index} className="bg-gray-800 p-4 rounded-lg">
                 <div className="flex justify-between items-start mb-1">
                   <h4 className="font-medium text-white line-clamp-1">
                     {video.title.includes('[Pending') ? (
@@ -621,82 +560,57 @@ export default function YouTubeSection({ videos, categories }: YouTubeSectionPro
                       video.title
                     )}
                   </h4>
-                  
-                  {/* Status badge */}
+
                   {video.title.includes('[Pending') ? (
-                    <span className="bg-amber-900/30 text-amber-300 text-xs px-2 py-1 rounded">
+                    <span className="bg-amber-900/30 text-amber-300 text-xs px-2 py-1 rounded flex-shrink-0 ml-2">
                       Pending
                     </span>
                   ) : video.featured ? (
-                    <span className="bg-yellow-900/30 text-yellow-300 text-xs px-2 py-1 rounded">
+                    <span className="bg-yellow-900/30 text-yellow-300 text-xs px-2 py-1 rounded flex-shrink-0 ml-2">
                       Featured
                     </span>
                   ) : null}
                 </div>
-                
+
                 <p className="text-sm text-gray-400 mb-2">Category: {video.category}</p>
                 {video.channelName && (
                   <p className="text-sm text-gray-400 mb-1">Channel: {video.channelName}</p>
                 )}
                 {video.publishedAt && (
-                  <p className="text-sm text-gray-400 mb-1">Published: {new Date(video.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}</p>
+                  <p className="text-sm text-gray-400 mb-1">
+                    Published: {new Date(video.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
+                  </p>
                 )}
                 <p className="text-sm text-gray-400 mb-3 line-clamp-2">{video.description}</p>
-                
-                {/* Actions row */}
+
                 <div className="flex justify-between items-center">
                   <div className="flex space-x-2">
-                    {/* View on YouTube link - only show if not pending */}
                     {!video.title.includes('[Pending') && video.url ? (
-                      <a 
-                        href={video.url} 
-                        target="_blank" 
+                      <a
+                        href={video.url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-cyan-400 hover:text-cyan-300 text-sm"
                       >
-                        View on YouTube
+                        View on YouTube ↗
                       </a>
                     ) : (
-                      <span className="text-gray-500 text-sm">URL needed</span>
+                      <span className="text-gray-500 text-sm">URL pending</span>
                     )}
                   </div>
-                  
-                  {/* Action buttons */}
+
                   <div className="flex space-x-2">
-                    {/* Replace button for pending videos */}
-                    {video.title.includes('[Pending') ? (
-                      <button
-                        onClick={() => {
-                          // Pre-fill the form with the pending video's category and featured status
-                          setCategory(video.category || availableCategories[0]);
-                          setFeatured(video.featured || false);
-                          setUrl('');
-                          setShowForm(true);
-                          // Scroll to form
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="text-xs px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors"
-                      >
-                        Replace
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => startEditing(video)}
-                        className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-                      >
-                        Edit
-                      </button>
-                    )}
-                    
-                    {/* Delete button */}
+                    <button
+                      onClick={() => startEditing(video)}
+                      className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                    >
+                      Edit
+                    </button>
+
                     <button
                       onClick={() => {
                         if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
-                          // Use a dummy ID for pending videos since they don't have real IDs
-                          const videoId = video.title.includes('[Pending') 
-                            ? `pending-${index}` 
-                            : video.id || `video-${index}`;
-                          handleDelete(videoId);
+                          handleDelete(video.id || `video-${index}`);
                         }
                       }}
                       disabled={isDeleting && deleteId === video.id}

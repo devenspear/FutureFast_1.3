@@ -36,30 +36,10 @@ function extractVideoId(url: string): string | null {
   return null;
 }
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
-    // Check authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const base64Credentials = authHeader.split(' ')[1];
-    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-    const [username, password] = credentials.split(':');
-
-    const validUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'devenspear';
-    const validPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'FUTUREp@ss2025';
-
-    if (username !== validUsername || password !== validPassword) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
+    // Auth is handled by middleware - /api/admin/* routes are protected
+    console.log('🔄 [Migration] Starting video migration from markdown to database');
 
     // Run migration
     const videosDir = path.join(process.cwd(), 'content/youtube/videos');

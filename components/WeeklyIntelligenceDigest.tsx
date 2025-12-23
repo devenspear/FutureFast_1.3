@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { FaExternalLinkAlt, FaChevronRight } from 'react-icons/fa';
+import { FaChevronRight } from 'react-icons/fa';
 
 interface TrendSummary {
   trend: string;
@@ -29,7 +29,6 @@ interface BriefingData {
   technologiesWatching: string[] | null;
   strategicInsight: string | null;
   emergingPatterns: string[] | null;
-  fullBriefingUrl: string | null;
   generatedAt: string;
   syncedAt: string;
 }
@@ -135,7 +134,7 @@ export default function WeeklyIntelligenceDigest() {
         <h1 className="font-orbitron text-4xl md:text-5xl font-bold text-center mb-8 bg-gradient-to-r from-[#99731A] via-[#D4AF37] to-[#99731A] bg-clip-text text-transparent">
           Weekly Intelligence Digest
         </h1>
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="container mx-auto px-4">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-800 rounded w-3/4 mx-auto"></div>
             <div className="h-4 bg-gray-800 rounded w-1/2 mx-auto"></div>
@@ -188,7 +187,7 @@ export default function WeeklyIntelligenceDigest() {
         )}
       </p>
 
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="container mx-auto px-4">
         {/* Headline */}
         {briefing.headline && (
           <div className="text-center mb-8">
@@ -319,21 +318,6 @@ export default function WeeklyIntelligenceDigest() {
             </div>
           </div>
         </div>
-
-        {/* View Full Analysis Link */}
-        {briefing.fullBriefingUrl && (
-          <div className="text-center mt-8">
-            <a
-              href={briefing.fullBriefingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              View Full Analysis
-              <FaExternalLinkAlt className="text-xs" />
-            </a>
-          </div>
-        )}
 
         {/* Footer Attribution */}
         <p className="text-center text-gray-500 text-xs italic mt-8">

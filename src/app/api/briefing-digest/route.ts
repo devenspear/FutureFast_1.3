@@ -45,7 +45,6 @@ export async function GET() {
       technologiesWatching: briefing.technologies_watching,
       strategicInsight: briefing.strategic_insight,
       emergingPatterns: briefing.emerging_patterns,
-      fullBriefingUrl: briefing.full_briefing_url,
       generatedAt: briefing.source_generated_at.toISOString(),
       syncedAt: briefing.synced_at.toISOString(),
     };

@@ -311,3 +311,58 @@ COMMENT ON TABLE static_content IS 'Stores rarely-changing static content (hero,
 COMMENT ON COLUMN news_articles.date_confidence IS 'Confidence score (0-100) for extracted publication date';
 COMMENT ON COLUMN news_articles.review_priority IS 'Priority level for manual review based on confidence and source reliability';
 COMMENT ON VIEW content_needing_review IS 'Articles flagged for manual review due to low date confidence or unreliable sources';
+
+-- ================================================================
+-- BRIEFING DIGESTS (from Disruption Radar)
+-- Cached executive briefing digests for the Weekly Intelligence Digest section
+-- ================================================================
+
+CREATE TABLE IF NOT EXISTS briefing_digests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Source identification
+  source TEXT DEFAULT 'disruption-radar',
+
+  -- Period information
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  period_days INTEGER NOT NULL,
+  analysis_count INTEGER NOT NULL,
+  validation_score DECIMAL(3,2),
+
+  -- Content fields (condensed from full briefing)
+  headline TEXT,
+  executive_summary TEXT,
+  top_trends JSONB,           -- Array of {trend, implication}
+  key_developments JSONB,     -- Array of {headline, significance}
+  companies_watching TEXT[],
+  technologies_watching TEXT[],
+  strategic_insight TEXT,
+  emerging_patterns TEXT[],
+
+  -- Metadata
+  full_briefing_url TEXT,
+  source_generated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  source_briefing_id TEXT,
+  synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+  -- Audit fields
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+  -- Unique constraint on source + period
+  UNIQUE(source, period_start, period_end)
+);
+
+-- Indexes for briefing_digests
+CREATE INDEX IF NOT EXISTS idx_briefing_synced_at ON briefing_digests(synced_at DESC);
+CREATE INDEX IF NOT EXISTS idx_briefing_source_generated ON briefing_digests(source_generated_at DESC);
+
+-- Trigger for auto-updating timestamps
+DROP TRIGGER IF EXISTS update_briefing_digests_updated_at ON briefing_digests;
+CREATE TRIGGER update_briefing_digests_updated_at
+  BEFORE UPDATE ON briefing_digests
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+COMMENT ON TABLE briefing_digests IS 'Cached executive briefing digests from Disruption Radar for the Weekly Intelligence Digest section';

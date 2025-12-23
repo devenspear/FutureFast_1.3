@@ -1,6 +1,6 @@
 import HeroSection from "../../components/HeroSection";
 import FastLaneSection from "../../components/FastLaneSection";
-import NewsAndDisruptionSection from "../../components/NewsAndDisruptionSection";
+import WeeklyIntelligenceDigest from "../../components/WeeklyIntelligenceDigest";
 import VideoInterviewsSection from "../../components/VideoInterviewsSection";
 import ResourceLibrarySection from "../../components/ResourceLibrarySection";
 import ThoughtLeadersSection from "../../components/ThoughtLeadersSection";
@@ -18,8 +18,8 @@ export default function Home() {
       <section aria-labelledby="fast-lane-heading">
         <FastLaneSection />
       </section>
-      <section aria-labelledby="news-heading">
-        <NewsAndDisruptionSection />
+      <section aria-labelledby="intelligence-digest-heading">
+        <WeeklyIntelligenceDigest />
       </section>
       <section aria-labelledby="videos-heading">
         <VideoInterviewsSection />

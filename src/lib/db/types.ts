@@ -247,3 +247,73 @@ export interface UpdateStaticContent {
   description?: string;
   updated_by?: string;
 }
+
+// ============================================================================
+// Briefing Digests (from Disruption Radar)
+// ============================================================================
+
+export interface TrendSummary {
+  trend: string;
+  implication: string;
+}
+
+export interface DevelopmentSummary {
+  headline: string;
+  significance: string;
+}
+
+export interface BriefingDigest {
+  id: string;
+  source: string;
+  period_start: Date;
+  period_end: Date;
+  period_days: number;
+  analysis_count: number;
+  validation_score: number | null;
+  headline: string | null;
+  executive_summary: string | null;
+  top_trends: TrendSummary[] | null;
+  key_developments: DevelopmentSummary[] | null;
+  companies_watching: string[] | null;
+  technologies_watching: string[] | null;
+  strategic_insight: string | null;
+  emerging_patterns: string[] | null;
+  full_briefing_url: string | null;
+  source_generated_at: Date;
+  source_briefing_id: string | null;
+  synced_at: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface CreateBriefingDigest {
+  source?: string;
+  period_start: Date | string;
+  period_end: Date | string;
+  period_days: number;
+  analysis_count: number;
+  validation_score?: number;
+  headline?: string;
+  executive_summary?: string;
+  top_trends?: TrendSummary[];
+  key_developments?: DevelopmentSummary[];
+  companies_watching?: string[];
+  technologies_watching?: string[];
+  strategic_insight?: string;
+  emerging_patterns?: string[];
+  full_briefing_url?: string;
+  source_generated_at: Date | string;
+  source_briefing_id?: string;
+}
+
+export interface UpdateBriefingDigest {
+  validation_score?: number;
+  headline?: string;
+  executive_summary?: string;
+  top_trends?: TrendSummary[];
+  key_developments?: DevelopmentSummary[];
+  companies_watching?: string[];
+  technologies_watching?: string[];
+  strategic_insight?: string;
+  emerging_patterns?: string[];
+}

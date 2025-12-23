@@ -180,11 +180,6 @@ export default function WeeklyIntelligenceDigest() {
 
       <p className="text-center text-gray-400 text-sm mb-8">
         {formatDateRange(briefing.periodStart, briefing.periodEnd)}
-        {briefing.validationScore && (
-          <span className="ml-2 text-green-400">
-            • {Math.round(briefing.validationScore * 100)}% validated
-          </span>
-        )}
       </p>
 
       <div className="container mx-auto px-4">

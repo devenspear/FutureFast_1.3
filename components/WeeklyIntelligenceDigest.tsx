@@ -174,12 +174,12 @@ export default function WeeklyIntelligenceDigest() {
         Weekly Intelligence Digest
       </h1>
 
-      <p className="text-center text-cyan-100 text-lg mb-2 max-w-3xl mx-auto px-4">
-        AI-synthesized insights from {briefing.analysisCount} sources
+      <p className="text-center text-cyan-400 text-xl md:text-2xl font-semibold mb-2">
+        {formatDateRange(briefing.periodStart, briefing.periodEnd)}
       </p>
 
-      <p className="text-center text-gray-400 text-sm mb-8">
-        {formatDateRange(briefing.periodStart, briefing.periodEnd)}
+      <p className="text-center text-gray-400 text-sm mb-8 max-w-3xl mx-auto px-4">
+        AI-synthesized insights from {briefing.analysisCount} sources
       </p>
 
       <div className="container mx-auto px-4">
@@ -272,18 +272,18 @@ export default function WeeklyIntelligenceDigest() {
             )}
 
             {/* Companies & Technologies */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {/* Companies */}
               {briefing.companiesWatching && briefing.companiesWatching.length > 0 && (
-                <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-                  <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">
+                <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                  <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">
                     Companies
                   </h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {briefing.companiesWatching.map((company, idx) => (
                       <span
                         key={idx}
-                        className="bg-gray-800 text-gray-200 px-2 py-1 rounded text-sm"
+                        className="bg-gray-800 text-gray-200 px-2 py-0.5 rounded text-xs"
                       >
                         {company}
                       </span>
@@ -294,15 +294,15 @@ export default function WeeklyIntelligenceDigest() {
 
               {/* Technologies */}
               {briefing.technologiesWatching && briefing.technologiesWatching.length > 0 && (
-                <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
-                  <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">
+                <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                  <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">
                     Technologies
                   </h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {briefing.technologiesWatching.map((tech, idx) => (
                       <span
                         key={idx}
-                        className="bg-cyan-900/50 text-cyan-200 px-2 py-1 rounded text-sm"
+                        className="bg-cyan-900/40 text-cyan-300 px-2 py-0.5 rounded text-xs"
                       >
                         {tech}
                       </span>

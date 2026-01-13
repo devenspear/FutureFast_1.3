@@ -292,30 +292,37 @@ To update the framework:
 4. Update dependencies
 5. Deploy to production
 
-## 📈 Recent Enhancements (August 2025)
+## 📈 Recent Enhancements (January 2026)
 
-### Alert Notification Center
+### YouTube Video Management
+- **Database-backed storage** using PostgreSQL for all video data
+- **YouTube Live URL support** - Added `/live/` URL pattern recognition
+- **Auto-metadata fetching** via YouTube Data API v3
+- **Admin panel integration** at `/admin` with full CRUD operations
+- **Client-side caching** (30 minutes) for optimal performance
+
+### Weekly Intelligence Digest
+- **Disruption Radar integration** for AI-synthesized briefings
+- **Enhanced layout** - Prominent date display, balanced card layout
+- **Companies card** in left column, Technologies full-width in right
+- **1-hour client-side cache** for briefing data
+
+### Resource Library
+- **File-based catalog** in `/content/catalog/` with markdown frontmatter
+- **Thumbnail support** via `/public/uploads/`
+- **Latest additions:** Deloitte Tech Trends 2026, Reimagining Tech Services for Agentic AI
+
+### Previous Enhancements (August 2025)
+
+#### Alert Notification Center
 - **Real-time monitoring** of Notion workflow processing
 - **Automated health checks** with email notifications
 - **Admin dashboard integration** for centralized system oversight
-- **Manual processing triggers** for workflow troubleshooting
 
-### Production YouTube Management
-- **Hybrid approach** for development vs production environments
-- **Admin panel validation** with production logging
-- **Helper scripts** for video file management
-- **Automatic deployment** with domain alias management
-
-### Enhanced Authentication
+#### Enhanced Authentication
 - **Seamless admin experience** with cookie-based sessions
 - **Production-ready security** with multiple auth methods
-- **API route protection** via middleware and direct validation
-
-### Deployment Improvements
-- **Automated domain assignment** for fresh deployments
-- **Troubleshooting workflows** for common deployment issues
-- **Force deployment mechanisms** for cache clearing
-- **Comprehensive logging** for production debugging
+- **Rate limiting** on login attempts (5 attempts, 15-min lockout)
 
 ---
 

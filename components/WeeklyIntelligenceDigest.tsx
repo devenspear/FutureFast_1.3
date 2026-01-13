@@ -240,6 +240,25 @@ export default function WeeklyIntelligenceDigest() {
                 </p>
               </div>
             )}
+
+            {/* Companies */}
+            {briefing.companiesWatching && briefing.companiesWatching.length > 0 && (
+              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">
+                  Companies
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {briefing.companiesWatching.map((company, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-gray-800 text-gray-200 px-2 py-0.5 rounded text-xs"
+                    >
+                      {company}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Key Developments & Watching */}
@@ -271,46 +290,24 @@ export default function WeeklyIntelligenceDigest() {
               </div>
             )}
 
-            {/* Companies & Technologies */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Companies */}
-              {briefing.companiesWatching && briefing.companiesWatching.length > 0 && (
-                <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
-                  <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    Companies
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {briefing.companiesWatching.map((company, idx) => (
-                      <span
-                        key={idx}
-                        className="bg-gray-800 text-gray-200 px-2 py-0.5 rounded text-xs"
-                      >
-                        {company}
-                      </span>
-                    ))}
-                  </div>
+            {/* Technologies - Full Width */}
+            {briefing.technologiesWatching && briefing.technologiesWatching.length > 0 && (
+              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+                <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">
+                  Technologies
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {briefing.technologiesWatching.map((tech, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-cyan-900/40 text-cyan-300 px-2 py-0.5 rounded text-xs"
+                    >
+                      {tech}
+                    </span>
+                  ))}
                 </div>
-              )}
-
-              {/* Technologies */}
-              {briefing.technologiesWatching && briefing.technologiesWatching.length > 0 && (
-                <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
-                  <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">
-                    Technologies
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {briefing.technologiesWatching.map((tech, idx) => (
-                      <span
-                        key={idx}
-                        className="bg-cyan-900/40 text-cyan-300 px-2 py-0.5 rounded text-xs"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -2,9 +2,17 @@
 
 import React from "react";
 import Image from "next/image";
-import MailerLiteEmbed from "./MailerLiteEmbed";
+import DualSubscriptionForm from "./DualSubscriptionForm";
 import { defaultAboutFutureFastContent as content } from "../lib/content";
 
+/**
+ * AboutWithSubscription - Now uses DualSubscriptionForm
+ *
+ * The form submits to both Deven CRM and MailerLite via /api/subscribe-v2.
+ * This enables parallel operation during the transition period.
+ *
+ * To revert to MailerLite-only: import MailerLiteEmbed and replace DualSubscriptionForm below.
+ */
 export default function AboutWithSubscription() {
   return (
     <section className="py-20 bg-black text-white overflow-hidden">
@@ -40,9 +48,9 @@ export default function AboutWithSubscription() {
             </p>
           </div>
 
-          {/* MailerLite embed - Right */}
+          {/* Subscription form - Right */}
           <div className="lg:w-2/5">
-            <MailerLiteEmbed />
+            <DualSubscriptionForm />
           </div>
         </div>
       </div>

@@ -15,12 +15,13 @@ import { NextRequest, NextResponse } from 'next/server'
 const MAILERLITE_FORM_URL = 'https://assets.mailerlite.com/jsonp/1595754/forms/157210520722605964/subscribe'
 
 // Environment configuration - read at request time to handle env var updates
+// Trim whitespace to handle env vars that may have trailing newlines
 function getConfig() {
   return {
-    DEVEN_CRM_API_URL: process.env.DEVEN_CRM_API_URL || 'https://crm.deven.network/api/v1/capture',
-    DEVEN_CRM_API_KEY: process.env.DEVEN_CRM_API_KEY,
-    ENABLE_DEVEN_CRM: process.env.ENABLE_DEVEN_CRM_SUBMISSION !== 'false',
-    ENABLE_MAILERLITE: process.env.ENABLE_MAILERLITE_SUBMISSION !== 'false',
+    DEVEN_CRM_API_URL: (process.env.DEVEN_CRM_API_URL || 'https://crm.deven.network/api/v1/capture').trim(),
+    DEVEN_CRM_API_KEY: process.env.DEVEN_CRM_API_KEY?.trim(),
+    ENABLE_DEVEN_CRM: process.env.ENABLE_DEVEN_CRM_SUBMISSION?.trim() !== 'false',
+    ENABLE_MAILERLITE: process.env.ENABLE_MAILERLITE_SUBMISSION?.trim() !== 'false',
   }
 }
 
@@ -42,8 +43,6 @@ interface SubmissionResult {
  */
 async function submitToDevenCRM(data: SubscribeRequest): Promise<SubmissionResult> {
   const config = getConfig()
-  console.log('[subscribe-v2] Deven CRM URL:', config.DEVEN_CRM_API_URL)
-  console.log('[subscribe-v2] API key present:', !!config.DEVEN_CRM_API_KEY, 'prefix:', config.DEVEN_CRM_API_KEY?.substring(0, 12))
 
   if (!config.DEVEN_CRM_API_KEY) {
     console.warn('[subscribe-v2] DEVEN_CRM_API_KEY not configured')
@@ -61,9 +60,9 @@ async function submitToDevenCRM(data: SubscribeRequest): Promise<SubmissionResul
         primaryEmail: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
-        primaryPhone: data.phone || null,
+        ...(data.phone ? { primaryPhone: data.phone } : {}),
         metadata: {
-          comment: data.comment || null,
+          ...(data.comment ? { comment: data.comment } : {}),
           source_page: 'futurefast.ai',
           submitted_at: new Date().toISOString(),
         },
@@ -73,7 +72,7 @@ async function submitToDevenCRM(data: SubscribeRequest): Promise<SubmissionResul
     if (!response.ok) {
       const errorBody = await response.text()
       console.error('[subscribe-v2] Deven CRM error:', response.status, errorBody)
-      return { success: false, error: `CRM error: ${response.status}` }
+      return { success: false, error: `CRM error: ${response.status} - ${errorBody}` }
     }
 
     const result = await response.json()

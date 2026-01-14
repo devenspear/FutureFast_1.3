@@ -1,6 +1,6 @@
 {
   "name": "vercel-web-framework",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A comprehensive Next.js web framework template with content management, admin dashboard, and third-party integrations",
   "private": true,
   "scripts": {

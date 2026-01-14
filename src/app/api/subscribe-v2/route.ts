@@ -11,14 +11,18 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-// Environment configuration
-const DEVEN_CRM_API_URL = process.env.DEVEN_CRM_API_URL || 'https://crm.deven.network/api/v1/capture'
-const DEVEN_CRM_API_KEY = process.env.DEVEN_CRM_API_KEY
-const ENABLE_DEVEN_CRM = process.env.ENABLE_DEVEN_CRM_SUBMISSION !== 'false'
-const ENABLE_MAILERLITE = process.env.ENABLE_MAILERLITE_SUBMISSION !== 'false'
-
 // MailerLite configuration (from existing integration)
 const MAILERLITE_FORM_URL = 'https://assets.mailerlite.com/jsonp/1595754/forms/157210520722605964/subscribe'
+
+// Environment configuration - read at request time to handle env var updates
+function getConfig() {
+  return {
+    DEVEN_CRM_API_URL: process.env.DEVEN_CRM_API_URL || 'https://crm.deven.network/api/v1/capture',
+    DEVEN_CRM_API_KEY: process.env.DEVEN_CRM_API_KEY,
+    ENABLE_DEVEN_CRM: process.env.ENABLE_DEVEN_CRM_SUBMISSION !== 'false',
+    ENABLE_MAILERLITE: process.env.ENABLE_MAILERLITE_SUBMISSION !== 'false',
+  }
+}
 
 interface SubscribeRequest {
   firstName: string
@@ -37,17 +41,21 @@ interface SubmissionResult {
  * Submit to Deven CRM capture API
  */
 async function submitToDevenCRM(data: SubscribeRequest): Promise<SubmissionResult> {
-  if (!DEVEN_CRM_API_KEY) {
+  const config = getConfig()
+  console.log('[subscribe-v2] Deven CRM URL:', config.DEVEN_CRM_API_URL)
+  console.log('[subscribe-v2] API key present:', !!config.DEVEN_CRM_API_KEY, 'prefix:', config.DEVEN_CRM_API_KEY?.substring(0, 12))
+
+  if (!config.DEVEN_CRM_API_KEY) {
     console.warn('[subscribe-v2] DEVEN_CRM_API_KEY not configured')
     return { success: false, error: 'API key not configured' }
   }
 
   try {
-    const response = await fetch(DEVEN_CRM_API_URL, {
+    const response = await fetch(config.DEVEN_CRM_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': DEVEN_CRM_API_KEY,
+        'X-API-Key': config.DEVEN_CRM_API_KEY,
       },
       body: JSON.stringify({
         primaryEmail: data.email,
@@ -116,6 +124,8 @@ async function submitToMailerLite(data: SubscribeRequest): Promise<SubmissionRes
 }
 
 export async function POST(request: NextRequest) {
+  const config = getConfig()
+
   try {
     const body: SubscribeRequest = await request.json()
 
@@ -139,25 +149,25 @@ export async function POST(request: NextRequest) {
     // Submit to both systems in parallel
     const submissions: Promise<SubmissionResult>[] = []
 
-    if (ENABLE_DEVEN_CRM) {
+    if (config.ENABLE_DEVEN_CRM) {
       submissions.push(submitToDevenCRM(body))
     }
 
-    if (ENABLE_MAILERLITE) {
+    if (config.ENABLE_MAILERLITE) {
       submissions.push(submitToMailerLite(body))
     }
 
     const results = await Promise.allSettled(submissions)
 
     // Check results
-    const crmResult = ENABLE_DEVEN_CRM ? results[0] : null
-    const mlResult = ENABLE_MAILERLITE ? results[ENABLE_DEVEN_CRM ? 1 : 0] : null
+    const crmResult = config.ENABLE_DEVEN_CRM ? results[0] : null
+    const mlResult = config.ENABLE_MAILERLITE ? results[config.ENABLE_DEVEN_CRM ? 1 : 0] : null
 
     const crmSuccess = crmResult?.status === 'fulfilled' && crmResult.value.success
     const mlSuccess = mlResult?.status === 'fulfilled' && mlResult.value.success
 
     // Log any discrepancies
-    if (ENABLE_DEVEN_CRM && ENABLE_MAILERLITE && crmSuccess !== mlSuccess) {
+    if (config.ENABLE_DEVEN_CRM && config.ENABLE_MAILERLITE && crmSuccess !== mlSuccess) {
       console.warn('[subscribe-v2] Submission discrepancy:', {
         devenCRM: crmSuccess,
         mailerlite: mlSuccess,
@@ -179,8 +189,8 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Thank you for subscribing! Check your inbox for a welcome email.',
       systems: {
-        devenCRM: ENABLE_DEVEN_CRM ? crmSuccess : 'disabled',
-        mailerlite: ENABLE_MAILERLITE ? mlSuccess : 'disabled',
+        devenCRM: config.ENABLE_DEVEN_CRM ? crmSuccess : 'disabled',
+        mailerlite: config.ENABLE_MAILERLITE ? mlSuccess : 'disabled',
       },
     })
   } catch (error) {

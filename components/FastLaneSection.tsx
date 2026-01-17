@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import AncientDarkGalaxy from './AncientDarkGalaxy';
+import ExponentialGrowthSVG from './ExponentialGrowthSVG';
 
 // Main FastLaneSection component
 export default function FastLaneSection() {
@@ -30,7 +30,7 @@ export default function FastLaneSection() {
       }
     }
   };
-  
+
   const itemVariants = {
     hidden: { opacity: 0, x: -20 },
     visible: {
@@ -43,20 +43,20 @@ export default function FastLaneSection() {
   return (
     <section id="intro" className="pb-16 md:pb-24 bg-black text-white relative">
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div 
+        <motion.div
           className="flex flex-col lg:flex-row gap-12 items-center"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants}
         >
-          {/* Left column: Exponential Growth Chart (replacing video) */}
-          <motion.div 
+          {/* Left column: Exponential Growth Visualization */}
+          <motion.div
             className="lg:w-2/5 flex justify-center items-center order-2 lg:order-1 mx-auto w-full"
             variants={itemVariants}
           >
-            <div className="w-full flex justify-center items-center">
-              <AncientDarkGalaxy />
+            <div className="w-full flex justify-center items-center max-w-md">
+              <ExponentialGrowthSVG />
             </div>
           </motion.div>
           

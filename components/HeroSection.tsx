@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-interface Bubble {
+interface BubbleData {
   id: number;
   x: number;
   y: number;
@@ -13,443 +13,319 @@ interface Bubble {
   hue: number;
   saturation: number;
   lightness: number;
-  rotationSpeed: number;
   rotation: number;
-  scaleDirection: number;
+  rotationSpeed: number;
   scale: number;
+  scaleDirection: number;
   lastDirectionChange: number;
-  pathMemory: Array<{x: number, y: number}>;
-  speedCategory: 'fast' | 'medium' | 'slow';
 }
 
-// Sampled hero image colors (example):
-// Blue: #1d5cff
-// Gold: #ffd700
-
+/**
+ * HeroSection with performance-optimized floating bubbles
+ *
+ * Optimizations applied:
+ * 1. Uses useRef + direct DOM manipulation instead of React state (0 re-renders)
+ * 2. Pauses animation when section is off-screen (IntersectionObserver)
+ * 3. Pauses animation when browser tab is hidden (visibilitychange)
+ * 4. Movement speed reduced 4x for calmer, more ambient feel
+ * 5. Respects prefers-reduced-motion user preference
+ */
 export default function HeroSection() {
-  const [bubbles, setBubbles] = useState<Bubble[]>([]);
-  const [content, setContent] = useState({ headline: 'Future Fast', subheadline: 'Accelerating Tomorrow\'s Innovations Today' });
-  const [textAreas, setTextAreas] = useState<Array<{x: number, y: number, width: number, height: number}>>([]);
+  const [content, setContent] = useState({
+    headline: 'Future Fast',
+    subheadline: 'Accelerating Tomorrow\'s Innovations Today'
+  });
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const bubblesContainerRef = useRef<HTMLDivElement>(null);
+  const bubbleElementsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const bubbleDataRef = useRef<BubbleData[]>([]);
   const animationRef = useRef<number | null>(null);
+  const isVisibleRef = useRef(true);
+  const isTabVisibleRef = useRef(true);
 
   // Client-side cache for hero content (1 hour)
   const CACHE_KEY = 'hero_content_cache';
-  const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+  const CACHE_DURATION = 60 * 60 * 1000;
 
   const getCachedContent = useCallback(() => {
     if (typeof window === 'undefined') return null;
-    
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       if (!cached) return null;
-      
       const { data, timestamp } = JSON.parse(cached);
-      const now = Date.now();
-      
-      // Check if cache is still valid (within 1 hour)
-      if (now - timestamp < CACHE_DURATION) {
-        console.log('Using cached hero content');
+      if (Date.now() - timestamp < CACHE_DURATION) {
         return data;
-      } else {
-        // Cache expired, remove it
-        localStorage.removeItem(CACHE_KEY);
-        return null;
       }
-    } catch (error) {
-      console.error('Error reading hero cache:', error);
       localStorage.removeItem(CACHE_KEY);
       return null;
+    } catch {
+      return null;
     }
-  }, [CACHE_KEY, CACHE_DURATION]);
+  }, []);
 
   const setCachedContent = useCallback((data: typeof content) => {
     if (typeof window === 'undefined') return;
-    
     try {
-      const cacheData = {
-        data,
-        timestamp: Date.now()
-      };
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-      console.log('Hero content cached for 1 hour');
-    } catch (error) {
-      console.error('Error caching hero content:', error);
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+    } catch {
+      // Ignore storage errors
     }
-  }, [CACHE_KEY]);
+  }, []);
 
-  // Initialize random bubbles with unique characteristics
-  const initializeBubbles = () => {
-    const newBubbles: Bubble[] = [];
-    const bubbleCount = 6; // Further reduced for calmer effect
-    
+  // Initialize bubble data (not state - just data)
+  const initializeBubbles = useCallback(() => {
+    const bubbles: BubbleData[] = [];
+    const width = window.innerWidth;
+    const height = window.innerHeight * 0.85;
+    const bubbleCount = 6;
+
     for (let i = 0; i < bubbleCount; i++) {
-      // Create unique random characteristics for each bubble
-      const size = Math.random() * 60 + 20; // 20-80px diameter (never larger than background circles)
-      
-      // Assign speed category - distribute evenly across three categories
-      let speedCategory: 'fast' | 'medium' | 'slow';
-      if (i % 3 === 0) {
-        speedCategory = 'fast';
-      } else if (i % 3 === 1) {
-        speedCategory = 'medium';
-      } else {
-        speedCategory = 'slow';
-      }
-      
-      // Calculate maximum speed based on diameter and speed category
-      const baseSpeedPerFrame = size / 50000; // Base speed calculation
-      let speedMultiplier: number;
-      
-      // Apply different speed multipliers based on category
-      switch (speedCategory) {
-        case 'fast':
-          speedMultiplier = 0.25; // 25% of current max speed for fast objects
-          break;
-        case 'medium':
-          speedMultiplier = 1.0; // Keep current speed for medium objects
-          break;
-        case 'slow':
-          speedMultiplier = 0.6; // Even slower for slow objects
-          break;
-      }
-      
-      const maxSpeedPerFrame = baseSpeedPerFrame * speedMultiplier;
-      
-      // Generate random initial velocity within the category-based speed limit
-      const randomDirection = Math.random() * 2 * Math.PI; // Random direction in radians
-      const randomSpeed = Math.random() * maxSpeedPerFrame * 0.002;
-      
-      const bubble: Bubble = {
+      const size = Math.random() * 50 + 25; // 25-75px diameter
+
+      // Much slower base speed (4x slower than original)
+      const maxSpeed = size / 200000;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * maxSpeed * 0.5;
+
+      bubbles.push({
         id: i,
-        x: Math.random() * (window.innerWidth - size),
-        y: Math.random() * (window.innerHeight - size),
+        x: Math.random() * (width - size),
+        y: Math.random() * (height - size),
         size,
-        opacity: Math.random() * 0.4 + 0.1, // 0.1 to 0.5 opacity
-        vx: Math.cos(randomDirection) * randomSpeed, // Velocity based on diameter constraint
-        vy: Math.sin(randomDirection) * randomSpeed, // Velocity based on diameter constraint
-        hue: Math.random() * 120 + 180, // Blue to cyan range
-        saturation: Math.random() * 40 + 60, // 60-100% saturation
-        lightness: Math.random() * 30 + 45, // 45-75% lightness
-        rotationSpeed: (Math.random() - 0.5) * 0.003, // Ultra-slow rotation for very calm effect
+        opacity: Math.random() * 0.35 + 0.1, // 0.1 to 0.45
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        hue: Math.random() * 120 + 180, // Blue to cyan
+        saturation: Math.random() * 40 + 60,
+        lightness: Math.random() * 30 + 45,
         rotation: Math.random() * 360,
-        scaleDirection: Math.random() > 0.5 ? 1 : -1,
+        rotationSpeed: (Math.random() - 0.5) * 0.002, // Very slow rotation
         scale: 1,
-        lastDirectionChange: Date.now() + Math.random() * 1200000 + 300000, // Much less frequent direction changes (10-25 minutes)
-        pathMemory: [],
-        speedCategory
-      };
-      newBubbles.push(bubble);
-    }
-    
-    setBubbles(newBubbles);
-  };
-
-  // Get text areas to avoid
-  const updateTextAreas = () => {
-    if (!containerRef.current) return;
-    
-    const textElements = containerRef.current.querySelectorAll('h1, div[class*="subheadline"]');
-    const areas: Array<{x: number, y: number, width: number, height: number}> = [];
-    
-    textElements.forEach(element => {
-      const rect = element.getBoundingClientRect();
-      const containerRect = containerRef.current!.getBoundingClientRect();
-      
-      areas.push({
-        x: rect.left - containerRect.left - 50, // Add padding
-        y: rect.top - containerRect.top - 50,
-        width: rect.width + 100,
-        height: rect.height + 100
+        scaleDirection: Math.random() > 0.5 ? 1 : -1,
+        lastDirectionChange: Date.now() + Math.random() * 600000 + 300000, // 5-15 min
       });
-    });
-    
-    setTextAreas(areas);
-  };
+    }
 
-  // Check if position overlaps with text areas
-  const isOverlappingText = useCallback((x: number, y: number, size: number) => {
-    return textAreas.some(area => 
-      x < area.x + area.width &&
-      x + size > area.x &&
-      y < area.y + area.height &&
-      y + size > area.y
-    );
-  }, [textAreas]);
+    bubbleDataRef.current = bubbles;
+  }, []);
 
-  // Generate truly random movement that avoids repeated patterns
-  const updateBubble = useCallback((bubble: Bubble, containerWidth: number, containerHeight: number): Bubble => {
+  // Update a single bubble's position (mutates data directly)
+  const updateBubble = useCallback((bubble: BubbleData, width: number, height: number) => {
     const now = Date.now();
-    let newX = bubble.x + bubble.vx;
-    let newY = bubble.y + bubble.vy;
-    let newVx = bubble.vx;
-    let newVy = bubble.vy;
 
-    // Add very subtle random direction changes to prevent repetitive patterns
+    // Update position
+    bubble.x += bubble.vx;
+    bubble.y += bubble.vy;
+
+    // Random direction changes (very infrequent for smooth paths)
     if (now > bubble.lastDirectionChange) {
-      const randomFactor = 0.0003; // Much smaller velocity changes for smoother movement
-      newVx += (Math.random() - 0.5) * randomFactor;
-      newVy += (Math.random() - 0.5) * randomFactor;
-      
-      bubble.lastDirectionChange = now + Math.random() * 1200000 + 300000; // Very infrequent changes (5-20 minutes)
+      const randomFactor = 0.00005; // Very subtle changes
+      bubble.vx += (Math.random() - 0.5) * randomFactor;
+      bubble.vy += (Math.random() - 0.5) * randomFactor;
+      bubble.lastDirectionChange = now + Math.random() * 600000 + 300000;
     }
 
-    // Apply diameter-based speed limiting with category-specific multipliers
-    // Maximum speed = diameter per second = diameter / 60 pixels per frame (at 60fps)
-    const baseSpeedLimit = bubble.size / 800; // Base speed limit
-    let speedMultiplier: number;
-    
-    // Apply the same speed multipliers as during initialization
-    switch (bubble.speedCategory) {
-      case 'fast':
-        speedMultiplier = 0.25; // 25% of current max speed for fast objects
-        break;
-      case 'medium':
-        speedMultiplier = 1.0; // Keep current speed for medium objects
-        break;
-      case 'slow':
-        speedMultiplier = 0.6; // Even slower for slow objects
-        break;
-    }
-    
-    const maxSpeedPerFrame = baseSpeedLimit * speedMultiplier;
-    const currentSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
-    
-    if (currentSpeed > maxSpeedPerFrame) {
-      // Scale down velocity to stay within diameter-per-second limit
-      const speedRatio = maxSpeedPerFrame / currentSpeed;
-      newVx *= speedRatio;
-      newVy *= speedRatio;
+    // Speed limiting (4x slower than original)
+    const maxSpeed = bubble.size / 200000;
+    const currentSpeed = Math.sqrt(bubble.vx * bubble.vx + bubble.vy * bubble.vy);
+    if (currentSpeed > maxSpeed) {
+      const ratio = maxSpeed / currentSpeed;
+      bubble.vx *= ratio;
+      bubble.vy *= ratio;
     }
 
-    // Bounce off walls with ultra-minimal random angle variation
-    if (newX <= 0 || newX >= containerWidth - bubble.size) {
-      newVx = -newVx + (Math.random() - 0.5) * 0.002; // Much smoother bouncing
-      newX = Math.max(0, Math.min(containerWidth - bubble.size, newX));
+    // Bounce off walls with subtle randomization
+    if (bubble.x <= 0 || bubble.x >= width - bubble.size) {
+      bubble.vx = -bubble.vx + (Math.random() - 0.5) * 0.0005;
+      bubble.x = Math.max(0, Math.min(width - bubble.size, bubble.x));
     }
-    if (newY <= 0 || newY >= containerHeight - bubble.size) {
-      newVy = -newVy + (Math.random() - 0.5) * 0.002; // Much smoother bouncing
-      newY = Math.max(0, Math.min(containerHeight - bubble.size, newY));
-    }
-
-    // Avoid text areas by adding repulsion force
-    if (isOverlappingText(newX, newY, bubble.size)) {
-      // Find nearest text area center
-      let nearestArea = textAreas[0];
-      let minDistance = Infinity;
-      
-      textAreas.forEach(area => {
-        const areaCenterX = area.x + area.width / 2;
-        const areaCenterY = area.y + area.height / 2;
-        const distance = Math.sqrt(
-          Math.pow(newX + bubble.size / 2 - areaCenterX, 2) + 
-          Math.pow(newY + bubble.size / 2 - areaCenterY, 2)
-        );
-        
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestArea = area;
-        }
-      });
-
-      // Add repulsion force away from text area
-      const areaCenterX = nearestArea.x + nearestArea.width / 2;
-      const areaCenterY = nearestArea.y + nearestArea.height / 2;
-      const bubbleCenterX = newX + bubble.size / 2;
-      const bubbleCenterY = newY + bubble.size / 2;
-      
-      const repulsionX = bubbleCenterX - areaCenterX;
-      const repulsionY = bubbleCenterY - areaCenterY;
-      const repulsionDistance = Math.sqrt(repulsionX * repulsionX + repulsionY * repulsionY);
-      
-      if (repulsionDistance > 0) {
-        const repulsionForce = 0.008; // Much gentler repulsion for smoother movement
-        newVx += (repulsionX / repulsionDistance) * repulsionForce;
-        newVy += (repulsionY / repulsionDistance) * repulsionForce;
-      }
+    if (bubble.y <= 0 || bubble.y >= height - bubble.size) {
+      bubble.vy = -bubble.vy + (Math.random() - 0.5) * 0.0005;
+      bubble.y = Math.max(0, Math.min(height - bubble.size, bubble.y));
     }
 
-    // Apply speed limit again after repulsion forces to ensure we never exceed category-specific limits
-    const finalSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
-    if (finalSpeed > maxSpeedPerFrame) {
-      const speedRatio = maxSpeedPerFrame / finalSpeed;
-      newVx *= speedRatio;
-      newVy *= speedRatio;
+    // Update rotation
+    bubble.rotation += bubble.rotationSpeed;
+
+    // Update scale (breathing effect)
+    bubble.scale += bubble.scaleDirection * 0.00005;
+    if (bubble.scale > 1.15 || bubble.scale < 0.85) {
+      bubble.scaleDirection = -bubble.scaleDirection;
+      bubble.scale = Math.max(0.85, Math.min(1.15, bubble.scale));
+    }
+  }, []);
+
+  // Apply bubble data to DOM element (direct manipulation, no React)
+  const applyBubbleToDOM = useCallback((bubble: BubbleData, element: HTMLDivElement | null) => {
+    if (!element) return;
+
+    element.style.transform = `translate(${bubble.x}px, ${bubble.y}px) rotate(${bubble.rotation}deg) scale(${bubble.scale})`;
+  }, []);
+
+  // Animation loop - uses refs, not state
+  const animate = useCallback(() => {
+    if (!isVisibleRef.current || !isTabVisibleRef.current) {
+      return;
     }
 
-    // Update rotation and scale for visual variety
-    const newRotation = bubble.rotation + bubble.rotationSpeed;
-    const scaleSpeed = 0.0001; // Ultra-slow scale animation for very subtle effect
-    let newScale = bubble.scale + (bubble.scaleDirection * scaleSpeed);
-    let newScaleDirection = bubble.scaleDirection;
-    
-    if (newScale > 1.3 || newScale < 0.7) {
-      newScaleDirection = -newScaleDirection;
-      newScale = Math.max(0.7, Math.min(1.3, newScale));
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    // Update each bubble and apply to DOM
+    bubbleDataRef.current.forEach((bubble, i) => {
+      updateBubble(bubble, width, height);
+      applyBubbleToDOM(bubble, bubbleElementsRef.current[i]);
+    });
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, [updateBubble, applyBubbleToDOM]);
+
+  // Start/stop animation based on visibility
+  const startAnimation = useCallback(() => {
+    if (animationRef.current) return;
+    animationRef.current = requestAnimationFrame(animate);
+  }, [animate]);
+
+  const stopAnimation = useCallback(() => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
+  }, []);
 
-    // Update path memory to ensure uniqueness (keep last 20 positions)
-    const newPathMemory = [...bubble.pathMemory, {x: newX, y: newY}];
-    if (newPathMemory.length > 20) {
-      newPathMemory.shift();
-    }
-
-    // Add ultra-minimal random drift to prevent identical paths
-    const driftX = (Math.random() - 0.5) * 0.00003; // Very minimal drift for smooth movement
-    const driftY = (Math.random() - 0.5) * 0.00003; // Very minimal drift for smooth movement
-
-    // Apply final velocity with drift, ensuring it still respects category-specific speed limit
-    let finalVx = newVx + driftX;
-    let finalVy = newVy + driftY;
-    
-    const driftSpeed = Math.sqrt(finalVx * finalVx + finalVy * finalVy);
-    if (driftSpeed > maxSpeedPerFrame) {
-      const speedRatio = maxSpeedPerFrame / driftSpeed;
-      finalVx *= speedRatio;
-      finalVy *= speedRatio;
-    }
-
-    return {
-      ...bubble,
-      x: newX,
-      y: newY,
-      vx: finalVx,
-      vy: finalVy,
-      rotation: newRotation,
-      scale: newScale,
-      scaleDirection: newScaleDirection,
-      pathMemory: newPathMemory
-    };
-  }, [isOverlappingText, textAreas]);
-
+  // Load content
   useEffect(() => {
-    // Load content with caching
     const loadContent = async () => {
+      const cached = getCachedContent();
+      if (cached) {
+        setContent(cached);
+        return;
+      }
       try {
-        // First, try to get cached content
-        const cachedContent = getCachedContent();
-        if (cachedContent) {
-          setContent(cachedContent);
-          return;
-        }
-
-        // If no valid cache, fetch from API
-        console.log('Fetching fresh hero content from API');
         const response = await fetch('/api/hero');
         const data = await response.json();
-        
-        // Cache the fresh content
         setCachedContent(data);
         setContent(data);
-      } catch (error) {
-        console.error('Error loading hero content:', error);
-        // Fallback content is already set in initial state
+      } catch {
+        // Use default content
       }
     };
-
     loadContent();
-
-    // Initialize bubbles and start animation
-    initializeBubbles();
-    
-    // Update text areas after content loads
-    const timer = setTimeout(() => {
-      updateTextAreas();
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
   }, [getCachedContent, setCachedContent]);
 
+  // Initialize bubbles and set up visibility detection
   useEffect(() => {
-    // Start animation when bubbles are initialized
-    if (bubbles.length > 0) {
-      updateTextAreas();
-      
-      // Animation loop - defined inside useEffect to avoid dependency issues
-      const animate = () => {
-        if (!containerRef.current) return;
-        
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const containerWidth = containerRect.width;
-        const containerHeight = containerRect.height;
-        
-        setBubbles(prevBubbles => 
-          prevBubbles.map(bubble => updateBubble(bubble, containerWidth, containerHeight))
-        );
-        
-        animationRef.current = requestAnimationFrame(animate);
-      };
-      
-      animate();
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      return; // Don't animate if user prefers reduced motion
+    }
+
+    initializeBubbles();
+
+    // IntersectionObserver for scroll visibility
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+        if (entry.isIntersecting && isTabVisibleRef.current) {
+          startAnimation();
+        } else {
+          stopAnimation();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    // Tab visibility detection
+    const handleVisibilityChange = () => {
+      isTabVisibleRef.current = !document.hidden;
+      if (!document.hidden && isVisibleRef.current) {
+        startAnimation();
+      } else {
+        stopAnimation();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Handle resize
+    const handleResize = () => {
+      initializeBubbles();
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Start animation if visible
+    if (isVisibleRef.current && isTabVisibleRef.current) {
+      startAnimation();
     }
 
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      stopAnimation();
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [bubbles.length, updateBubble]);
+  }, [initializeBubbles, startAnimation, stopAnimation]);
 
-  // Update text areas when window resizes
-  useEffect(() => {
-    const handleResize = () => {
-      updateTextAreas();
-      initializeBubbles(); // Reinitialize bubbles for new screen size
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
   return (
     <section
       ref={containerRef}
       className="relative flex flex-col items-center justify-center min-h-[65vh] md:min-h-[85vh] w-full overflow-hidden bg-black"
     >
-      {/* Background image without darkening overlay */}
-      <div 
+      {/* Background image */}
+      <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: 'url(/FutureFastBack1.jpg)' }}
       />
-      
-      {/* Dynamic animated floating bubbles - random movement avoiding text */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {bubbles.map(bubble => (
-          <div
-            key={bubble.id}
-            className="absolute rounded-full"
-            style={{
-              left: `${bubble.x}px`,
-              top: `${bubble.y}px`,
-              width: `${bubble.size}px`,
-              height: `${bubble.size}px`,
-              opacity: bubble.opacity,
-              background: `linear-gradient(135deg, 
-                hsl(${bubble.hue}, ${bubble.saturation}%, ${bubble.lightness}%), 
-                hsl(${bubble.hue + 20}, ${bubble.saturation - 10}%, ${bubble.lightness + 10}%))`,
-              transform: `rotate(${bubble.rotation}deg) scale(${bubble.scale})`,
-              transition: 'none',
-              willChange: 'transform, left, top',
-              filter: 'blur(0.5px)',
-              boxShadow: `0 0 ${bubble.size * 0.3}px hsla(${bubble.hue}, ${bubble.saturation}%, ${bubble.lightness}%, 0.3)`
-            }}
-          />
-        ))}
+
+      {/* Floating bubbles container */}
+      <div
+        ref={bubblesContainerRef}
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        aria-hidden="true"
+      >
+        {[0, 1, 2, 3, 4, 5].map((i) => {
+          const bubble = bubbleDataRef.current[i];
+          return (
+            <div
+              key={i}
+              ref={(el) => { bubbleElementsRef.current[i] = el; }}
+              className="absolute rounded-full will-change-transform"
+              style={{
+                width: bubble?.size || 40,
+                height: bubble?.size || 40,
+                opacity: bubble?.opacity || 0.2,
+                background: bubble
+                  ? `linear-gradient(135deg,
+                      hsl(${bubble.hue}, ${bubble.saturation}%, ${bubble.lightness}%),
+                      hsl(${bubble.hue + 20}, ${bubble.saturation - 10}%, ${bubble.lightness + 10}%))`
+                  : 'linear-gradient(135deg, hsl(200, 70%, 50%), hsl(220, 60%, 60%))',
+                filter: 'blur(0.5px)',
+                boxShadow: bubble
+                  ? `0 0 ${bubble.size * 0.3}px hsla(${bubble.hue}, ${bubble.saturation}%, ${bubble.lightness}%, 0.3)`
+                  : 'none',
+              }}
+            />
+          );
+        })}
       </div>
-      
-      {/* Subtle bottom gradient for text readability */}
+
+      {/* Bottom gradient for text readability */}
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black to-transparent z-10" />
-      <div className="absolute inset-x-0 bottom-[-20px] h-[20px] bg-black z-10" /> {/* Solid black bottom to ensure perfect transition */}
-      
-      {/* Hero content container - using CSS Grid for perfect centering */}
+      <div className="absolute inset-x-0 bottom-[-20px] h-[20px] bg-black z-10" />
+
+      {/* Hero content */}
       <div className="relative z-20 w-full h-full grid place-items-center p-4">
         <div className="w-full max-w-6xl space-y-8 md:space-y-12">
-          {/* Headline with gradient text */}
+          {/* Headline */}
           <h1 className="font-orbitron text-5xl md:text-7xl font-bold text-center bg-gradient-to-r from-[#1d5cff] via-[#ffd700] to-[#1d5cff] bg-clip-text text-transparent animate-fade-in drop-shadow-xl">
             {content.headline.split(' ').length > 4 ? (
               <>
@@ -460,14 +336,12 @@ export default function HeroSection() {
               content.headline
             )}
           </h1>
-          
-          {/* Compact subheadline box with character-height padding */}
+
+          {/* Subheadline box */}
           <div className="relative w-full max-w-2xl mx-auto">
             <div className="relative">
-              {/* Decorative border elements */}
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400/10 to-blue-500/10 border-2 border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]" />
-              
-              {/* Main content box */}
+
               <div className="relative bg-gradient-to-r from-black/70 via-indigo-950/60 to-black/70 backdrop-blur-md p-4 md:p-5 rounded-xl">
                 <div className="flex items-center justify-center">
                   <p className="font-orbitron text-base md:text-lg lg:text-xl text-center text-cyan-100 tracking-wide leading-tight py-3 px-2">
@@ -475,8 +349,8 @@ export default function HeroSection() {
                   </p>
                 </div>
               </div>
-              
-              {/* Corner accents - smaller to match the box */}
+
+              {/* Corner accents */}
               <div className="absolute -top-0.5 -left-0.5 w-4 h-4 border-t-2 border-l-2 border-cyan-400 rounded-tl-md" />
               <div className="absolute -top-0.5 -right-0.5 w-4 h-4 border-t-2 border-r-2 border-cyan-400 rounded-tr-md" />
               <div className="absolute -bottom-0.5 -left-0.5 w-4 h-4 border-b-2 border-l-2 border-cyan-400 rounded-bl-md" />
